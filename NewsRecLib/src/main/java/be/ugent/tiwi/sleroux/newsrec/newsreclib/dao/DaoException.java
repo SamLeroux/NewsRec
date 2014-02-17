@@ -13,25 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao;
 
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsSource;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.NewsRecException;
 
 /**
- * Provides access to newsSources
- * Always call starSession() before and stopSession() after every operation.
- * @see NewsSource
+ *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public interface INewsSourceDao {
+public class DaoException extends NewsRecException{
 
-    NewsSource[] getSourcesToCheck() throws DaoException;
+    public DaoException() {
+    }
 
-    NewsSource[] getAllSources() throws DaoException;
+    public DaoException(String message) {
+        super(message);
+    }
 
-    void AddNewsSource(NewsSource source) throws DaoException;
+    public DaoException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-    void startSession() throws DaoException;
+    public DaoException(Throwable cause) {
+        super(cause);
+    }
 
-    void stopSession() throws DaoException;
+    public DaoException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
+    
 }

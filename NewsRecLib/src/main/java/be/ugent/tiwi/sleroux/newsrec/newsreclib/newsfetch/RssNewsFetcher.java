@@ -15,6 +15,7 @@
  */
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch;
 
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.enhance.EnhanceException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsSource;
 import com.sun.syndication.feed.synd.SyndCategory;
@@ -55,11 +56,11 @@ public class RssNewsFetcher extends AbstractNewsfetcher {
             source.setDescription(feed.getDescription());
             source.setName(feed.getTitle());
             source.setLastFetchTry(new Date());
+            
 
             // The timestamp of the article that was last fetched.
             Date lastSeen = null;
 
-            int i = 0;
             for (SyndEntry entry : entries) {
                 // If this article has not been seen before
                 if (source.getLastArticleFetchTime() == null || entry.getPublishedDate().after(source.getLastArticleFetchTime())) {
@@ -84,10 +85,9 @@ public class RssNewsFetcher extends AbstractNewsfetcher {
                     }
 
                     // Pass the article to the enhancement chain.
-                    //enhance(item);
-
+                    enhance(item);
+                    
                     items.add(item);
-                    System.out.println(item);
 
                     // Store the timestamp to make sure we don't process this article
                     // again next time.
@@ -96,21 +96,30 @@ public class RssNewsFetcher extends AbstractNewsfetcher {
                     }
                 }
             }
-            source.setLastArticleFetchTime(lastSeen);
+            if (lastSeen != null) {
+                source.setLastArticleFetchTime(lastSeen);
+            }
+            
+            // Exponential backoff
+            // When there were no new articles, increase the interval, otherwise 
+            // decrease the interval. Do not go below 30 seconds.
+            if(items.isEmpty()){
+                source.setFetchinterval(source.getFetchinterval()*2);
+            }
+            else{
+                int interval = source.getFetchinterval()/2;
+                interval = (interval < 30 ? 30: interval);
+                source.setFetchinterval(interval);
+            }
+            
         } catch (MalformedURLException ex) {
             Logger.getLogger(RssNewsFetcher.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(RssNewsFetcher.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(RssNewsFetcher.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (FeedException ex) {
+        } catch (IllegalArgumentException | FeedException | EnhanceException ex) {
             Logger.getLogger(RssNewsFetcher.class.getName()).log(Level.SEVERE, null, ex);
         }
-//        } catch (EnhanceException ex) {
-//            Logger.getLogger(RssNewsFetcher.class.getName()).log(Level.SEVERE, null, ex);
-//        }
 
-        
         return items.toArray(new NewsItem[items.size()]);
     }
 

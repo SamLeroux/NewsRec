@@ -30,7 +30,7 @@ public class NewsSource {
     private Date lastFetchTry;
     private int fetchinterval;
     private String description;
-    protected URL rssUrl;
+    private URL rssUrl;
 
     public int getId() {
         return id;
@@ -50,6 +50,10 @@ public class NewsSource {
         this.name = name;
     }
 
+    /**
+     * The timestamp of the last seen article.
+     * @return 
+     */
     public Date getLastArticleFetchTime() {
         return lastArticleFetchTime;
     }
@@ -58,6 +62,10 @@ public class NewsSource {
         this.lastArticleFetchTime = lastArticleFetchTime;
     }
 
+    /**
+     * The timestamp of the last check for new articles.
+     * @return 
+     */
     public Date getLastFetchTry() {
         return lastFetchTry;
     }
@@ -68,6 +76,10 @@ public class NewsSource {
 
     
 
+    /**
+     * The time between checks for new articles in seconds
+     * @return 
+     */
     public int getFetchinterval() {
         return fetchinterval;
     }

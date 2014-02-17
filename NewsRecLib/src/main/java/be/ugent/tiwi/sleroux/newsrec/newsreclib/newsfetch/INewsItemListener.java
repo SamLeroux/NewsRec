@@ -13,34 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch;
 
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.enhance.IEnhancer;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.enhance.EnhanceException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public abstract class AbstractNewsfetcher implements INewsFetcher {
-
-    private final List<IEnhancer> enhancers;
-
-    public AbstractNewsfetcher() {
-        enhancers = new ArrayList<>();
-    }
-
-    public void addEnhancer(IEnhancer enhancer) {
-        enhancers.add(enhancer);
-    }
-
-    public void enhance(NewsItem item) throws EnhanceException {
-        for (IEnhancer enhancer : enhancers) {
-            enhancer.enhance(item);
-        }
-    }
-
+public interface INewsItemListener {
+    public void newItem(NewsItem item);
+    public void newItem(NewsItem[] items);
 }

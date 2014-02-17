@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlDao;
+package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.INewsSourceDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsSource;
 import java.util.List;
 import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 /**
+ * MySQL implementation of INewsSourceDao.
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
@@ -30,17 +29,14 @@ public class MysqlNewsSourceDao extends HibernateDaoTemplate implements INewsSou
 
     @Override
     public NewsSource[] getSourcesToCheck() {
-        
-        Session session = getSession();
-        Query query = session.createQuery("from NewsSource where (lastFetchTry + fetchinterval < CURRENT_TIMESTAMP()) or lastFetchTry = null");
+        Query query = session.createQuery("from NewsSource where lastFetchTry = null or (lastFetchTry + fetchinterval < CURRENT_TIMESTAMP())");
         List<NewsSource> sources = query.list();
-        
+
         return sources.toArray(new NewsSource[sources.size()]);
     }
 
     @Override
     public NewsSource[] getAllSources() {
-        Session session  = getSession();
         Query query = session.createQuery("from NewsSource");
         List<NewsSource> sources = query.list();
         return sources.toArray(new NewsSource[sources.size()]);
@@ -48,17 +44,7 @@ public class MysqlNewsSourceDao extends HibernateDaoTemplate implements INewsSou
 
     @Override
     public void AddNewsSource(NewsSource source) {
-        Session session  = getSession();
-        Transaction t = session.beginTransaction();
         session.saveOrUpdate(source);
-        t.commit();
-        closeSession();
     }
 
-    @Override
-    public void close() {
-        closeSession();
-    }
-
-    
 }

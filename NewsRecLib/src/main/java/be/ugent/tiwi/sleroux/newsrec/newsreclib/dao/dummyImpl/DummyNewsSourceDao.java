@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.dummyImpl;
 
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.INewsSourceDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsSource;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,9 +29,10 @@ import java.util.logging.Logger;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class DummyNewsSourceDao implements INewsSourceDao{
+public class DummyNewsSourceDao implements INewsSourceDao {
 
     private List<NewsSource> newsSources;
+    private boolean started = false;
 
     public DummyNewsSourceDao() {
         try {
@@ -45,28 +45,47 @@ public class DummyNewsSourceDao implements INewsSourceDao{
         } catch (MalformedURLException ex) {
             Logger.getLogger(DummyNewsSourceDao.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
-    
-    
-    
+
     @Override
-    public NewsSource[] getSourcesToCheck() {
+    public NewsSource[] getSourcesToCheck() throws DaoException {
+        if (!started){
+            throw new DaoException("Session not started");
+        }
         return getAllSources();
     }
 
     @Override
-    public NewsSource[] getAllSources() {
+    public NewsSource[] getAllSources() throws DaoException {
+        if (!started){
+            throw new DaoException("Session not started");
+        }
         return newsSources.toArray(new NewsSource[newsSources.size()]);
     }
 
     @Override
-    public void AddNewsSource(NewsSource source) {
+    public void AddNewsSource(NewsSource source) throws DaoException {
+        if (!started){
+            throw new DaoException("Session not started");
+        }
         newsSources.add(source);
     }
 
     @Override
-    public void close() {
+    public void startSession() throws DaoException {
+        if (started){
+            throw new DaoException("Previous session not closed");
+        }
+        started = true;
     }
-    
+
+    @Override
+    public void stopSession() throws DaoException {
+        if (!started){
+            throw new DaoException("Session not started");
+        }
+        started = false;
+    }
+
 }

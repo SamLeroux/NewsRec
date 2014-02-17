@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch;
+package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.enhance;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 
@@ -22,6 +22,10 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public interface IEnhancer {
-    public void enhance(NewsItem item) throws EnhanceException;
+public class DummyEnhancer implements IEnhancer{
+
+    @Override
+    public void enhance(NewsItem item) throws EnhanceException {
+    }
+    
 }

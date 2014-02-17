@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlDao;
+package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl;
 
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -26,25 +28,42 @@ import org.hibernate.cfg.Configuration;
  */
 public abstract class HibernateDaoTemplate {
 
-    private static final SessionFactory sessionfactory = new Configuration().configure().buildSessionFactory();
-    private Session session;
-    private Transaction transaction;
+    private static SessionFactory sessionfactory = null;
+    protected Session session=null;
+    protected Transaction transaction=null;
 
-    
 
-    protected Session getSession() {
-        if (session == null) {
+    public HibernateDaoTemplate() {
+        if (sessionfactory == null) {
+            sessionfactory = new Configuration().configure().buildSessionFactory();
+        }
+    }
+
+    public void startSession() throws DaoException {
+        try {
             session = sessionfactory.openSession();
             transaction = session.beginTransaction();
+        } catch (HibernateException ex) {
+            throw new DaoException();
         }
-        return session;
+
     }
 
-    protected void closeSession() {
-        if (session != null) {
-            transaction.commit();
-            session.close();
-            session = null;
+    public void stopSession() throws DaoException {
+
+        try{
+            if (transaction != null){
+                transaction.commit();
+            }
+        }
+        catch (HibernateException ex){
+            throw new DaoException();
+        }
+        finally{
+            if (session !=null){
+                session.close();
+            }
         }
     }
+
 }

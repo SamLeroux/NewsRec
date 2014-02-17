@@ -21,5 +21,24 @@ package be.ugent.tiwi.sleroux.newsrec.newsreclib.utils;
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class NewsRecException extends Exception{
+
+    public NewsRecException() {
+    }
+
+    public NewsRecException(String message) {
+        super(message);
+    }
+
+    public NewsRecException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public NewsRecException(Throwable cause) {
+        super(cause);
+    }
+
+    public NewsRecException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
     
 }
