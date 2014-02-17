@@ -40,14 +40,15 @@ public class NewsItem {
     private Locale locale;
     private NewsSource source;
     private URL url;
+    private URL imageUrl;
+    
 
     public NewsItem() {
         terms = new HashMap<>();
         authors = new ArrayList<>();
     }
 
-    public NewsItem(int id, String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Double> terms, Locale locale, NewsSource source, URL url) {
-        this();
+    public NewsItem(int id, String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Double> terms, Locale locale, NewsSource source, URL url, URL imageUrl) {
         this.id = id;
         this.title = title;
         this.authors = authors;
@@ -58,7 +59,18 @@ public class NewsItem {
         this.locale = locale;
         this.source = source;
         this.url = url;
+        this.imageUrl = imageUrl;
     }
+
+    public URL getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(URL imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    
 
     public URL getUrl() {
         return url;

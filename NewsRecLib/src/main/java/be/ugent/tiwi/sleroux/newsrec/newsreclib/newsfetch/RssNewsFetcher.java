@@ -17,6 +17,7 @@ package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsSource;
+import com.sun.syndication.feed.synd.SyndCategory;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.feed.synd.SyndPerson;
@@ -28,6 +29,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,38 +38,65 @@ import java.util.logging.Logger;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class RssNewsFetcher extends AbstractNewsfetcher{
+public class RssNewsFetcher extends AbstractNewsfetcher {
 
+    @Override
     public NewsItem[] fetch(NewsSource source) throws NewsFetchException {
         List<NewsItem> items = new ArrayList<>();
         try {
-            URL url = new URL(source.getRssUrl());
+            URL url = source.getRssUrl();
             HttpURLConnection httpcon = (HttpURLConnection) url.openConnection();
 
             SyndFeedInput input = new SyndFeedInput();
             SyndFeed feed = input.build(new XmlReader(httpcon));
             List<SyndEntry> entries = feed.getEntries();
 
+            // update news source information
+            source.setDescription(feed.getDescription());
+            source.setName(feed.getTitle());
+            source.setLastFetchTry(new Date());
+
+            // The timestamp of the article that was last fetched.
+            Date lastSeen = null;
+
+            int i = 0;
             for (SyndEntry entry : entries) {
-                NewsItem item = new NewsItem();
-                item.setTitle(entry.getTitle());
+                // If this article has not been seen before
+                if (source.getLastArticleFetchTime() == null || entry.getPublishedDate().after(source.getLastArticleFetchTime())) {
 
-                for (Object o : entry.getAuthors()) {
-                    SyndPerson p = (SyndPerson) o;
-                    item.addAuthor(p.getName());
+                    NewsItem item = new NewsItem();
+                    item.setTitle(entry.getTitle());
+
+                    for (Object o : entry.getAuthors()) {
+                        SyndPerson p = (SyndPerson) o;
+                        item.addAuthor(p.getName());
+                    }
+
+                    item.setTimestamp(entry.getPublishedDate());
+
+                    item.setDescription(entry.getDescription().getValue());
+                    item.setUrl(new URL(entry.getLink()));
+                    item.setSource(source);
+
+                    for (Object o : entry.getCategories()) {
+                        SyndCategory cat = (SyndCategory) o;
+                        item.addTerm(cat.getName(), 0.75);
+                    }
+
+                    // Pass the article to the enhancement chain.
+                    //enhance(item);
+
+                    items.add(item);
+                    System.out.println(item);
+
+                    // Store the timestamp to make sure we don't process this article
+                    // again next time.
+                    if (lastSeen == null || entry.getPublishedDate().after(lastSeen)) {
+                        lastSeen = entry.getPublishedDate();
+                    }
                 }
-
-                item.setTimestamp(entry.getPublishedDate());
-                item.setDescription(entry.getDescription().getValue());
-                item.setUrl(new URL(entry.getLink()));
-                item.setSource(source);
-                
-                enhance(item);
-                
-                items.add(item);
-                System.out.println(item);
-                break;
             }
+            source.setLastArticleFetchTime(lastSeen);
         } catch (MalformedURLException ex) {
             Logger.getLogger(RssNewsFetcher.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -76,11 +105,13 @@ public class RssNewsFetcher extends AbstractNewsfetcher{
             Logger.getLogger(RssNewsFetcher.class.getName()).log(Level.SEVERE, null, ex);
         } catch (FeedException ex) {
             Logger.getLogger(RssNewsFetcher.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (EnhanceException ex) {
-            Logger.getLogger(RssNewsFetcher.class.getName()).log(Level.SEVERE, null, ex);
         }
+//        } catch (EnhanceException ex) {
+//            Logger.getLogger(RssNewsFetcher.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+
+        
         return items.toArray(new NewsItem[items.size()]);
     }
 
-    
 }

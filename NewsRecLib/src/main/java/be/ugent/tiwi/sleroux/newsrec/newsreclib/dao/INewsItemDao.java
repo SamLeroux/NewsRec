@@ -16,16 +16,12 @@
 
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao;
 
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsSource;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 
 /**
- * Provides Access to newsSources
- * @see NewsSource
+ *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public interface INewsSourceDao {
-    NewsSource[] getSourcesToCheck();
-    NewsSource[] getAllSources();
-    void AddNewsSource(NewsSource source);
-    void close();
+public interface INewsItemDao {
+    public void addNewsItem(NewsItem item);
 }

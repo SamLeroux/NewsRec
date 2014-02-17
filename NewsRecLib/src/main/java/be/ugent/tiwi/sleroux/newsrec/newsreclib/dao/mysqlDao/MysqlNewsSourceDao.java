@@ -13,60 +13,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.dummyImpl;
+package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlDao;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.INewsSourceDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsSource;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 /**
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class DummyNewsSourceDao implements INewsSourceDao{
+public class MysqlNewsSourceDao extends HibernateDaoTemplate implements INewsSourceDao {
 
-    private List<NewsSource> newsSources;
-
-    public DummyNewsSourceDao() {
-        try {
-            newsSources = new ArrayList<>();
-            NewsSource n = new NewsSource();
-            n.setName("CNN - Top Stories");
-            n.setRssUrl(new URL("http://rss.cnn.com/rss/edition.rss"));
-            n.setFetchinterval(5);
-            newsSources.add(n);
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(DummyNewsSourceDao.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-    }
-    
-    
-    
     @Override
     public NewsSource[] getSourcesToCheck() {
-        return getAllSources();
+        
+        Session session = getSession();
+        Query query = session.createQuery("from NewsSource where (lastFetchTry + fetchinterval < CURRENT_TIMESTAMP()) or lastFetchTry = null");
+        List<NewsSource> sources = query.list();
+        
+        return sources.toArray(new NewsSource[sources.size()]);
     }
 
     @Override
     public NewsSource[] getAllSources() {
-        return newsSources.toArray(new NewsSource[newsSources.size()]);
+        Session session  = getSession();
+        Query query = session.createQuery("from NewsSource");
+        List<NewsSource> sources = query.list();
+        return sources.toArray(new NewsSource[sources.size()]);
     }
 
     @Override
     public void AddNewsSource(NewsSource source) {
-        newsSources.add(source);
+        Session session  = getSession();
+        Transaction t = session.beginTransaction();
+        session.saveOrUpdate(source);
+        t.commit();
+        closeSession();
     }
 
     @Override
     public void close() {
+        closeSession();
     }
+
     
 }

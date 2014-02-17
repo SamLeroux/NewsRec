@@ -16,6 +16,7 @@
 
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.model;
 
+import java.net.URL;
 import java.util.Date;
 
 /**
@@ -23,12 +24,24 @@ import java.util.Date;
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class NewsSource {
+    private int id;
     private String name;
-    private Date lastFetched;
+    private Date lastArticleFetchTime;
+    private Date lastFetchTry;
     private int fetchinterval;
     private String description;
-    protected String rssUrl;
+    protected URL rssUrl;
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    
+    
     public String getName() {
         return name;
     }
@@ -37,13 +50,23 @@ public class NewsSource {
         this.name = name;
     }
 
-    public Date getLastFetched() {
-        return lastFetched;
+    public Date getLastArticleFetchTime() {
+        return lastArticleFetchTime;
     }
 
-    public void setLastFetched(Date lastFetched) {
-        this.lastFetched = lastFetched;
+    public void setLastArticleFetchTime(Date lastArticleFetchTime) {
+        this.lastArticleFetchTime = lastArticleFetchTime;
     }
+
+    public Date getLastFetchTry() {
+        return lastFetchTry;
+    }
+
+    public void setLastFetchTry(Date lastFetchTry) {
+        this.lastFetchTry = lastFetchTry;
+    }
+
+    
 
     public int getFetchinterval() {
         return fetchinterval;
@@ -61,13 +84,20 @@ public class NewsSource {
         this.description = description;
     }
 
-    public String getRssUrl() {
+    public URL getRssUrl() {
         return rssUrl;
     }
 
-    public void setRssUrl(String rssUrl) {
+    public void setRssUrl(URL rssUrl) {
         this.rssUrl = rssUrl;
     }
+
+    @Override
+    public String toString() {
+        return "NewsSource{" + "id=" + id + ", name=" + name + ", lastArticleFetchTime=" + lastArticleFetchTime + ", lastFetchTry=" + lastFetchTry + ", fetchinterval=" + fetchinterval + ", description=" + description + ", rssUrl=" + rssUrl + '}';
+    }
+
+    
     
     
 }
