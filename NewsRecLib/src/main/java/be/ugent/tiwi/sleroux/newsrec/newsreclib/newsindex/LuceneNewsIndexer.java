@@ -20,8 +20,7 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.INewsItemListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
@@ -36,24 +35,26 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 
 /**
- *
+ * Listens for new articles and adds them to the lucene index.
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class LuceneNewsIndexer implements INewsItemListener {
 
     private final IndexWriter writer;
+    private static final Logger logger = Logger.getLogger(LuceneNewsIndexer.class);
 
     public LuceneNewsIndexer(String indexLocation) throws IOException {
         Directory dir = FSDirectory.open(new File(indexLocation));
         StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_46);
         IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_46, analyzer);
-
         writer = new IndexWriter(dir, config);
+        
+        logger.info("Created lucene index");
     }
 
     @Override
     public void newItem(NewsItem[] items) {
-
+        logger.debug(items.length+" new items to add to lucene index.");
         try {
             for (NewsItem item : items) {
                 Document doc = new Document();
@@ -99,9 +100,10 @@ public class LuceneNewsIndexer implements INewsItemListener {
 
             }
             writer.commit();
+            logger.debug("commited new items");
 
         } catch (IOException ex) {
-            Logger.getLogger(LuceneNewsIndexer.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage(), ex);
         }
     }
 

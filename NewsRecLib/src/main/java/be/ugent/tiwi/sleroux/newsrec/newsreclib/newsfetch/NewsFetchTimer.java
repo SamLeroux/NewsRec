@@ -23,8 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 
 /**
  * Timer to automatically check for new articles. When a new article has been
@@ -40,7 +41,8 @@ public class NewsFetchTimer {
     private int checkInterval;
     private final Timer timer;
     private final List<INewsItemListener> listeners;
-
+    private static final Logger logger = Logger.getLogger(NewsFetchTimer.class);
+    
     /**
      * 
      * @param dao The NewsSourceDao to use.
@@ -107,7 +109,7 @@ public class NewsFetchTimer {
             try {
                 dao.startSession();
                 NewsSource[] sources = dao.getSourcesToCheck();
-                System.out.println(sources.length+" to check");
+                logger.debug(sources.length+" to check");
                 for (NewsSource source : sources) {
                     try {
                         NewsItem[] items = newsfetcher.fetch(source);
@@ -116,12 +118,12 @@ public class NewsFetchTimer {
                             listener.newItem(items);
                         }
                     } catch (NewsFetchException ex) {
-                        Logger.getLogger(NewsFetchTimer.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(NewsFetchTimer.class.getName()).log(Level.ERROR, null, ex);
                     }
                 }
                 dao.stopSession();
             } catch (DaoException ex) {
-                Logger.getLogger(NewsFetchTimer.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(NewsFetchTimer.class.getName()).log(Level.ERROR, null, ex);
             }
         }
 

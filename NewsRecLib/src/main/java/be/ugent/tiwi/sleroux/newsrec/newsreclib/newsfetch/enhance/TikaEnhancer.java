@@ -23,8 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.io.IOUtils;
@@ -42,8 +42,10 @@ import org.xml.sax.SAXException;
  */
 public class TikaEnhancer implements IEnhancer {
 
+    private static final Logger logger = Logger.getLogger(TikaEnhancer.class);
     @Override
     public void enhance(NewsItem item) throws EnhanceException {
+        logger.debug("start tika enhancement for "+item.getUrl());
         InputStream in = null;
         try {
             Metadata metadata = new Metadata();
@@ -72,18 +74,18 @@ public class TikaEnhancer implements IEnhancer {
             item.setLocale(new Locale(identifier.getLanguage()));
             
         } catch (IOException ex) {
-            Logger.getLogger(RssNewsFetcher.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage(),ex);
         } catch (SAXException ex) {
-            Logger.getLogger(RssNewsFetcher.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage(),ex);
         } catch (TikaException ex) {
-            Logger.getLogger(RssNewsFetcher.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage(),ex);
         } finally {
             try {
                 if (in != null) {
                     in.close();
                 }
             } catch (IOException ex) {
-                Logger.getLogger(RssNewsFetcher.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(ex.getMessage(),ex);
             }
         }
     }
