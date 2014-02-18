@@ -81,7 +81,7 @@ public class RssNewsFetcher extends AbstractNewsfetcher {
 
                     for (Object o : entry.getCategories()) {
                         SyndCategory cat = (SyndCategory) o;
-                        item.addTerm(cat.getName(), 0.75);
+                        item.addTerm(cat.getName(), 0.75F);
                     }
 
                     // Pass the article to the enhancement chain.

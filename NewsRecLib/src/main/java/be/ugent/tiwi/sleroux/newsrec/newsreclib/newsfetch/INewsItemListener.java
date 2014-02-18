@@ -23,6 +23,5 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public interface INewsItemListener {
-    public void newItem(NewsItem item);
     public void newItem(NewsItem[] items);
 }

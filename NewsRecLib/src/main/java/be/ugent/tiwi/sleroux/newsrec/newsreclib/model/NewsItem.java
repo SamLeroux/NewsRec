@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Reprensents an article.
+ * Represents an article.
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
@@ -33,10 +33,10 @@ public class NewsItem {
     private int id;
     private String title;
     private List<String> authors;
-    private String fulltext;
+    private String fulltext = "";
     private String description;
     private Date timestamp;
-    private Map<String, Double> terms;
+    private Map<String, Float> terms;
     private Locale locale;
     private NewsSource source;
     private URL url;
@@ -48,7 +48,7 @@ public class NewsItem {
         authors = new ArrayList<>();
     }
 
-    public NewsItem(int id, String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Double> terms, Locale locale, NewsSource source, URL url, URL imageUrl) {
+    public NewsItem(int id, String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Float> terms, Locale locale, NewsSource source, URL url, URL imageUrl) {
         this.id = id;
         this.title = title;
         this.authors = authors;
@@ -120,11 +120,11 @@ public class NewsItem {
         this.timestamp = timestamp;
     }
 
-    public Map<String, Double> getTerms() {
+    public Map<String, Float> getTerms() {
         return terms;
     }
 
-    public void setTerms(Map<String, Double> terms) {
+    public void setTerms(Map<String, Float> terms) {
         this.terms = terms;
     }
 
@@ -152,7 +152,7 @@ public class NewsItem {
         this.source = source;
     }
     
-    public void addTerm(String term, double relevancy){
+    public void addTerm(String term, float relevancy){
         terms.put(term, relevancy);
     }
 
