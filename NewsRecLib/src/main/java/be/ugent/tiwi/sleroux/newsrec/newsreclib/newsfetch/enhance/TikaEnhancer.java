@@ -16,14 +16,14 @@
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.enhance;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.RssNewsFetcher;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.Locale;
-import org.apache.log4j.Level;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
 import org.apache.log4j.Logger;
 import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
@@ -41,53 +41,53 @@ import org.xml.sax.SAXException;
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class TikaEnhancer implements IEnhancer {
-
+    
     private static final Logger logger = Logger.getLogger(TikaEnhancer.class);
+    private static final ResourceBundle bundle = PropertyResourceBundle.getBundle("newsRec");
+
     @Override
     public void enhance(NewsItem item) throws EnhanceException {
-        logger.debug("start tika enhancement for "+item.getUrl());
+        logger.debug("start tika enhancement for " + item.getUrl());
         InputStream in = null;
         try {
             Metadata metadata = new Metadata();
             BodyContentHandler ch = new BodyContentHandler();
             AutoDetectParser parser = new AutoDetectParser();
-
+            
             HttpURLConnection urlConnection = (HttpURLConnection) item.getUrl().openConnection();
+            urlConnection.setRequestProperty("User-Agent", bundle.getString("useragent"));
+            urlConnection.setConnectTimeout(2500);
+            urlConnection.setReadTimeout(2500);
             in = new BufferedInputStream(urlConnection.getInputStream());
             byte[] content = IOUtils.toByteArray(in);
             urlConnection.disconnect();
-
+            
             String mimeType = new Tika().detect(content);
-
+            
             metadata.set(Metadata.CONTENT_TYPE, mimeType);
             parser.parse(new ByteArrayInputStream(content), ch, metadata, new ParseContext());
-
+            
             BodyContentHandler textHandler = new BodyContentHandler();
             BoilerpipeContentHandler boilerpipeHandler = new BoilerpipeContentHandler(textHandler);
             ParseContext parseContext = new ParseContext();
-
+            
             parser.parse(new ByteArrayInputStream(content), boilerpipeHandler, metadata, parseContext);
-
             
             item.setFulltext(boilerpipeHandler.getTextDocument().getContent());
             LanguageIdentifier identifier = new LanguageIdentifier(item.getFulltext());
             item.setLocale(new Locale(identifier.getLanguage()));
             
-        } catch (IOException ex) {
-            logger.error(ex.getMessage(),ex);
-        } catch (SAXException ex) {
-            logger.error(ex.getMessage(),ex);
-        } catch (TikaException ex) {
-            logger.error(ex.getMessage(),ex);
+        } catch (IOException | SAXException | TikaException ex) {
+            logger.error(ex.getMessage(), ex);
         } finally {
             try {
                 if (in != null) {
                     in.close();
                 }
             } catch (IOException ex) {
-                logger.error(ex.getMessage(),ex);
+                logger.error(ex.getMessage(), ex);
             }
         }
     }
-
+    
 }

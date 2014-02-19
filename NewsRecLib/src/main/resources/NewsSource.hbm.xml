@@ -5,7 +5,7 @@
         <id name="id">
             <generator class="native"/>
         </id>
-        <property name="description"/>
+        <property name="description" length="2097152"/>
         <property name="fetchinterval"/>
         <property name="lastArticleFetchTime" type="timestamp"/>
         <property name="lastFetchTry" type="timestamp"/>

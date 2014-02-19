@@ -40,9 +40,9 @@ import org.apache.log4j.Logger;
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class RssNewsFetcher extends AbstractNewsfetcher {
-
+    
     private static final Logger logger = Logger.getLogger(RssNewsFetcher.class);
-
+    
     @Override
     public NewsItem[] fetch(NewsSource source) throws NewsFetchException {
         logger.debug("fetching news from " + source.getName());
@@ -50,7 +50,9 @@ public class RssNewsFetcher extends AbstractNewsfetcher {
         try {
             URL url = source.getRssUrl();
             HttpURLConnection httpcon = (HttpURLConnection) url.openConnection();
-
+            httpcon.setConnectTimeout(2500);
+            httpcon.setReadTimeout(2500);
+            
             SyndFeedInput input = new SyndFeedInput();
             SyndFeed feed = input.build(new XmlReader(httpcon));
             List<SyndEntry> entries = feed.getEntries();
@@ -62,26 +64,31 @@ public class RssNewsFetcher extends AbstractNewsfetcher {
 
             // The timestamp of the article that was last fetched.
             Date lastSeen = null;
-
+            
             int i = 0;
             while (i < entries.size()
                     && (source.getLastArticleFetchTime() == null
-                    || entries.get(i).getPublishedDate().after(source.getLastArticleFetchTime()))) {
+                    || (entries.get(i).getPublishedDate() != null
+                    && entries.get(i).getPublishedDate().after(source.getLastArticleFetchTime())))) {
                 SyndEntry entry = entries.get(i);
                 NewsItem item = new NewsItem();
                 item.setTitle(entry.getTitle());
-
+                
                 for (Object o : entry.getAuthors()) {
                     SyndPerson p = (SyndPerson) o;
                     item.addAuthor(p.getName());
                 }
-
+                
                 item.setTimestamp(entry.getPublishedDate());
-
-                item.setDescription(entry.getDescription().getValue());
+                
+                if (entry.getDescription() != null) {
+                    item.setDescription(entry.getDescription().getValue());
+                } else {
+                    item.setDescription("No description available.");
+                }
                 item.setUrl(new URL(entry.getLink()));
                 item.setSource(source);
-
+                
                 for (Object o : entry.getCategories()) {
                     SyndCategory cat = (SyndCategory) o;
                     item.addTerm(cat.getName(), 0.75F);
@@ -89,7 +96,7 @@ public class RssNewsFetcher extends AbstractNewsfetcher {
 
                 // Pass the article to the enhancement chain.
                 enhance(item);
-
+                
                 items.add(item);
 
                 // Store the timestamp to make sure we don't process this article
@@ -97,44 +104,8 @@ public class RssNewsFetcher extends AbstractNewsfetcher {
                 if (lastSeen == null || entry.getPublishedDate().after(lastSeen)) {
                     lastSeen = entry.getPublishedDate();
                 }
-                i++;
+                i++;     
             }
-
-//            for (SyndEntry entry : entries) {
-//                 If this article has not been seen before
-//                if (source.getLastArticleFetchTime() == null || entry.getPublishedDate().after(source.getLastArticleFetchTime())) {
-//
-//                    NewsItem item = new NewsItem();
-//                    item.setTitle(entry.getTitle());
-//
-//                    for (Object o : entry.getAuthors()) {
-//                        SyndPerson p = (SyndPerson) o;
-//                        item.addAuthor(p.getName());
-//                    }
-//
-//                    item.setTimestamp(entry.getPublishedDate());
-//
-//                    item.setDescription(entry.getDescription().getValue());
-//                    item.setUrl(new URL(entry.getLink()));
-//                    item.setSource(source);
-//
-//                    for (Object o : entry.getCategories()) {
-//                        SyndCategory cat = (SyndCategory) o;
-//                        item.addTerm(cat.getName(), 0.75F);
-//                    }
-//
-//                     Pass the article to the enhancement chain.
-//                    enhance(item);
-//
-//                    items.add(item);
-//
-//                     Store the timestamp to make sure we don't process this article
-//                     again next time.
-//                    if (lastSeen == null || entry.getPublishedDate().after(lastSeen)) {
-//                        lastSeen = entry.getPublishedDate();
-//                    }
-//                }
-//      }  
             logger.debug(items.size() + " new articles");
             if (lastSeen != null) {
                 source.setLastArticleFetchTime(lastSeen);
@@ -143,8 +114,7 @@ public class RssNewsFetcher extends AbstractNewsfetcher {
             // Exponential backoff
             // When there were no new articles, increase the interval, otherwise 
             // decrease the interval. Do not go below 30 seconds.
-            if (items.isEmpty()) {
-
+            if (items.isEmpty()) {                
                 source.setFetchinterval(source.getFetchinterval() * 2);
             } else {
                 int interval = source.getFetchinterval() / 2;
@@ -152,17 +122,20 @@ public class RssNewsFetcher extends AbstractNewsfetcher {
                 source.setFetchinterval(interval);
             }
             logger.debug("New fetchinterval " + source.getFetchinterval());
-
+            
         } catch (MalformedURLException ex) {
+            source.setFetchinterval(source.getFetchinterval() * 4);
             logger.error("Invalid url", ex);
         } catch (IOException ex) {
+            source.setFetchinterval(source.getFetchinterval() * 4);
             logger.error("IOexception", ex);
+            source.setFetchinterval(source.getFetchinterval() * 4);
         } catch (IllegalArgumentException | FeedException | EnhanceException ex) {
             logger.error(ex.getMessage(), ex);
         }
-
+        
         return items.toArray(
                 new NewsItem[items.size()]);
     }
-
+    
 }
