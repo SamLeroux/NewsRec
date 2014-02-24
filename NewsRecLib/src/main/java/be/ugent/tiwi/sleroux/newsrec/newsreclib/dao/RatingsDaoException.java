@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl;
+package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
 

@@ -15,7 +15,9 @@
  */
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders;
 
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.RatingsDaoException;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.RatingsDaoException;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCViewsDao;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.ViewsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +28,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -33,6 +37,7 @@ import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -74,9 +79,15 @@ public class LuceneRecommender extends DaoRecommender {
             Query query = buildQuery(terms);
             int hitsPerPage = 100000;
 
-            TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
-
-            searcher.search(query, collector);
+            TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage,true);
+            try {
+                Filter filter = new SeenArticlesFilter(new JDBCViewsDao(), userid);
+                searcher.search(query, filter, collector);
+            } catch (ViewsDaoException ex) {
+                logger.error(ex);
+                searcher.search(query, collector);
+            }
+            
             ScoreDoc[] hits = collector.topDocs().scoreDocs;
 
             int stop = (start + count < hits.length ? start + count : hits.length);
@@ -106,7 +117,9 @@ public class LuceneRecommender extends DaoRecommender {
             query.setBoost(terms.get(term).floatValue());
             q.add(query, BooleanClause.Occur.SHOULD);
         }
-        return q;
+        
+        //return q;
+        return new RecencyBoostQuery(q);
     }
 
     private void openIndex() throws IOException {

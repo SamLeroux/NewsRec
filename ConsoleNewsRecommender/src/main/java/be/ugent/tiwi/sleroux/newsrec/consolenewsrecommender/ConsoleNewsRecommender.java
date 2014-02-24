@@ -7,9 +7,9 @@ package be.ugent.tiwi.sleroux.newsrec.consolenewsrecommender;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.INewsSourceDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.MysqlNewsSourceDao;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.RatingsDaoException;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.RatingsDaoException;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.AbstractNewsfetcher;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.INewsItemListener;
@@ -38,7 +38,7 @@ public class ConsoleNewsRecommender {
     private static final ResourceBundle bundle = ResourceBundle.getBundle("newsRec");
     private IScorer scorer;
     private DaoRecommender rec;
-    private long userid = 2L;
+    private final long userid = 2L;
 
     public ConsoleNewsRecommender() {
         try {
@@ -49,17 +49,21 @@ public class ConsoleNewsRecommender {
         } catch (RatingsDaoException | IOException ex) {
             java.util.logging.Logger.getLogger(ConsoleNewsRecommender.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        
     }
 
     public void start() {
+        NewsFetchTimer timer = getTimer();
+        //timer.start();
         try {
-            score(3738);
-            score(3735);
-            score(2443);
-            score(2118);
+//            score(3738);
+//            score(3735);
+//            score(2443);
+//            score(2118);
             
             testrecommendation();
-        } catch (RatingsDaoException | RecommendationException ex) {
+        } catch (RecommendationException ex) {
             java.util.logging.Logger.getLogger(ConsoleNewsRecommender.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

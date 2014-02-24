@@ -15,6 +15,7 @@
  */
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl;
 
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.RatingsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.RssNewsFetcher;
 import java.sql.PreparedStatement;
@@ -37,9 +38,8 @@ public class JDBCRatingsDao implements IRatingsDao {
     private PreparedStatement selectStatement;
     private static final Logger logger = Logger.getLogger(RssNewsFetcher.class);
     private static final ResourceBundle bundle = ResourceBundle.getBundle("newsRec");
-    
-    
-    public JDBCRatingsDao() throws RatingsDaoException{
+
+    public JDBCRatingsDao() throws RatingsDaoException {
         logger.debug("constructor called");
         if (connectionPool == null) {
             try {
@@ -48,14 +48,14 @@ public class JDBCRatingsDao implements IRatingsDao {
                 String user = bundle.getString("dbUser");
                 String pass = bundle.getString("dbPass");
                 String url = bundle.getString("dbUrl");
-                url = url +"?user="+user+"&password="+pass;
+                url = url + "?user=" + user + "&password=" + pass;
                 connectionPool = new BasicDataSource();
                 connectionPool.setDriverClassName(driver);
                 connectionPool.setUsername(user);
                 connectionPool.setPassword(pass);
                 connectionPool.setUrl(url);
                 logger.debug("connectionpool created");
-                
+
                 logger.debug("creating preparedstatements");
                 String statementText = bundle.getString("selectRatingsQuery");
                 selectStatement = connectionPool.getConnection().prepareStatement(statementText);
@@ -72,37 +72,58 @@ public class JDBCRatingsDao implements IRatingsDao {
     @Override
     public Map<String, Double> getRatings(long userid) throws RatingsDaoException {
         try {
-            logger.debug("get rating for user: "+userid);
+            logger.debug("get rating for user: " + userid);
             selectStatement.setLong(1, userid);
             Map<String, Double> ratings;
             try (ResultSet results = selectStatement.executeQuery()) {
                 ratings = new HashMap<>();
-                while (results.next()){
+                while (results.next()) {
                     ratings.put(results.getString(1), results.getDouble(2));
                 }
             }
             return ratings;
         } catch (SQLException ex) {
             logger.error("Error fetching ratings", ex);
-            throw new RatingsDaoException("Error fetching ratings: "+ex.getMessage(), ex);
+            throw new RatingsDaoException("Error fetching ratings: " + ex.getMessage(), ex);
         }
-        
+
     }
 
     @Override
     public void giveRating(long userid, String term, double rating) throws RatingsDaoException {
         try {
-            logger.debug("set rating for user: "+userid+" and term: "+term+" to: "+rating);
+            logger.debug("set rating for user: " + userid + " and term: " + term + " to: " + rating);
             insertUpdateRatingStatement.setLong(1, userid);
             insertUpdateRatingStatement.setString(2, term);
             insertUpdateRatingStatement.setDouble(3, rating);
             insertUpdateRatingStatement.setDouble(4, rating);
-            
+
             int result = insertUpdateRatingStatement.executeUpdate();
-            logger.debug("return value insert/update: "+result);
+            logger.debug("return value insert/update: " + result);
         } catch (SQLException ex) {
             logger.error("Error updating rating", ex);
-            throw new RatingsDaoException("Error updating rating: "+ex.getMessage(), ex);
+            throw new RatingsDaoException("Error updating rating: " + ex.getMessage(), ex);
+        }
+    }
+
+    @Override
+    public void giveRating(long userid, Map<String, Double> terms) throws RatingsDaoException {
+        try {
+            logger.debug("updating ratings in batch");
+            for (String term : terms.keySet()) {
+                double rating = terms.get(term);
+                insertUpdateRatingStatement.setLong(1, userid);
+                insertUpdateRatingStatement.setString(2, term);
+                insertUpdateRatingStatement.setDouble(3, rating);
+                insertUpdateRatingStatement.setDouble(4, rating);
+                insertUpdateRatingStatement.addBatch();
+            }
+
+            int result = insertUpdateRatingStatement.executeUpdate();
+            logger.debug("return value insert/update: " + result);
+        } catch (SQLException ex) {
+            logger.error("Error updating rating", ex);
+            throw new RatingsDaoException("Error updating rating: " + ex.getMessage(), ex);
         }
     }
 

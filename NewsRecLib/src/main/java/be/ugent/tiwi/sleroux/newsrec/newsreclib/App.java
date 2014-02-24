@@ -4,7 +4,7 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.INewsSourceDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.MysqlNewsSourceDao;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.RatingsDaoException;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.RatingsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.AbstractNewsfetcher;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.INewsItemListener;

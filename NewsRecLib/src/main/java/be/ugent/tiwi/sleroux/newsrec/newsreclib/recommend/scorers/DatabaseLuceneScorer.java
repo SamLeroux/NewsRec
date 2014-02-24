@@ -16,7 +16,7 @@
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.RatingsDaoException;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.RatingsDaoException;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -67,12 +67,14 @@ public class DatabaseLuceneScorer implements IScorer {
         int n = (pq.size() < 10 ? pq.size() : 10);
         int i = 0;
         TermScorePair tsp = pq.poll();
+        Map<String, Double> termsToStore = new HashMap<>();
         try {
             while (i < n && tsp != null) {
-                ratingsDao.giveRating(user, tsp.getTerm(), tsp.getScore());
+                termsToStore.put(tsp.getTerm(), tsp.getScore());
                 tsp = pq.poll();
                 i++;
             }
+            ratingsDao.giveRating(user, termsToStore);
         } catch (RatingsDaoException ex) {
             logger.error(ex.getMessage(), ex);
         }

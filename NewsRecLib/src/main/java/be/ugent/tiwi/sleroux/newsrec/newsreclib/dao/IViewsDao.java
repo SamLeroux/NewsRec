@@ -16,15 +16,14 @@
 
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao;
 
-import java.util.Map;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.ViewsDaoException;
+import java.util.List;
 
 /**
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public interface IRatingsDao {
-    public Map<String, Double> getRatings(long userid) throws RatingsDaoException;
-    public void giveRating(long userid, String term, double rating) throws RatingsDaoException;
-    public void giveRating(long userid, Map<String, Double> terms) throws RatingsDaoException;
-
+public interface IViewsDao {
+    public List<Integer> getSeenArticles(long userId) throws ViewsDaoException;
+    public void see(long userId, int itemid) throws ViewsDaoException;
 }
