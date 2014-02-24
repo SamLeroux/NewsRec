@@ -1,8 +1,9 @@
 package be.ugent.tiwi.sleroux.newsrec.newsreclib;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.INewsSourceDao;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.DebuggingMysqlNewsSourceDao;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.MysqlNewsSourceDao;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.RatingsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.AbstractNewsfetcher;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.INewsItemListener;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.NewsFetchTimer;
@@ -12,6 +13,7 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsindex.LuceneNewsIndexer;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 
 public class App {
@@ -34,9 +36,10 @@ public class App {
         } catch (IOException ex) {
             logger.fatal(ex.getMessage(), ex);
         }
+
         timer.start();
         try {
-            Thread.sleep(600000);
+            Thread.sleep(6000000);
         } catch (InterruptedException ex) {
             logger.fatal(ex.getMessage(), ex);
         }
@@ -44,4 +47,5 @@ public class App {
         timer.stop();
 
     }
+
 }

@@ -41,7 +41,7 @@ import org.xml.sax.SAXException;
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class TikaEnhancer implements IEnhancer {
-    
+
     private static final Logger logger = Logger.getLogger(TikaEnhancer.class);
     private static final ResourceBundle bundle = PropertyResourceBundle.getBundle("newsRec");
 
@@ -50,33 +50,35 @@ public class TikaEnhancer implements IEnhancer {
         logger.debug("start tika enhancement for " + item.getUrl());
         InputStream in = null;
         try {
-            Metadata metadata = new Metadata();
-            BodyContentHandler ch = new BodyContentHandler();
-            AutoDetectParser parser = new AutoDetectParser();
-            
             HttpURLConnection urlConnection = (HttpURLConnection) item.getUrl().openConnection();
+            HttpURLConnection.setFollowRedirects(true);
             urlConnection.setRequestProperty("User-Agent", bundle.getString("useragent"));
-            urlConnection.setConnectTimeout(2500);
-            urlConnection.setReadTimeout(2500);
+            urlConnection.setConnectTimeout(5000);
+            urlConnection.setReadTimeout(5000);
             in = new BufferedInputStream(urlConnection.getInputStream());
             byte[] content = IOUtils.toByteArray(in);
             urlConnection.disconnect();
-            
-            String mimeType = new Tika().detect(content);
-            
+
+            Tika tika = new Tika();
+            tika.setMaxStringLength(Integer.MAX_VALUE);
+            String mimeType = tika.detect(content);
+
+            Metadata metadata = new Metadata();
+            BodyContentHandler ch = new BodyContentHandler(-1);
+            AutoDetectParser parser = new AutoDetectParser();
+
             metadata.set(Metadata.CONTENT_TYPE, mimeType);
             parser.parse(new ByteArrayInputStream(content), ch, metadata, new ParseContext());
-            
-            BodyContentHandler textHandler = new BodyContentHandler();
+
+            BodyContentHandler textHandler = new BodyContentHandler(-1);
             BoilerpipeContentHandler boilerpipeHandler = new BoilerpipeContentHandler(textHandler);
-            ParseContext parseContext = new ParseContext();
-            
-            parser.parse(new ByteArrayInputStream(content), boilerpipeHandler, metadata, parseContext);
-            
+
+            parser.parse(new ByteArrayInputStream(content), boilerpipeHandler, metadata, new ParseContext());
+
             item.setFulltext(boilerpipeHandler.getTextDocument().getContent());
             LanguageIdentifier identifier = new LanguageIdentifier(item.getFulltext());
             item.setLocale(new Locale(identifier.getLanguage()));
-            
+
         } catch (IOException | SAXException | TikaException ex) {
             logger.error(ex.getMessage(), ex);
         } finally {
@@ -89,5 +91,5 @@ public class TikaEnhancer implements IEnhancer {
             }
         }
     }
-    
+
 }

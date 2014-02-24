@@ -22,6 +22,7 @@ import java.util.Map;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.UUID;
 
 /**
  * Represents an article.
@@ -30,7 +31,7 @@ import java.util.HashMap;
  */
 public class NewsItem {
 
-    private int id;
+    private long id;
     private String title;
     private List<String> authors;
     private String fulltext = "";
@@ -46,9 +47,16 @@ public class NewsItem {
     public NewsItem() {
         terms = new HashMap<>();
         authors = new ArrayList<>();
+        id = UUID.randomUUID().getLeastSignificantBits();
     }
 
-    public NewsItem(int id, String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Float> terms, Locale locale, NewsSource source, URL url, URL imageUrl) {
+    public NewsItem(String title, List<String> authors,String fulltext, String description, Date timestamp, Map<String, Float> terms, Locale locale, NewsSource source, URL url, URL imageUrl) {
+        this(UUID.randomUUID().getLeastSignificantBits(), title, authors, fulltext, description, timestamp, terms, locale, source, url, imageUrl);
+    }
+    
+    
+
+    public NewsItem(long id, String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Float> terms, Locale locale, NewsSource source, URL url, URL imageUrl) {
         this.id = id;
         this.title = title;
         this.authors = authors;
@@ -80,11 +88,11 @@ public class NewsItem {
         this.url = url;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

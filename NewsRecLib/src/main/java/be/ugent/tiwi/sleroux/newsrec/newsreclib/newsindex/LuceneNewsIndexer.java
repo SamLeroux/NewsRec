@@ -79,7 +79,7 @@ public class LuceneNewsIndexer implements INewsItemListener {
                     doc.add(new Field("description", item.getDescription(), ftype));
                 }
 
-                doc.add(new IntField("id", item.getId(), Store.YES));
+                doc.add(new LongField("id", item.getId(), Store.YES));
 
                 if (item.getUrl() != null) {
                     doc.add(new StringField("url", item.getUrl().toString(), Store.YES));

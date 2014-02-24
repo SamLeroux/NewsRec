@@ -48,19 +48,22 @@ public class RssNewsFetcher extends AbstractNewsfetcher {
         logger.debug("fetching news from " + source.getName());
         List<NewsItem> items = new ArrayList<>();
         try {
+            source.setLastFetchTry(new Date());
+            
             URL url = source.getRssUrl();
             HttpURLConnection httpcon = (HttpURLConnection) url.openConnection();
-            httpcon.setConnectTimeout(2500);
-            httpcon.setReadTimeout(2500);
+            httpcon.setConnectTimeout(5000);
+            httpcon.setReadTimeout(5000);
             
             SyndFeedInput input = new SyndFeedInput();
             SyndFeed feed = input.build(new XmlReader(httpcon));
             List<SyndEntry> entries = feed.getEntries();
 
+            
             // update news source information
             source.setDescription(feed.getDescription());
             source.setName(feed.getTitle());
-            source.setLastFetchTry(new Date());
+            
 
             // The timestamp of the article that was last fetched.
             Date lastSeen = null;
@@ -129,9 +132,10 @@ public class RssNewsFetcher extends AbstractNewsfetcher {
         } catch (IOException ex) {
             source.setFetchinterval(source.getFetchinterval() * 4);
             logger.error("IOexception", ex);
-            source.setFetchinterval(source.getFetchinterval() * 4);
         } catch (IllegalArgumentException | FeedException | EnhanceException ex) {
+            source.setFetchinterval(source.getFetchinterval() * 4);
             logger.error(ex.getMessage(), ex);
+            
         }
         
         return items.toArray(
