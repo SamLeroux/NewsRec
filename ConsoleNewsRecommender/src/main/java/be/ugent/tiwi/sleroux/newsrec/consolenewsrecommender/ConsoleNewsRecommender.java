@@ -1,4 +1,9 @@
-package be.ugent.tiwi.sleroux.newsrec.newsreclib;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package be.ugent.tiwi.sleroux.newsrec.consolenewsrecommender;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.INewsSourceDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
@@ -18,33 +23,45 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.Recommend
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.DatabaseLuceneScorer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.IScorer;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 
-public class App {
+/**
+ *
+ * @author Sam Leroux <sam.leroux@ugent.be>
+ */
+public class ConsoleNewsRecommender {
 
-    private static final Logger logger = Logger.getLogger(App.class);
+    private static final Logger logger = Logger.getLogger(be.ugent.tiwi.sleroux.newsrec.newsreclib.App.class);
     private static final ResourceBundle bundle = ResourceBundle.getBundle("newsRec");
+    private IScorer scorer;
+    private DaoRecommender rec;
+    private long userid = 2L;
 
-    public static void main(String[] args) throws MalformedURLException, IOException, RatingsDaoException {
-
-        NewsFetchTimer timer = getTimer();
-
-        timer.start();
+    public ConsoleNewsRecommender() {
         try {
-            Thread.sleep(480000);
-        } catch (InterruptedException ex) {
-            logger.fatal(ex.getMessage(), ex);
+            IRatingsDao dao = new JDBCRatingsDao();
+            scorer = new DatabaseLuceneScorer(bundle.getString("luceneIndexLocation"), dao);
+            rec = new LuceneRecommender(bundle.getString("luceneIndexLocation"));
+            rec.setRatingsDao(dao);
+        } catch (RatingsDaoException | IOException ex) {
+            java.util.logging.Logger.getLogger(ConsoleNewsRecommender.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
 
-        timer.stop();
-        
-//        testrecommendation();
-//        testScoring();
-        
-
+    public void start() {
+        try {
+            score(3738);
+            score(3735);
+            score(2443);
+            score(2118);
+            
+            testrecommendation();
+        } catch (RatingsDaoException | RecommendationException ex) {
+            java.util.logging.Logger.getLogger(ConsoleNewsRecommender.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public static NewsFetchTimer getTimer() {
@@ -64,24 +81,16 @@ public class App {
         }
         return timer;
     }
-    
-    public static void testrecommendation(){
-        try {
-            DaoRecommender rec = new LuceneRecommender(bundle.getString("luceneIndexLocation"));
-            rec.setRatingsDao(new JDBCRatingsDao());
-            List<NewsItem> results = rec.recommend(1L, 0, 10);
-            for(NewsItem item: results){
-                System.out.println(item.getTitle());
-            }
-        } catch (IOException | RecommendationException | RatingsDaoException ex) {
-            logger.error(ex);
+
+    public void testrecommendation() throws RecommendationException {
+        List<NewsItem> results = rec.recommend(userid, 0, 20);
+        for (NewsItem item : results) {
+            System.out.println(item.getTitle());
         }
     }
 
-    private static void testScoring() throws IOException, RatingsDaoException {
-        IRatingsDao dao = new JDBCRatingsDao();
-        IScorer scorer = new DatabaseLuceneScorer(bundle.getString("luceneIndexLocation"), dao);
-        scorer.view(1L, 4789);
+    private void score(int item) throws RatingsDaoException {
+        scorer.view(userid, item);
     }
 
 }

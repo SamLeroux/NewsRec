@@ -14,22 +14,24 @@
  * limitations under the License.
  */
 
-package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend;
+package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders;
+
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import java.util.List;
 
 /**
- *
+ * Basic recommender interface.
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class MySQLScorer implements IScorer{
-
-    @Override
-    public void score(long user, long item, double rating) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void view(long user, long item) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
+public interface IRecommender {
+    /**
+     * Recommend "count" item for the user with userid "userid", return only the
+     * items after "start".
+     * @param userid
+     * @param start
+     * @param count
+     * @return 
+     * @throws be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.RecommendationException 
+     */
+    public List<NewsItem> recommend(long userid, int start, int count) throws RecommendationException;
 }

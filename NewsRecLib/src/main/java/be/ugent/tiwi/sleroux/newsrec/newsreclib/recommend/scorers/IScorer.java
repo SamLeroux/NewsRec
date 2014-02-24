@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend;
-
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers;
 
 /**
- * Recommend newsitems by creating a query and issuing it to Lucene.
+ *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class LuceneRecommender implements IRecommender{
-
-    @Override
-    public NewsItem[] recommend(long userid, int start, int count) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
+public interface IScorer {
+    public void score(long user, int item, double rating);
+    public void view(long user, int item);
 }

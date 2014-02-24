@@ -14,22 +14,24 @@
  * limitations under the License.
  */
 
-package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend;
+package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders;
 
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
 
 /**
- * Basic recommender interface.
+ *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public interface IRecommender {
-    /**
-     * Recommend "count" item for the user with userid "userid", return only the
-     * items after "start".
-     * @param userid
-     * @param start
-     * @param count
-     * @return 
-     */
-    public NewsItem[] recommend(long userid, int start, int count);
+public abstract class DaoRecommender implements IRecommender{
+    private IRatingsDao ratingsDao;
+
+    public IRatingsDao getRatingsDao() {
+        return ratingsDao;
+    }
+
+    public void setRatingsDao(IRatingsDao ratingsDao) {
+        this.ratingsDao = ratingsDao;
+    }
+    
+    
 }
