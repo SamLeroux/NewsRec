@@ -19,9 +19,12 @@ package be.ugent.tiwi.sleroux.newsrec.newsreclib.config;
 import org.apache.lucene.util.Version;
 
 /**
- *
+ * Util class to store frequently used constants.
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class Config {
+    /**
+     * The Lucene index version.
+     */
     public static final Version LUCENE_VERSION = Version.LUCENE_46;
 }

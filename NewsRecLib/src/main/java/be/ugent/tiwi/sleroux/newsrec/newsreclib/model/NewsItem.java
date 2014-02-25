@@ -39,7 +39,8 @@ public class NewsItem {
     private Date timestamp;
     private Map<String, Float> terms;
     private Locale locale;
-    private NewsSource source;
+    private String source;
+    
     private URL url;
     private URL imageUrl;
     
@@ -50,13 +51,13 @@ public class NewsItem {
         id = UUID.randomUUID().getLeastSignificantBits();
     }
 
-    public NewsItem(String title, List<String> authors,String fulltext, String description, Date timestamp, Map<String, Float> terms, Locale locale, NewsSource source, URL url, URL imageUrl) {
+    public NewsItem(String title, List<String> authors,String fulltext, String description, Date timestamp, Map<String, Float> terms, Locale locale, String source, URL url, URL imageUrl) {
         this(UUID.randomUUID().getLeastSignificantBits(), title, authors, fulltext, description, timestamp, terms, locale, source, url, imageUrl);
     }
     
     
 
-    public NewsItem(long id, String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Float> terms, Locale locale, NewsSource source, URL url, URL imageUrl) {
+    public NewsItem(long id, String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Float> terms, Locale locale, String source, URL url, URL imageUrl) {
         this.id = id;
         this.title = title;
         this.authors = authors;
@@ -152,11 +153,11 @@ public class NewsItem {
         this.description = description;
     }
 
-    public NewsSource getSource() {
+    public String getSource() {
         return source;
     }
 
-    public void setSource(NewsSource source) {
+    public void setSource(String source) {
         this.source = source;
     }
     

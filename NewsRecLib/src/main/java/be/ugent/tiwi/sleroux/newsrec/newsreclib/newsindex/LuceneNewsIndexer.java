@@ -30,7 +30,6 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.FieldType;
-import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
@@ -90,8 +89,8 @@ public class LuceneNewsIndexer implements INewsItemListener {
                 if (item.getLocale() != null) {
                     doc.add(new StringField("locale", item.getLocale().getISO3Language(), Store.YES));
                 }
-                if (item.getSource() != null && item.getSource().getName() != null) {
-                    doc.add(new StringField("source", item.getSource().getName(), Store.YES));
+                if (item.getSource() != null) {
+                    doc.add(new StringField("source", item.getSource(), Store.YES));
                 }
                 if (item.getTimestamp() != null) {
                     doc.add(new LongField("timestamp", item.getTimestamp().getTime(), Store.YES));
@@ -118,7 +117,7 @@ public class LuceneNewsIndexer implements INewsItemListener {
         }
     }
 
-    protected CharArraySet getStopwords(String stopwordsLocation) throws FileNotFoundException, IOException{
+    private CharArraySet getStopwords(String stopwordsLocation) throws FileNotFoundException, IOException{
         logger.debug("reading stopwords file: "+stopwordsLocation);
         CharArraySet stopw;
         try (BufferedReader reader = new BufferedReader(new FileReader(stopwordsLocation))) {

@@ -90,7 +90,7 @@ public class RssNewsFetcher extends AbstractNewsfetcher {
                     item.setDescription("No description available.");
                 }
                 item.setUrl(new URL(entry.getLink()));
-                item.setSource(source);
+                item.setSource(source.getName());
                 
                 for (Object o : entry.getCategories()) {
                     SyndCategory cat = (SyndCategory) o;

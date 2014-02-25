@@ -24,11 +24,24 @@ import org.apache.lucene.queries.CustomScoreQuery;
 import org.apache.lucene.search.Query;
 
 /**
+ * A custom query wrapper, gives recent documents a larger boost. The boost
+ * factor (bf) is calculated with the formula bf = a/(m*x + b) x is the age of
+ * the article in milliseconds, a, m and b are constants. The values used are:
+ * a=1.1, b=1.0 and m=9e-10. The returned score is the score of the inner query
+ * * bf
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class RecencyBoostQuery extends CustomScoreQuery {
 
+    private double a = 1.1;
+    private double b = 1.0;
+    private double m = 9e-10;
+
+    /**
+     *
+     * @param subQuery The inner query
+     */
     public RecencyBoostQuery(Query subQuery) {
         super(subQuery);
     }
@@ -38,40 +51,37 @@ public class RecencyBoostQuery extends CustomScoreQuery {
         return new RecencyBoostScoreProvider(context);
     }
 
+    public double getA() {
+        return a;
+    }
+
+    public void setA(double a) {
+        this.a = a;
+    }
+
+    public double getB() {
+        return b;
+    }
+
+    public void setB(double b) {
+        this.b = b;
+    }
+
+    public double getM() {
+        return m;
+    }
+
+    public void setM(double m) {
+        this.m = m;
+    }
+
     private class RecencyBoostScoreProvider extends CustomScoreProvider {
 
         private final AtomicReader atomicReader;
-        private double a = 1.0;
-        private double b = 1.0;
-        private double m = 9e-10;
 
         public RecencyBoostScoreProvider(AtomicReaderContext context) {
             super(context);
             atomicReader = context.reader();
-        }
-
-        public double getA() {
-            return a;
-        }
-
-        public void setA(double a) {
-            this.a = a;
-        }
-
-        public double getB() {
-            return b;
-        }
-
-        public void setB(double b) {
-            this.b = b;
-        }
-
-        public double getM() {
-            return m;
-        }
-
-        public void setM(double m) {
-            this.m = m;
         }
 
         @Override

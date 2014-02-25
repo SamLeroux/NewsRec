@@ -16,10 +16,11 @@
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.ViewsDaoException;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ViewsDaoException;
 import java.io.IOException;
 import java.util.List;
 import org.apache.log4j.Logger;
+import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.Filter;
@@ -27,6 +28,7 @@ import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.OpenBitSet;
 
 /**
+ * Custom filter to remove already seen items from the recommendations.
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
@@ -43,12 +45,24 @@ public class SeenArticlesFilter extends Filter {
 
     @Override
     public DocIdSet getDocIdSet(AtomicReaderContext context, Bits acceptDocs) throws IOException {
-        OpenBitSet bits = new OpenBitSet(context.reader().maxDoc());
-        bits.set(0, bits.size());
+        // The context only represents a single index not the complete underlying index.
+        // We need to calculate the relative id in this part of the index.
+        AtomicReader reader = context.reader();
+        int maxId = reader.maxDoc();
+        int docBase = context.docBase;
+
+        OpenBitSet bits = new OpenBitSet(maxId);
+        // Mark all documents as active
+        bits.set(0, maxId);
         try {
             List<Integer> viewed = viewsdao.getSeenArticles(userId);
             for (int i : viewed) {
-                bits.clear(i);
+                int relative = i - docBase; // relative id in this context
+                if (relative >= 0 && relative < maxId) {
+                    logger.debug("cleared "+i+", should not show up in results");
+                    // Remove this document from the results.
+                    bits.fastClear(i-docBase);
+                }
             }
         } catch (ViewsDaoException ex) {
             logger.error(ex);

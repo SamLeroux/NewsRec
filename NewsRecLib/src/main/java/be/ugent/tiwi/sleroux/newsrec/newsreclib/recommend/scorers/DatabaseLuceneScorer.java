@@ -33,6 +33,8 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
 
 /**
+ * Updates the user model stored in a database with the information of the
+ * viewed item stored in the Lucene index.
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
@@ -42,6 +44,12 @@ public class DatabaseLuceneScorer implements IScorer {
     private final IndexReader reader;
     private static final Logger logger = Logger.getLogger(DatabaseLuceneScorer.class);
 
+    /**
+     *
+     * @param lucineIndexLocation Location where the index is stored
+     * @param dao The RatingsDao to use
+     * @throws IOException when there was an error opening the Lucene index.
+     */
     public DatabaseLuceneScorer(String lucineIndexLocation, IRatingsDao dao) throws IOException {
         ratingsDao = dao;
         Directory dir = FSDirectory.open(new File(lucineIndexLocation));
@@ -50,15 +58,13 @@ public class DatabaseLuceneScorer implements IScorer {
 
     @Override
     public void score(long user, int item, double rating) {
-        view(user, item);
-    }
-
-    @Override
-    public void view(long user, int item) {
+        // fetch the terms occuring in this document
         Map<String, Double> termMap = new HashMap<>(250);
         updateTermMap(termMap, item, "text", 1);
-        updateTermMap(termMap, item, "title", 1.5);
+        // terms in the title are more important than terms in the text.
+        updateTermMap(termMap, item, "title", 2);
 
+        // Only store the n most important terms.
         PriorityQueue<TermScorePair> pq = new PriorityQueue<>(termMap.size());
         for (String term : termMap.keySet()) {
             TermScorePair p = new TermScorePair(term, termMap.get(term));
@@ -68,19 +74,34 @@ public class DatabaseLuceneScorer implements IScorer {
         int i = 0;
         TermScorePair tsp = pq.poll();
         Map<String, Double> termsToStore = new HashMap<>();
+        while (i < n && tsp != null) {
+            termsToStore.put(tsp.getTerm(), tsp.getScore()*rating);
+            tsp = pq.poll();
+            i++;
+        }
+        
+        // Store them in the database
         try {
-            while (i < n && tsp != null) {
-                termsToStore.put(tsp.getTerm(), tsp.getScore());
-                tsp = pq.poll();
-                i++;
-            }
             ratingsDao.giveRating(user, termsToStore);
         } catch (RatingsDaoException ex) {
             logger.error(ex.getMessage(), ex);
         }
+    }
+
+    @Override
+    public void view(long user, int item) {
+        score(user, item, 0.75);
 
     }
 
+    /**
+     * Fetch the document and copy all terms and term frequencies to the map.
+     * Multiply the weight of each term by the provided weight factor.
+     * @param termMap
+     * @param item
+     * @param field
+     * @param weight 
+     */
     private void updateTermMap(Map<String, Double> termMap, int item, String field, double weight) {
         try {
             Terms vector = reader.getTermVector(item, field);
@@ -89,8 +110,8 @@ public class DatabaseLuceneScorer implements IScorer {
             BytesRef text;
             while ((text = termsEnum.next()) != null) {
                 String term = text.utf8ToString();
-                int tf = (int) termsEnum.totalTermFreq();
-                double idf = 1.0 / reader.docFreq(new Term("text", text));
+                double tf = 1 + Math.log(termsEnum.totalTermFreq());
+                double idf = Math.log((double) reader.numDocs() / reader.docFreq(new Term(field, text)));
                 if (!Double.isInfinite(idf)) {
                     if (!termMap.containsKey(term)) {
                         termMap.put(term, tf * idf * weight);

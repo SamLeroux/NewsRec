@@ -16,7 +16,6 @@
 
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao;
 
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.ViewsDaoException;
 import java.util.List;
 
 /**
@@ -25,5 +24,6 @@ import java.util.List;
  */
 public interface IViewsDao {
     public List<Integer> getSeenArticles(long userId) throws ViewsDaoException;
-    public void see(long userId, int itemid) throws ViewsDaoException;
+    public void see(long userId, int docNr, long itemId) throws ViewsDaoException;
+    public List<Long> getNMostSeenArticles(int start, int stop) throws ViewsDaoException;
 }

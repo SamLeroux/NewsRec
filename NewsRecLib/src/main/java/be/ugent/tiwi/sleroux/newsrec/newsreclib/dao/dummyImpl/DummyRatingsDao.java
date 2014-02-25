@@ -26,7 +26,7 @@ import java.util.Map;
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class DummyRatingsDao implements IRatingsDao{
-    private Map<String, Double> ratings;
+    private final Map<String, Double> ratings;
 
     public DummyRatingsDao() {
         ratings = new HashMap<>();

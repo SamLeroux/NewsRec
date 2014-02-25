@@ -1,10 +1,12 @@
 package be.ugent.tiwi.sleroux.newsrec.newsreclib;
 
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.INewsSourceDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.MysqlNewsSourceDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.RatingsDaoException;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.AbstractNewsfetcher;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.INewsItemListener;
@@ -12,8 +14,8 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.NewsFetchTimer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.RssNewsFetcher;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.enhance.TikaEnhancer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsindex.LuceneNewsIndexer;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.DaoRecommender;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.LuceneRecommender;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.IRecommender;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.LuceneTermRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.RecommendationException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.DatabaseLuceneScorer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.IScorer;
@@ -40,11 +42,9 @@ public class App {
         }
 
         timer.stop();
-        
+
 //        testrecommendation();
 //        testScoring();
-        
-
     }
 
     public static NewsFetchTimer getTimer() {
@@ -64,16 +64,16 @@ public class App {
         }
         return timer;
     }
-    
-    public static void testrecommendation(){
+
+    public static void testrecommendation() {
         try {
-            DaoRecommender rec = new LuceneRecommender(bundle.getString("luceneIndexLocation"));
-            rec.setRatingsDao(new JDBCRatingsDao());
+            IRatingsDao rdao = new JDBCRatingsDao();
+            IRecommender rec = new LuceneTermRecommender(bundle.getString("luceneIndexLocation"), rdao, new JDBCViewsDao());
             List<NewsItem> results = rec.recommend(1L, 0, 10);
-            for(NewsItem item: results){
+            for (NewsItem item : results) {
                 System.out.println(item.getTitle());
             }
-        } catch (IOException | RecommendationException | RatingsDaoException ex) {
+        } catch (IOException | DaoException | RecommendationException ex) {
             logger.error(ex);
         }
     }

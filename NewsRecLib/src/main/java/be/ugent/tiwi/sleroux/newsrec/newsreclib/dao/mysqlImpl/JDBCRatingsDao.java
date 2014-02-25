@@ -17,7 +17,7 @@ package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.RatingsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.RssNewsFetcher;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -36,7 +36,7 @@ public class JDBCRatingsDao implements IRatingsDao {
     private static BasicDataSource connectionPool = null;
     private PreparedStatement insertUpdateRatingStatement;
     private PreparedStatement selectStatement;
-    private static final Logger logger = Logger.getLogger(RssNewsFetcher.class);
+    private static final Logger logger = Logger.getLogger(JDBCRatingsDao.class);
     private static final ResourceBundle bundle = ResourceBundle.getBundle("newsRec");
 
     public JDBCRatingsDao() throws RatingsDaoException {
@@ -54,13 +54,16 @@ public class JDBCRatingsDao implements IRatingsDao {
                 connectionPool.setUsername(user);
                 connectionPool.setPassword(pass);
                 connectionPool.setUrl(url);
+                
                 logger.debug("connectionpool created");
 
                 logger.debug("creating preparedstatements");
                 String statementText = bundle.getString("selectRatingsQuery");
-                selectStatement = connectionPool.getConnection().prepareStatement(statementText);
+                Connection conn = connectionPool.getConnection();
+                conn.setAutoCommit(true);
+                selectStatement = conn.prepareStatement(statementText);
                 statementText = bundle.getString("insertUpdateRatingsQuery");
-                insertUpdateRatingStatement = connectionPool.getConnection().prepareStatement(statementText);
+                insertUpdateRatingStatement = conn.prepareStatement(statementText);
                 logger.debug("created preparedstatements");
             } catch (SQLException ex) {
                 logger.error(ex.getMessage(), ex);
@@ -119,8 +122,8 @@ public class JDBCRatingsDao implements IRatingsDao {
                 insertUpdateRatingStatement.addBatch();
             }
 
-            int result = insertUpdateRatingStatement.executeUpdate();
-            logger.debug("return value insert/update: " + result);
+            int[] result = insertUpdateRatingStatement.executeBatch();
+            logger.debug("length return value insert/update: " + result.length);
         } catch (SQLException ex) {
             logger.error("Error updating rating", ex);
             throw new RatingsDaoException("Error updating rating: " + ex.getMessage(), ex);

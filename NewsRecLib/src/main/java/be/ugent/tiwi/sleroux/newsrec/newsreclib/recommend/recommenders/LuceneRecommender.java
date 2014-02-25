@@ -15,34 +15,19 @@
  */
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders;
 
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.RatingsDaoException;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCViewsDao;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.ViewsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexableField;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TopScoreDocCollector;
+import org.apache.lucene.search.similarities.DefaultSimilarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
@@ -51,12 +36,13 @@ import org.apache.lucene.store.FSDirectory;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class LuceneRecommender extends DaoRecommender {
+public abstract class LuceneRecommender implements IRecommender {
 
     private String luceneIndexLocation;
     private Directory dir;
     private IndexReader reader;
-    private IndexSearcher searcher;
+    protected IndexSearcher searcher;
+
     private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(LuceneRecommender.class);
 
     public LuceneRecommender(String luceneIndexLocation) throws IOException {
@@ -72,63 +58,15 @@ public class LuceneRecommender extends DaoRecommender {
         this.luceneIndexLocation = luceneIndexLocation;
     }
 
-    @Override
-    public List<NewsItem> recommend(long userid, int start, int count) throws RecommendationException {
-        try {
-            Map<String, Double> terms = getRatingsDao().getRatings(userid);
-            Query query = buildQuery(terms);
-            int hitsPerPage = 100000;
-
-            TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage,true);
-            try {
-                Filter filter = new SeenArticlesFilter(new JDBCViewsDao(), userid);
-                searcher.search(query, filter, collector);
-            } catch (ViewsDaoException ex) {
-                logger.error(ex);
-                searcher.search(query, collector);
-            }
-            
-            ScoreDoc[] hits = collector.topDocs().scoreDocs;
-
-            int stop = (start + count < hits.length ? start + count : hits.length);
-            List<NewsItem> results = new ArrayList<>(stop-start);
-            
-            for (int i = start; i < stop; i++) {
-                int docId = hits[i].doc;
-                Document d = searcher.doc(docId);
-                results.add(toNewsitem(d));
-            }
-
-            return results;
-
-        } catch (RatingsDaoException | IOException ex) {
-            logger.error(ex);
-            throw new RecommendationException(ex);
-        }
-    }
-
-    private Query buildQuery(Map<String, Double> terms) {
-        BooleanQuery q = new BooleanQuery();
-
-        BooleanQuery.setMaxClauseCount(terms.size() * 2);
-
-        for (String term : terms.keySet()) {
-            Query query = new TermQuery(new Term("text", term));
-            query.setBoost(terms.get(term).floatValue());
-            q.add(query, BooleanClause.Occur.SHOULD);
-        }
-        
-        //return q;
-        return new RecencyBoostQuery(q);
-    }
-
     private void openIndex() throws IOException {
         dir = FSDirectory.open(new File(luceneIndexLocation));
         reader = DirectoryReader.open(dir, 1);
         searcher = new IndexSearcher(reader);
+        searcher.setSimilarity(new DefaultSimilarity());
+
     }
 
-    private NewsItem toNewsitem(Document d) {
+    protected NewsItem toNewsitem(Document d, int docId) {
         logger.debug("Converting document to newsitem");
         NewsItem item = new NewsItem();
 
@@ -140,6 +78,13 @@ public class LuceneRecommender extends DaoRecommender {
         } else {
             item.setDescription("No description available");
         }
+        
+        field = d.getField("source");
+        if (field != null) {
+            item.setSource(field.stringValue());
+        } else {
+            item.setSource("No source available");
+        }
 
         field = d.getField("text");
         if (field != null) {
@@ -147,10 +92,11 @@ public class LuceneRecommender extends DaoRecommender {
         } else {
             item.setFulltext("No text available");
         }
-        
+
         field = d.getField("id");
         if (field != null) {
-            item.setId(field.numericValue().longValue());
+            //item.setId(field.numericValue().longValue());
+            item.setId(docId);
         } else {
             item.setId(0);
         }
@@ -173,7 +119,7 @@ public class LuceneRecommender extends DaoRecommender {
             item.setLocale(Locale.getDefault());
         }
 
-        item.setSource(null);
+    
 
         field = d.getField("timestamp");
         if (field != null) {

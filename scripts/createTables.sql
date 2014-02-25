@@ -9,7 +9,8 @@
 CREATE TABLE Views (
     userId NUMERIC(21,0),
     docNr INTEGER,
-    PRIMARY KEY (userId, docNr)
+    itemId NUMERIC(21,0),
+    PRIMARY KEY (userId, docNr, itemId)
 );
 
 

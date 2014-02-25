@@ -17,7 +17,7 @@
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers;
 
 /**
- *
+ * Update the user model after the user has viewed or scored an item.
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public interface IScorer {
