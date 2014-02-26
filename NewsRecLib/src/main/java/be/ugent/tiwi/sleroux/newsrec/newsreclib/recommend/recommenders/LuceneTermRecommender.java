@@ -29,6 +29,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
@@ -52,6 +53,7 @@ public class LuceneTermRecommender extends LuceneRecommender {
 
     @Override
     public List<NewsItem> recommend(long userid, int start, int count) throws RecommendationException {
+        IndexSearcher searcher = null;
         try {
             Map<String, Double> terms = ratingsDao.getRatings(userid);
             Query query = buildQuery(terms);
@@ -60,6 +62,8 @@ public class LuceneTermRecommender extends LuceneRecommender {
             TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
 
             Filter filter = new SeenArticlesFilter(viewsDao, userid);
+            searcher = manager.acquire();
+            manager.maybeRefresh();
             searcher.search(query, filter, collector);
 
             ScoreDoc[] hits = collector.topDocs().scoreDocs;
@@ -80,6 +84,13 @@ public class LuceneTermRecommender extends LuceneRecommender {
         } catch (RatingsDaoException | IOException ex) {
             logger.error(ex);
             throw new RecommendationException(ex);
+        } finally{
+            try {
+                manager.release(searcher);
+            } catch (IOException ex) {
+                logger.error(ex);
+            }
+            searcher = null;
         }
     }
 

@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import org.apache.log4j.Logger;
 import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.ReaderManager;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
@@ -41,7 +41,7 @@ import org.apache.lucene.util.BytesRef;
 public class DatabaseLuceneScorer implements IScorer {
 
     private final IRatingsDao ratingsDao;
-    private final IndexReader reader;
+    private final ReaderManager manager;
     private static final Logger logger = Logger.getLogger(DatabaseLuceneScorer.class);
 
     /**
@@ -53,7 +53,8 @@ public class DatabaseLuceneScorer implements IScorer {
     public DatabaseLuceneScorer(String lucineIndexLocation, IRatingsDao dao) throws IOException {
         ratingsDao = dao;
         Directory dir = FSDirectory.open(new File(lucineIndexLocation));
-        reader = DirectoryReader.open(dir, 1);
+        //reader = DirectoryReader.open(dir, 1);
+        manager = new ReaderManager(dir);
     }
 
     @Override
@@ -61,7 +62,8 @@ public class DatabaseLuceneScorer implements IScorer {
         // fetch the terms occuring in this document
         Map<String, Double> termMap = new HashMap<>(250);
         updateTermMap(termMap, item, "text", 1);
-        // terms in the title are more important than terms in the text.
+        // terms in the title adn description are more important than terms in the text.
+        updateTermMap(termMap, item, "description", 1.5);
         updateTermMap(termMap, item, "title", 2);
 
         // Only store the n most important terms.
@@ -75,11 +77,11 @@ public class DatabaseLuceneScorer implements IScorer {
         TermScorePair tsp = pq.poll();
         Map<String, Double> termsToStore = new HashMap<>();
         while (i < n && tsp != null) {
-            termsToStore.put(tsp.getTerm(), tsp.getScore()*rating);
+            termsToStore.put(tsp.getTerm(), tsp.getScore() * rating);
             tsp = pq.poll();
             i++;
         }
-        
+
         // Store them in the database
         try {
             ratingsDao.giveRating(user, termsToStore);
@@ -97,13 +99,17 @@ public class DatabaseLuceneScorer implements IScorer {
     /**
      * Fetch the document and copy all terms and term frequencies to the map.
      * Multiply the weight of each term by the provided weight factor.
+     *
      * @param termMap
      * @param item
      * @param field
-     * @param weight 
+     * @param weight
      */
     private void updateTermMap(Map<String, Double> termMap, int item, String field, double weight) {
+        DirectoryReader reader = null;
         try {
+            reader = manager.acquire();
+            manager.maybeRefresh();
             Terms vector = reader.getTermVector(item, field);
             TermsEnum termsEnum;
             termsEnum = vector.iterator(TermsEnum.EMPTY);
@@ -111,17 +117,29 @@ public class DatabaseLuceneScorer implements IScorer {
             while ((text = termsEnum.next()) != null) {
                 String term = text.utf8ToString();
                 double tf = 1 + Math.log(termsEnum.totalTermFreq());
-                double idf = Math.log((double) reader.numDocs() / reader.docFreq(new Term(field, text)));
-                if (!Double.isInfinite(idf)) {
-                    if (!termMap.containsKey(term)) {
-                        termMap.put(term, tf * idf * weight);
-                    } else {
-                        termMap.put(term, termMap.get(term) + tf * idf * weight);
+                int docFreq = reader.docFreq(new Term(field, text));
+                // ignore really rare terms
+                if (docFreq > 5) {
+                    double idf = Math.log((double) reader.numDocs() / docFreq);
+                    if (!Double.isInfinite(idf)) {
+                        if (!termMap.containsKey(term)) {
+                            termMap.put(term, tf * idf * weight);
+                        } else {
+                            termMap.put(term, termMap.get(term) + tf * idf * weight);
+                        }
                     }
                 }
             }
-        } catch (IOException ex) {
+        } catch (IOException | NullPointerException ex) {
             logger.error(ex.getMessage(), ex);
+        } finally {
+            if (reader != null) {
+                try {
+                    manager.release(reader);
+                } catch (IOException ex) {
+                    logger.error(ex);
+                }
+            }
         }
     }
 

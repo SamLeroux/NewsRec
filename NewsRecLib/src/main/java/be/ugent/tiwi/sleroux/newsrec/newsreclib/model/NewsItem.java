@@ -32,9 +32,10 @@ import java.util.UUID;
 public class NewsItem {
 
     private long id;
+    private int docNr;
     private String title;
     private List<String> authors;
-    private String fulltext = "";
+    private String fulltext;
     private String description;
     private Date timestamp;
     private Map<String, Float> terms;
@@ -51,14 +52,13 @@ public class NewsItem {
         id = UUID.randomUUID().getLeastSignificantBits();
     }
 
-    public NewsItem(String title, List<String> authors,String fulltext, String description, Date timestamp, Map<String, Float> terms, Locale locale, String source, URL url, URL imageUrl) {
-        this(UUID.randomUUID().getLeastSignificantBits(), title, authors, fulltext, description, timestamp, terms, locale, source, url, imageUrl);
+    public NewsItem(int docNr,String title, List<String> authors,String fulltext, String description, Date timestamp, Map<String, Float> terms, Locale locale, String source, URL url, URL imageUrl) {
+        this(UUID.randomUUID().getLeastSignificantBits(), docNr, title, authors, fulltext, description, timestamp, terms, locale, source, url, imageUrl);
     }
-    
-    
 
-    public NewsItem(long id, String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Float> terms, Locale locale, String source, URL url, URL imageUrl) {
+    public NewsItem(long id, int docNr, String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Float> terms, Locale locale, String source, URL url, URL imageUrl) {
         this.id = id;
+        this.docNr = docNr;
         this.title = title;
         this.authors = authors;
         this.fulltext = fulltext;
@@ -70,6 +70,13 @@ public class NewsItem {
         this.url = url;
         this.imageUrl = imageUrl;
     }
+
+    
+    
+    
+    
+
+    
 
     public URL getImageUrl() {
         return imageUrl;
@@ -164,6 +171,16 @@ public class NewsItem {
     public void addTerm(String term, float relevancy){
         terms.put(term, relevancy);
     }
+
+    public int getDocNr() {
+        return docNr;
+    }
+
+    public void setDocNr(int docNr) {
+        this.docNr = docNr;
+    }
+    
+    
 
     @Override
     public String toString() {

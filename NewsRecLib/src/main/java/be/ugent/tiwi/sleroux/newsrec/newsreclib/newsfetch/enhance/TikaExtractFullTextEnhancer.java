@@ -40,9 +40,9 @@ import org.xml.sax.SAXException;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class TikaEnhancer implements IEnhancer {
+public class TikaExtractFullTextEnhancer implements IEnhancer {
 
-    private static final Logger logger = Logger.getLogger(TikaEnhancer.class);
+    private static final Logger logger = Logger.getLogger(TikaExtractFullTextEnhancer.class);
     private static final ResourceBundle bundle = PropertyResourceBundle.getBundle("newsRec");
 
     @Override

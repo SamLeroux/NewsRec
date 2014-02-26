@@ -1,23 +1,35 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright 2014 Sam Leroux <sam.leroux@ugent.be>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package be.ugent.tiwi.sleroux.newsrec.webnewsrecommender;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.enhance.EnhanceException;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.enhance.IEnhancer;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.enhance.JsoupStripHtmlDescriptionEnhancer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.IRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.RecommendationException;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -34,9 +46,10 @@ public class GetRecommendationsServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    private static final Logger logger = Logger.getLogger(GetRecommendationsServlet.class);
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
+        response.setContentType("application/json");
         PrintWriter out = response.getWriter();
         try {
             //long user = (Long)request.getSession().getAttribute("userId");
@@ -46,11 +59,24 @@ public class GetRecommendationsServlet extends HttpServlet {
 
             IRecommender recommender = (IRecommender) getServletContext().getAttribute("recommender");
             List<NewsItem> items = recommender.recommend(user, start, count);
+            
+            // No need to send the full text over the network.
+            String empty = "";
+            IEnhancer enhancer = new JsoupStripHtmlDescriptionEnhancer();
+            for (NewsItem n : items){
+                n.setFulltext(empty);
+                try {
+                    enhancer.enhance(n);
+                } catch (EnhanceException ex) {
+                    logger.error(ex);
+                }
+            }
+            
             Gson gson = new Gson();
             String json = gson.toJson(items);
             out.write(json);
         } catch (RecommendationException ex) {
-            Logger.getLogger(GetRecommendationsServlet.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
         } finally {
             out.close();
         }

@@ -23,11 +23,8 @@ import java.net.URL;
 import java.util.Date;
 import java.util.Locale;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexableField;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.similarities.DefaultSimilarity;
+import org.apache.lucene.search.SearcherManager;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
@@ -40,8 +37,7 @@ public abstract class LuceneRecommender implements IRecommender {
 
     private String luceneIndexLocation;
     private Directory dir;
-    private IndexReader reader;
-    protected IndexSearcher searcher;
+    protected SearcherManager manager;
 
     private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(LuceneRecommender.class);
 
@@ -60,10 +56,11 @@ public abstract class LuceneRecommender implements IRecommender {
 
     private void openIndex() throws IOException {
         dir = FSDirectory.open(new File(luceneIndexLocation));
-        reader = DirectoryReader.open(dir, 1);
-        searcher = new IndexSearcher(reader);
-        searcher.setSimilarity(new DefaultSimilarity());
-
+        manager = new SearcherManager(dir,null);     
+        
+//        reader = DirectoryReader.open(dir, 1);
+//        searcher = new IndexSearcher(reader);
+//        searcher.setSimilarity(new DefaultSimilarity());
     }
 
     protected NewsItem toNewsitem(Document d, int docId) {
@@ -95,12 +92,13 @@ public abstract class LuceneRecommender implements IRecommender {
 
         field = d.getField("id");
         if (field != null) {
-            //item.setId(field.numericValue().longValue());
-            item.setId(docId);
+            item.setId(field.numericValue().longValue());
         } else {
             item.setId(0);
         }
 
+        item.setDocNr(docId);
+        
         field = d.getField("imageUrl");
         if (field != null) {
             try {

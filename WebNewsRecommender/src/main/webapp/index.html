@@ -1,0 +1,95 @@
+<!doctype html>
+
+<html lang ="en">
+    <head>
+        <title>News Recommendation</title>
+        <meta charset="utf-8"/>
+
+        <!-- style -->
+        <link href="css/search.css" rel="stylesheet">
+        <link href="css/settings.css" rel="stylesheet">
+        <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+        <!-- includes -->
+
+        <!-- jquery -->
+        <script src="lib/jquery-1.9.1.js"></script>
+        <script src="lib/jquery-ui.js"></script>
+
+        <!-- script om beschrijving in te korten -->
+        <script src="lib/jquery.shorten.1.0.js"></script>
+
+       
+
+        <!-- Eigen scripts -->
+        <script src="js/main.js"></script>
+    </head>
+
+    <body>
+        <!-- Balk bovenaan -->
+        <header>
+            <div id="topLeft">
+                <input id="queryinput" type="text" placeholder="Type here">
+                <input id="btnSearch" type="submit" value="Search" onclick="btnClicked();">
+            </div>
+            <nav>
+                <a href="#" id="menu-icon"></a>
+                <ul>
+                    <li><a id="linkSearch" onclick="display(1);" class="current">Search</a></li>
+                    <li><a id="linkRecommended" onclick="display(2);">Recommended</a></li>
+                    <li><a id="linkLogin" onclick="display(3);">Login</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Div om op te vullen met de resultaten van de zoekopdracht -->
+        <div id="results"></div>
+
+        <!-- Div om op te vullen met de aanbevelingen -->
+        <div id="recommended"></div>
+
+        <!-- Boodschap voor de gebruiker -->
+        <img id="loader" src="img/ajax-loader.gif" class="loader" alt="Please wait"/>
+        <span id="message"></span>
+
+        <!-- Login formulier -->
+        <div id="login" class="settings login-form">
+
+                <div class="header">
+                    <h1>Login</h1>
+                </div>
+
+                <div class="content">
+                    <input id="username" name="username" type="text" class="input username" placeholder="Username" />
+                    <input id="password" name="password" type="password" class="input password" placeholder="Password"/>
+                </div>
+
+                <div class="footer">
+                    <input type="submit" name="submit" id="btnLogin" value="Login" onclick="userUtils.login();" class="button" />
+                    <input type="submit" name="submit" value="Register" onclick="display(4);" class="register" />
+                </div>
+
+        </div>
+
+        <!-- registreerformulier -->
+        <div id="register" class="settings login-form">
+
+                <div class="header">
+                    <h1>Register</h1>
+                </div>
+
+                <div class="content">
+                    <input id="Reg_username" name="username" type="text" class="input username" placeholder="Username" />
+                    <input id="Reg_password" name="password" type="password" class="input password" placeholder="Password"/>
+                    <input id="Reg_passwordConfirm" name="confirm password" type="password" class="input password" placeholder="Confirm password" />
+                </div>
+
+                <div class="footer">
+                    <input type="submit" name="submit" id="btnRegister" value="Register" onclick="userUtils.register();" class="button" />
+                </div>
+        </div>
+
+        <!-- Show more results -->
+        <div id="showMore" onclick="fetchNextResults();">More</div>
+
+    </body>
+</html>

@@ -1,7 +1,17 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright 2014 Sam Leroux <sam.leroux@ugent.be>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package be.ugent.tiwi.sleroux.newsrec.webnewsrecommender;
@@ -11,12 +21,11 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ViewsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.IScorer;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -33,9 +42,10 @@ public class ViewedServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    private static final Logger logger = Logger.getLogger(ViewedServlet.class);
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
+        response.setContentType("application/json");
         PrintWriter out = response.getWriter();
         try {            
             long user = 2L;
@@ -47,8 +57,11 @@ public class ViewedServlet extends HttpServlet {
             
             IViewsDao viewsdao = (IViewsDao)getServletContext().getAttribute(("viewsDao"));
             viewsdao.see(user, docNr, itemId);
+            out.write("{\"response\":\"OK\"}");
+            logger.debug("returned recommendations");
         } catch (ViewsDaoException ex) {
-            Logger.getLogger(ViewedServlet.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
+            out.write("{\"exception\":\""+ex.getMessage()+"\"}");
         } finally {
             out.close();
         }

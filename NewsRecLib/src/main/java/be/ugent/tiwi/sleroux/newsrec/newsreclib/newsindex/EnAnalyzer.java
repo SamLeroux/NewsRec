@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
 import org.apache.lucene.analysis.core.LowerCaseFilter;
 import org.apache.lucene.analysis.core.StopFilter;
 import org.apache.lucene.analysis.en.EnglishPossessiveFilter;
@@ -74,6 +75,7 @@ public class EnAnalyzer extends Analyzer {
 
     @Override
     protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+        //reader = new HTMLStripCharFilter(reader);
         Tokenizer t = new StandardTokenizer(Config.LUCENE_VERSION, reader);
         TokenStream result = t;
         //result = new SynonymFilter(result, synonyms, true);

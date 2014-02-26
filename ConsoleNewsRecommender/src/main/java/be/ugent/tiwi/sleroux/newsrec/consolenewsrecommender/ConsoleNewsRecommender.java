@@ -1,7 +1,17 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright 2014 Sam Leroux <sam.leroux@ugent.be>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package be.ugent.tiwi.sleroux.newsrec.consolenewsrecommender;
 
@@ -19,7 +29,8 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.AbstractNewsfetcher;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.INewsItemListener;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.NewsFetchTimer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.RssNewsFetcher;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.enhance.TikaEnhancer;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.enhance.JsoupStripHtmlDescriptionEnhancer;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.enhance.TikaExtractFullTextEnhancer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsindex.LuceneNewsIndexer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.ColdStartLuceneRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.IRecommender;
@@ -38,7 +49,7 @@ import org.apache.log4j.Logger;
  */
 public class ConsoleNewsRecommender {
 
-    private static final Logger logger = Logger.getLogger(be.ugent.tiwi.sleroux.newsrec.newsreclib.App.class);
+    private static final Logger logger = Logger.getLogger(ConsoleNewsRecommender.class);
     private static final ResourceBundle bundle = ResourceBundle.getBundle("newsRec");
     private IScorer scorer;
     private IRecommender rec;
@@ -66,17 +77,14 @@ public class ConsoleNewsRecommender {
 
     public void start() {
         startAddArticles();
-        startRectest();
+        //startRectest();
         //startFetchTest();
     }
     
     public void startAddArticles(){
         try {
-            score(8290, -6987741477396414561L);
-            score(8291, -7520079592792343477L);
-            score(8293, -5002904209232001034L);
-            score(9100, -5193966549208919344L);
-            score(9098, -9159839562141742758L);
+            score(5988, -8331052715895382000L);
+            score(5993, -6943791445157224000L);
         } catch (DaoException ex) {
             java.util.logging.Logger.getLogger(ConsoleNewsRecommender.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -94,7 +102,8 @@ public class ConsoleNewsRecommender {
         INewsSourceDao dao = new MysqlNewsSourceDao();
 
         AbstractNewsfetcher fetcher = new RssNewsFetcher();
-        fetcher.addEnhancer(new TikaEnhancer());
+        fetcher.addEnhancer(new TikaExtractFullTextEnhancer());
+        fetcher.addEnhancer(new JsoupStripHtmlDescriptionEnhancer());
 
         NewsFetchTimer timer = new NewsFetchTimer(dao, fetcher, 10000);
         try {

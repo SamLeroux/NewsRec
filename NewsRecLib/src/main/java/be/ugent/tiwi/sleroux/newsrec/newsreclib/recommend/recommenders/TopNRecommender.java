@@ -21,11 +21,13 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -56,6 +58,7 @@ public class TopNRecommender extends LuceneRecommender {
 
     @Override
     public List<NewsItem> recommend(long userid, int start, int count) throws RecommendationException {
+        IndexSearcher searcher = null;
         try {
             List<Long> ids = viewsDao.getNMostSeenArticles(start, start + count);
             Query query = buildQuery(ids);
@@ -64,6 +67,7 @@ public class TopNRecommender extends LuceneRecommender {
             TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
 
             Filter filter = new SeenArticlesFilter(viewsDao, userid);
+            searcher = manager.acquire();
             searcher.search(query, filter, collector);
 
             ScoreDoc[] hits = collector.topDocs().scoreDocs;
@@ -79,9 +83,18 @@ public class TopNRecommender extends LuceneRecommender {
 
             return results;
 
-        } catch (ViewsDaoException| IOException ex) {
-            logger.error(ex);
+        } catch (ViewsDaoException | IOException ex) {
+            
             throw new RecommendationException(ex);
+        } finally {
+            if (searcher != null) {
+                try {
+                    manager.release(searcher);
+                } catch (IOException ex) {
+                    logger.error(ex);
+                }
+                searcher = null;
+            }
         }
     }
 
@@ -91,9 +104,9 @@ public class TopNRecommender extends LuceneRecommender {
         BooleanQuery.setMaxClauseCount((ids.size() + 1) * 3);
 
         float boost = 1.0F;
-        float d = 0.5F/ids.size();
+        float d = 0.5F / ids.size();
         for (long id : ids) {
-            Query query = NumericRangeQuery.newLongRange("id",1, id, id, true, true);
+            Query query = NumericRangeQuery.newLongRange("id", 1, id, id, true, true);
             query.setBoost(boost);
             boost -= d;
             q.add(query, BooleanClause.Occur.SHOULD);
@@ -101,7 +114,7 @@ public class TopNRecommender extends LuceneRecommender {
 
         RecencyBoostQuery rbq = new RecencyBoostQuery(q);
         rbq.setM(9e-9);
-        
+
         return new RecencyBoostQuery(q);
     }
 
