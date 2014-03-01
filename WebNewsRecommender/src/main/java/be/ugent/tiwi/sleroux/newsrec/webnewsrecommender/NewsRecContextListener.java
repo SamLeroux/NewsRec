@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.webnewsrecommender;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.INewsSourceDao;
@@ -44,7 +43,7 @@ import org.apache.log4j.Logger;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class NewsRecContextListener implements ServletContextListener{
+public class NewsRecContextListener implements ServletContextListener {
 
     private IViewsDao viewsDao;
     private IRatingsDao ratingsDao;
@@ -53,29 +52,28 @@ public class NewsRecContextListener implements ServletContextListener{
     private NewsFetchTimer timer;
     private static final Logger logger = Logger.getLogger(NewsRecContextListener.class);
     private static final ResourceBundle bundle = ResourceBundle.getBundle("WebNewsrecommender");
-    
+
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         try {
             viewsDao = new JDBCViewsDao();
             sce.getServletContext().setAttribute("viewsDao", viewsDao);
-            
+
             ratingsDao = new JDBCRatingsDao();
-            
+
             String luceneLocation = bundle.getString("luceneIndexLocation");
-            recommender = new ColdStartLuceneRecommender(luceneLocation, ratingsDao, viewsDao); 
+            recommender = new ColdStartLuceneRecommender(luceneLocation, ratingsDao, viewsDao);
             sce.getServletContext().setAttribute("recommender", recommender);
-            
+
             scorer = new DatabaseLuceneScorer(luceneLocation, ratingsDao);
             sce.getServletContext().setAttribute("scorer", scorer);
-            
-            
+
             AbstractNewsfetcher newsfetcher = new RssNewsFetcher();
             newsfetcher.addEnhancer(new TikaExtractFullTextEnhancer());
             newsfetcher.addEnhancer(new JsoupStripHtmlDescriptionEnhancer());
-            
+
             INewsSourceDao newsSourceDao = new MysqlNewsSourceDao();
-            timer = new NewsFetchTimer(newsSourceDao, newsfetcher, 60000); 
+            timer = new NewsFetchTimer(newsSourceDao, newsfetcher, 60000);
             String stopwordFile = bundle.getString("stopwordsFile");
             timer.addListener(new LuceneNewsIndexer(luceneLocation, stopwordFile));
             timer.start();
@@ -86,12 +84,14 @@ public class NewsRecContextListener implements ServletContextListener{
         } catch (IOException ex) {
             logger.error(ex);
         }
-        
+
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        timer.stop();
+        if (timer != null) {
+            timer.stop();
+        }
     }
-    
+
 }

@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package be.ugent.tiwi.sleroux.newsrec.newsreclib.config;
+package be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering;
 
-import org.apache.lucene.util.Version;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItemCluster;
 
 /**
- * Util class to store frequently used constants.
+ *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class Config {
-    /**
-     * The Lucene index version.
-     */
-    public static final Version LUCENE_VERSION = Version.LUCENE_47;
+public interface IClusterer {
+    public NewsItemCluster[] cluster(NewsItem[] items);
 }

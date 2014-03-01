@@ -66,27 +66,29 @@ public class DatabaseLuceneScorer implements IScorer {
         updateTermMap(termMap, item, "description", 1.5);
         updateTermMap(termMap, item, "title", 2);
 
-        // Only store the n most important terms.
-        PriorityQueue<TermScorePair> pq = new PriorityQueue<>(termMap.size());
-        for (String term : termMap.keySet()) {
-            TermScorePair p = new TermScorePair(term, termMap.get(term));
-            pq.add(p);
-        }
-        int n = (pq.size() < 10 ? pq.size() : 10);
-        int i = 0;
-        TermScorePair tsp = pq.poll();
-        Map<String, Double> termsToStore = new HashMap<>();
-        while (i < n && tsp != null) {
-            termsToStore.put(tsp.getTerm(), tsp.getScore() * rating);
-            tsp = pq.poll();
-            i++;
-        }
+        if (termMap.size() > 0) {
+            // Only store the n most important terms.
+            PriorityQueue<TermScorePair> pq = new PriorityQueue<>(termMap.size());
+            for (String term : termMap.keySet()) {
+                TermScorePair p = new TermScorePair(term, termMap.get(term));
+                pq.add(p);
+            }
+            int n = (pq.size() < 10 ? pq.size() : 10);
+            int i = 0;
+            TermScorePair tsp = pq.poll();
+            Map<String, Double> termsToStore = new HashMap<>();
+            while (i < n && tsp != null) {
+                termsToStore.put(tsp.getTerm(), tsp.getScore() * rating);
+                tsp = pq.poll();
+                i++;
+            }
 
-        // Store them in the database
-        try {
-            ratingsDao.giveRating(user, termsToStore);
-        } catch (RatingsDaoException ex) {
-            logger.error(ex.getMessage(), ex);
+            // Store them in the database
+            try {
+                ratingsDao.giveRating(user, termsToStore);
+            } catch (RatingsDaoException ex) {
+                logger.error(ex.getMessage(), ex);
+            }
         }
     }
 
@@ -111,21 +113,26 @@ public class DatabaseLuceneScorer implements IScorer {
             reader = manager.acquire();
             manager.maybeRefresh();
             Terms vector = reader.getTermVector(item, field);
-            TermsEnum termsEnum;
-            termsEnum = vector.iterator(TermsEnum.EMPTY);
-            BytesRef text;
-            while ((text = termsEnum.next()) != null) {
-                String term = text.utf8ToString();
-                double tf = 1 + Math.log(termsEnum.totalTermFreq());
-                int docFreq = reader.docFreq(new Term(field, text));
-                // ignore really rare terms
-                if (docFreq > 5) {
-                    double idf = Math.log((double) reader.numDocs() / docFreq);
-                    if (!Double.isInfinite(idf)) {
-                        if (!termMap.containsKey(term)) {
-                            termMap.put(term, tf * idf * weight);
-                        } else {
-                            termMap.put(term, termMap.get(term) + tf * idf * weight);
+            if (vector != null) {
+                TermsEnum termsEnum;
+                termsEnum = vector.iterator(TermsEnum.EMPTY);
+                BytesRef text;
+                while ((text = termsEnum.next()) != null) {
+                    String term = text.utf8ToString();
+
+                    int docFreq = reader.docFreq(new Term(field, text));
+                    // ignore really rare terms and really common terms
+                    double minFreq = reader.numDocs() *0.0001;
+                    double maxFreq = reader.numDocs() /3;
+                    if (docFreq > minFreq && docFreq < maxFreq) {
+                        double tf = 1 + (double) termsEnum.totalTermFreq() / reader.getSumTotalTermFreq(field);
+                        double idf = Math.log((double) reader.numDocs() / docFreq);
+                        if (!Double.isInfinite(idf)) {
+                            if (!termMap.containsKey(term)) {
+                                termMap.put(term, tf * idf * weight);
+                            } else {
+                                termMap.put(term, termMap.get(term) + tf * idf * weight);
+                            }
                         }
                     }
                 }

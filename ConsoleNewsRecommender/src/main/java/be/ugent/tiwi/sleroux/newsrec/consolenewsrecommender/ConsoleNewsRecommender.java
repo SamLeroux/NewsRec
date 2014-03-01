@@ -83,8 +83,7 @@ public class ConsoleNewsRecommender {
     
     public void startAddArticles(){
         try {
-            score(5988, -8331052715895382000L);
-            score(5993, -6943791445157224000L);
+            score(13, -8006031196735184673L);
         } catch (DaoException ex) {
             java.util.logging.Logger.getLogger(ConsoleNewsRecommender.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -122,7 +121,7 @@ public class ConsoleNewsRecommender {
         for (NewsItem item : results) {
             System.out.print(item.getTitle());
             System.out.print(" : ");
-            System.out.println(item.getSource());
+            System.out.println(item.getUrl());
         }
     }
 

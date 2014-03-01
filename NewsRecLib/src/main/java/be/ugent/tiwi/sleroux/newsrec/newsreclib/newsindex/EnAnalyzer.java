@@ -21,15 +21,17 @@ import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.charfilter.HTMLStripCharFilter;
 import org.apache.lucene.analysis.core.LowerCaseFilter;
 import org.apache.lucene.analysis.core.StopFilter;
 import org.apache.lucene.analysis.en.EnglishPossessiveFilter;
-import org.apache.lucene.analysis.en.PorterStemFilter;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
+import org.apache.lucene.analysis.miscellaneous.TrimFilter;
+import org.apache.lucene.analysis.snowball.SnowballFilter;
+import org.apache.lucene.analysis.standard.StandardFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.analysis.synonym.SynonymMap;
 import org.apache.lucene.analysis.util.CharArraySet;
+import org.tartarus.snowball.ext.EnglishStemmer;
 
 /**
  *
@@ -78,8 +80,11 @@ public class EnAnalyzer extends Analyzer {
         //reader = new HTMLStripCharFilter(reader);
         Tokenizer t = new StandardTokenizer(Config.LUCENE_VERSION, reader);
         TokenStream result = t;
+        
         //result = new SynonymFilter(result, synonyms, true);
+        result = new StandardFilter(Config.LUCENE_VERSION, result);
         result = new LowerCaseFilter(Config.LUCENE_VERSION, result);
+        result = new TrimFilter(Config.LUCENE_VERSION, result);
         result = new ASCIIFoldingFilter(result);
         if (stopwords != null) {
             result = new StopFilter(Config.LUCENE_VERSION, result, stopwords);
@@ -88,9 +93,11 @@ public class EnAnalyzer extends Analyzer {
         }
         //result = new LowerCaseFilter(Version.LUCENE_46, result);
         result = new EnglishPossessiveFilter(Config.LUCENE_VERSION, result);
-        result = new PorterStemFilter(result);
-
-
+        //result = new PorterStemFilter(result);
+        result = new SnowballFilter(result, new EnglishStemmer());
+//        ShingleFilter sf = new ShingleFilter(result, 2, 3);
+//        sf.setFillerToken(null);
+//        result = sf;
         TokenStreamComponents comp = new TokenStreamComponents(t, result);
         return comp;
     }

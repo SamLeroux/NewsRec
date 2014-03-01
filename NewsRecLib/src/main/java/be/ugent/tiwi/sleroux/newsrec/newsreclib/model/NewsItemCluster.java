@@ -13,18 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package be.ugent.tiwi.sleroux.newsrec.newsreclib.model;
 
-package be.ugent.tiwi.sleroux.newsrec.newsreclib.config;
-
-import org.apache.lucene.util.Version;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Util class to store frequently used constants.
+ *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class Config {
-    /**
-     * The Lucene index version.
-     */
-    public static final Version LUCENE_VERSION = Version.LUCENE_47;
+public class NewsItemCluster {
+
+    private final List<NewsItem> items;
+    private NewsItem representative;
+
+    public NewsItemCluster() {
+        items = new ArrayList<>();
+    }
+
+    public void addItem(NewsItem item) {
+        if (representative == null || representative.getTimestamp().before(item.getTimestamp())) {
+            items.add(representative);
+            representative = item;
+        } else {
+            items.add(item);
+        }
+    }
+
 }
