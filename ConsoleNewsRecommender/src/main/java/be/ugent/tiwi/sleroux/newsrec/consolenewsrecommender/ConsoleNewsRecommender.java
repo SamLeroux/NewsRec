@@ -76,14 +76,14 @@ public class ConsoleNewsRecommender {
     }
 
     public void start() {
-        startAddArticles();
+        //startAddArticles();
         //startRectest();
-        //startFetchTest();
+        startFetchTest();
     }
     
     public void startAddArticles(){
         try {
-            score(13, -8006031196735184673L);
+            score(16100, -4959261087675326762L);
         } catch (DaoException ex) {
             java.util.logging.Logger.getLogger(ConsoleNewsRecommender.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -110,6 +110,9 @@ public class ConsoleNewsRecommender {
             String stopwordFile = bundle.getString("stopwordsFile");
             INewsItemListener luceneListener = new LuceneNewsIndexer(luceneIndex, stopwordFile);
             timer.addListener(luceneListener);
+            
+
+            
         } catch (IOException ex) {
             logger.fatal(ex.getMessage(), ex);
         }

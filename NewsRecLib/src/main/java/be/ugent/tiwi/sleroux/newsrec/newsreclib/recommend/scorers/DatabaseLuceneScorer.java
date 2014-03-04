@@ -17,6 +17,7 @@ package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.RatingsDaoException;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.TermScorePair;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -69,9 +70,18 @@ public class DatabaseLuceneScorer implements IScorer {
         if (termMap.size() > 0) {
             // Only store the n most important terms.
             PriorityQueue<TermScorePair> pq = new PriorityQueue<>(termMap.size());
+            double avg = 0;
+            for (double d : termMap.values()) {
+                avg += d;
+            }
+            avg /= termMap.size();
+
             for (String term : termMap.keySet()) {
-                TermScorePair p = new TermScorePair(term, termMap.get(term));
-                pq.add(p);
+                if (termMap.get(term) > avg) {
+                    TermScorePair p = new TermScorePair(term, termMap.get(term));
+                    pq.add(p);
+                }
+
             }
             int n = (pq.size() < 10 ? pq.size() : 10);
             int i = 0;
@@ -89,6 +99,7 @@ public class DatabaseLuceneScorer implements IScorer {
             } catch (RatingsDaoException ex) {
                 logger.error(ex.getMessage(), ex);
             }
+
         }
     }
 
@@ -119,13 +130,12 @@ public class DatabaseLuceneScorer implements IScorer {
                 BytesRef text;
                 while ((text = termsEnum.next()) != null) {
                     String term = text.utf8ToString();
-
                     int docFreq = reader.docFreq(new Term(field, text));
                     // ignore really rare terms and really common terms
-                    double minFreq = reader.numDocs() *0.0001;
-                    double maxFreq = reader.numDocs() /3;
+                    double minFreq = reader.numDocs() * 0.0001;
+                    double maxFreq = reader.numDocs() / 3;
                     if (docFreq > minFreq && docFreq < maxFreq) {
-                        double tf = 1 + (double) termsEnum.totalTermFreq() / reader.getSumTotalTermFreq(field);
+                        double tf = 1 + ((double) termsEnum.totalTermFreq()) / reader.getSumTotalTermFreq(field);
                         double idf = Math.log((double) reader.numDocs() / docFreq);
                         if (!Double.isInfinite(idf)) {
                             if (!termMap.containsKey(term)) {
@@ -150,40 +160,6 @@ public class DatabaseLuceneScorer implements IScorer {
         }
     }
 
-    private class TermScorePair implements Comparable<Object> {
-
-        private String term;
-        private double score;
-
-        public TermScorePair(String term, double score) {
-            this.term = term;
-            this.score = score;
-        }
-
-        public String getTerm() {
-            return term;
-        }
-
-        public void setTerm(String term) {
-            this.term = term;
-        }
-
-        public double getScore() {
-            return score;
-        }
-
-        public void setScore(double score) {
-            this.score = score;
-        }
-
-        @Override
-        public int compareTo(Object o) {
-            if (o instanceof TermScorePair) {
-                return Double.compare(((TermScorePair) o).score, score);
-            }
-            return -1;
-        }
-
-    }
+    
 
 }
