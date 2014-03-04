@@ -35,4 +35,10 @@ public class StreamIDs {
     public static final String NEWSARTICLEWITHCONTENTSTREAM = "articleWithContentStream";
     public static final String NEWSARTICLEWITHCONTENT = "articleWithContent";
     
+    public static final String INDEXEDITEMSTREAM = "indexedItemStream";
+    public static final String INDEXEDITEM = "indexeditem";
+    
+    public static final String TERMSTREAM = "TermStream";
+    public static final String TERM = "term";
+    
 }

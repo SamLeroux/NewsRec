@@ -59,10 +59,17 @@ public class FeedSourceSpout extends BaseRichSpout {
     public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
         sourcesQueue = new LinkedBlockingQueue<>();
         timer = new Timer();
-        timer.schedule(new FetchTask(), 0, 2500);
+        timer.schedule(new FetchTask(), 0, 60000);
         this.collector = collector;
     }
 
+    @Override
+    public void close() {
+        super.close(); 
+        timer.cancel();
+    }
+
+    
     @Override
     public void nextTuple() {
         NewsSource source = sourcesQueue.poll();
@@ -84,6 +91,7 @@ public class FeedSourceSpout extends BaseRichSpout {
             try {
                 NewsSource[] sources = newsSourceDao.getSourcesToCheck();
                 sourcesQueue.addAll(Arrays.asList(sources));
+                logger.info(sources.length+" feeds to check");
             } catch (DaoException ex) {
                 logger.error(ex);
             }

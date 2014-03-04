@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.stormNewsFetch.storm.bolts;
 
 import backtype.storm.task.OutputCollector;
@@ -27,21 +26,25 @@ import java.util.Map;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class LoggingBolt extends BaseRichBolt{
+public class LoggingBolt extends BaseRichBolt {
 
-    
-    
+    private OutputCollector collector;
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
     }
 
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+        this.collector = collector;
     }
 
     @Override
     public void execute(Tuple input) {
+        collector.ack(input);
+        System.out.println("--------------------------------------------------");
         System.out.println(input);
+        System.out.println("--------------------------------------------------");
+
     }
-    
+
 }

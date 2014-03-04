@@ -50,11 +50,11 @@ public class NewsItem {
     public NewsItem() {
         terms = new HashMap<>();
         authors = new ArrayList<>();
-        id = UUID.randomUUID().getLeastSignificantBits();
+        id = Math.abs(UUID.randomUUID().getMostSignificantBits());
     }
 
     public NewsItem(int docNr,String title, List<String> authors,String fulltext, String description, Date timestamp, Map<String, Float> terms, Locale locale, String source, URL url, URL imageUrl) {
-        this(UUID.randomUUID().getLeastSignificantBits(), docNr, title, authors, fulltext, description, timestamp, terms, locale, source, url, imageUrl);
+        this(Math.abs(UUID.randomUUID().getMostSignificantBits()), docNr, title, authors, fulltext, description, timestamp, terms, locale, source, url, imageUrl);
     }
 
     public NewsItem(long id, int docNr, String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Float> terms, Locale locale, String source, URL url, URL imageUrl) {

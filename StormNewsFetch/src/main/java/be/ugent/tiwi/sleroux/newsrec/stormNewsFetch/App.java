@@ -10,6 +10,7 @@ import be.ugent.tiwi.sleroux.newsrec.stormNewsFetch.dao.INewsSourceDao;
 import be.ugent.tiwi.sleroux.newsrec.stormNewsFetch.dao.dummyImpl.DummyNewsSourceDao;
 import be.ugent.tiwi.sleroux.newsrec.stormNewsFetch.dao.mysqlImpl.MysqlNewsSourceDao;
 import be.ugent.tiwi.sleroux.newsrec.stormNewsFetch.storm.topology.NewsFetchTopologyStarter;
+import java.util.PropertyResourceBundle;
 import org.apache.log4j.Logger;
 
 
@@ -21,9 +22,19 @@ public class App {
     public static void main(String[] args) {
         try {
             INewsSourceDao newsSourceDao = new MysqlNewsSourceDao();
-            NewsFetchTopologyStarter starter = new NewsFetchTopologyStarter(newsSourceDao, "newsfetch");
+            
+            PropertyResourceBundle bundle = (PropertyResourceBundle)PropertyResourceBundle.getBundle("newsRec");
+            String luceneIndexLocation = bundle.getString("luceneIndexLocation");
+            String stopwordsFileLocation = bundle.getString("stopwordsFile");
+            
+            NewsFetchTopologyStarter starter = new NewsFetchTopologyStarter(
+                    newsSourceDao,
+                    "newsfetch",
+                    luceneIndexLocation,
+                    stopwordsFileLocation);
+            
             starter.start();
-            Thread.sleep(500000);
+            Thread.sleep(2500000);
             starter.stop();
             
         } catch (InterruptedException ex) {

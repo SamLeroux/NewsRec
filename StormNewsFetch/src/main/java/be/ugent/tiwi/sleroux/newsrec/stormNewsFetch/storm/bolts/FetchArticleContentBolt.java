@@ -68,10 +68,13 @@ public class FetchArticleContentBolt extends BaseRichBolt{
 
     @Override
     public void execute(Tuple input) {
+        collector.ack(input);
         InputStream in = null;
         try {
             NewsItem item = (NewsItem)input.getValueByField(StreamIDs.NEWSARTICLENOCONTENT);
            
+            logger.info("Fetching full content from: "+item.getUrl());
+            
             HttpURLConnection urlConnection = (HttpURLConnection) item.getUrl().openConnection();
             HttpURLConnection.setFollowRedirects(true);
             urlConnection.setRequestProperty("User-Agent", bundle.getString("useragent"));
@@ -102,7 +105,7 @@ public class FetchArticleContentBolt extends BaseRichBolt{
             item.setLocale(new Locale(identifier.getLanguage()));
 
             collector.emit(StreamIDs.NEWSARTICLEWITHCONTENTSTREAM, new Values(item));
-        } catch (IOException | SAXException | TikaException ex) {
+        } catch (IOException | SAXException | TikaException | IllegalArgumentException ex) {
             logger.error(ex.getMessage(), ex);
         } finally {
             try {
@@ -113,7 +116,7 @@ public class FetchArticleContentBolt extends BaseRichBolt{
                 logger.error(ex.getMessage(), ex);
             }
         }
-        collector.ack(input);
+        
     }
     
 }

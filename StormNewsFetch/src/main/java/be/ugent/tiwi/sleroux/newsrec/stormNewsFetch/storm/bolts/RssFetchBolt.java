@@ -68,7 +68,9 @@ public class RssFetchBolt extends BaseRichBolt {
 
     @Override
     public void execute(Tuple input) {
+        collector.ack(input);
         NewsSource source = (NewsSource) input.getValueByField(StreamIDs.NEWSSOURCEITEM);
+        logger.info("checking: "+source.getName());
         try {
             source.setLastFetchTry(new Date());
 
@@ -95,7 +97,7 @@ public class RssFetchBolt extends BaseRichBolt {
                     && entries.get(i).getPublishedDate().after(source.getLastArticleFetchTime())))) {
                 
                 SyndEntry entry = entries.get(i);
-
+                count++;
                 if (!articlesurlBuffer.contains(entry.getTitle())) {
                     NewsItem item = generateNewsItem(source, entry);
 
@@ -106,7 +108,7 @@ public class RssFetchBolt extends BaseRichBolt {
                     }
 
                     articlesurlBuffer.putNoCheck(entry.getTitle());
-                    count++;
+                    
                     
                     collector.emit(StreamIDs.NEWSARTICLENOCONTENTSTREAM, new Values(item, item.getSource()));
 
@@ -128,7 +130,8 @@ public class RssFetchBolt extends BaseRichBolt {
                 interval = (interval < 30 ? 30 : interval);
                 source.setFetchinterval(interval);
             }
-            logger.debug("New fetchinterval " + source.getFetchinterval());
+            logger.info("found "+count+" new articles");
+            logger.info("New fetchinterval " + source.getFetchinterval());
 
         } catch (MalformedURLException ex) {
             source.setFetchinterval(source.getFetchinterval() * 4);
@@ -145,6 +148,7 @@ public class RssFetchBolt extends BaseRichBolt {
     }
 
     private NewsItem generateNewsItem(NewsSource source,SyndEntry entry) throws MalformedURLException {
+        logger.info("Generating news item from feed entry");
         NewsItem item = new NewsItem();
         item.setTitle(entry.getTitle());
 
