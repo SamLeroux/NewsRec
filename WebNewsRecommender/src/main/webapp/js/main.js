@@ -165,7 +165,7 @@ function fetchRecommendations() {
     $("#loader").show();
 
     $.ajax({
-        url: "GetRecommendations.do?count=10&start=0",
+        url: "GetRecommendations.do?count=25&start=0",
         dataType: "json",
         success: recommendationsFetched,
         error: recommendationsFetchError

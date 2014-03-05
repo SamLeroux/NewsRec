@@ -37,6 +37,10 @@ public class UpdateNewsSourceBolt extends BaseRichBolt{
     private OutputCollector collector;
     private static final Logger logger = Logger.getLogger(UpdateNewsSourceBolt.class);
 
+    /**
+     *
+     * @param newsSourceDao
+     */
     public UpdateNewsSourceBolt(INewsSourceDao newsSourceDao) {
         this.newsSourceDao = newsSourceDao;
     }

@@ -57,6 +57,11 @@ public class LuceneIndexBolt extends BaseRichBolt {
     private final String stopwordsLocation;
     private static final Logger logger = Logger.getLogger(LuceneIndexBolt.class);
 
+    /**
+     *
+     * @param indexLocation
+     * @param stopwordsLocation
+     */
     public LuceneIndexBolt(String indexLocation, String stopwordsLocation) {
         this.indexLocation = indexLocation;
         this.stopwordsLocation = stopwordsLocation;

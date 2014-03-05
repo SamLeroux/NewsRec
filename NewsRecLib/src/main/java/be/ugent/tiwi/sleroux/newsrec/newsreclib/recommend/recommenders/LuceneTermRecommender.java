@@ -93,12 +93,9 @@ public class LuceneTermRecommender extends LuceneRecommender {
             searcher = null;
         }
     }
-
+    
     protected Query buildQuery(Map<String, Double> terms) {
         BooleanQuery q = new BooleanQuery();
-
-        BooleanQuery.setMaxClauseCount((terms.size() + 1) * 3);
-
         for (String term : terms.keySet()) {
             Query query = new TermQuery(new Term("text", term));
             query.setBoost(terms.get(term).floatValue());
@@ -107,7 +104,6 @@ public class LuceneTermRecommender extends LuceneRecommender {
             query2.setBoost(terms.get(term).floatValue());
             q.add(query2, BooleanClause.Occur.SHOULD);
         }
-
         //return q;
         return new RecencyBoostQuery(q);
     }

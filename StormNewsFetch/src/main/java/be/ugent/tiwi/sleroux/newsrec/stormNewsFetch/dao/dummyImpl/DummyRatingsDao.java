@@ -29,22 +29,42 @@ import java.util.Map;
 public class DummyRatingsDao implements IRatingsDao{
     private final Map<String, Double> ratings;
 
+    /**
+     *
+     */
     public DummyRatingsDao() {
         ratings = new HashMap<>();
     }
-    
-    
 
+    /**
+     *
+     * @param userid
+     * @return
+     * @throws RatingsDaoException
+     */
     @Override
     public Map<String, Double> getRatings(long userid) throws RatingsDaoException {
         return ratings;
     }
 
+    /**
+     *
+     * @param userid
+     * @param term
+     * @param rating
+     * @throws RatingsDaoException
+     */
     @Override
     public void giveRating(long userid, String term, double rating) throws RatingsDaoException {
         ratings.put(term, rating);
     }
 
+    /**
+     *
+     * @param userid
+     * @param terms
+     * @throws RatingsDaoException
+     */
     @Override
     public void giveRating(long userid, Map<String, Double> terms) throws RatingsDaoException {
         ratings.putAll(terms);

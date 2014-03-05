@@ -16,9 +16,6 @@
 package be.ugent.tiwi.sleroux.newsrec.webnewsrecommender;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.enhance.EnhanceException;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.enhance.IEnhancer;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.enhance.JsoupStripHtmlDescriptionEnhancer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.IRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.RecommendationException;
 import com.google.gson.Gson;
@@ -62,14 +59,8 @@ public class GetRecommendationsServlet extends HttpServlet {
             
             // No need to send the full text over the network.
             String empty = "";
-            IEnhancer enhancer = new JsoupStripHtmlDescriptionEnhancer();
             for (NewsItem n : items){
                 n.setFulltext(empty);
-                try {
-                    enhancer.enhance(n);
-                } catch (EnhanceException ex) {
-                    logger.error(ex);
-                }
             }
             
             Gson gson = new Gson();

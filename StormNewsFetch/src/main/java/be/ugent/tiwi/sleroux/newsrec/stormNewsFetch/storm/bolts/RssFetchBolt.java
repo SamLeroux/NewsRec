@@ -45,13 +45,13 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 /**
- *
+ * Checks a news source for new articles.
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class RssFetchBolt extends BaseRichBolt {
 
     private HashCircularBuffer<String> articlesurlBuffer;
-    private OutputCollector collector;
+    private transient OutputCollector collector;
     private static final Logger logger = Logger.getLogger(RssFetchBolt.class);
 
     @Override

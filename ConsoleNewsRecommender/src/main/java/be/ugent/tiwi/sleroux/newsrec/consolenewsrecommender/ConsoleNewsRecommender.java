@@ -18,25 +18,19 @@ package be.ugent.tiwi.sleroux.newsrec.consolenewsrecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.INewsSourceDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ITrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.MysqlNewsSourceDao;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.RatingsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCRatingsDao;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCTrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCViewsDao;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ViewsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.AbstractNewsfetcher;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.INewsItemListener;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.NewsFetchTimer;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.RssNewsFetcher;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.enhance.JsoupStripHtmlDescriptionEnhancer;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.enhance.TikaExtractFullTextEnhancer;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsindex.LuceneNewsIndexer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.ColdStartLuceneRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.IRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.RecommendationException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.DatabaseLuceneScorer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.IScorer;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.topology.NewsFetchTopologyStarter;
 import java.io.IOException;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -55,6 +49,7 @@ public class ConsoleNewsRecommender {
     private IRecommender rec;
     private final long userid = 4L;
     private IViewsDao viewsDao;
+    private ITrendsDao trendsDao;
 
     public ConsoleNewsRecommender() {
         try {
@@ -62,6 +57,7 @@ public class ConsoleNewsRecommender {
             String luceneLoc = bundle.getString("luceneIndexLocation");
             scorer = new DatabaseLuceneScorer(luceneLoc, dao);
             viewsDao = new JDBCViewsDao();
+            trendsDao = new JDBCTrendsDao();
             //rec = new LuceneTermRecommender(bundle.getString("luceneIndexLocation"),dao, viewsDao);
             //rec = new TopNRecommender(bundle.getString("luceneIndexLocation"), viewsDao);
             //rec.setRatingsDao(dao);
@@ -69,7 +65,7 @@ public class ConsoleNewsRecommender {
 //            rec.addRecommender(new LuceneTermRecommender(bundle.getString("luceneIndexLocation"),dao, viewsDao));
 //            rec.addRecommender(new TopNRecommender(bundle.getString("luceneIndexLocation"), viewsDao));
             rec = new ColdStartLuceneRecommender(luceneLoc, dao, viewsDao);
-        } catch (RatingsDaoException | IOException | ViewsDaoException ex) {
+        } catch (IOException | DaoException ex) {
             java.util.logging.Logger.getLogger(ConsoleNewsRecommender.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -97,27 +93,7 @@ public class ConsoleNewsRecommender {
         }
     }
 
-    public static NewsFetchTimer getTimer() {
-        INewsSourceDao dao = new MysqlNewsSourceDao();
-
-        AbstractNewsfetcher fetcher = new RssNewsFetcher();
-        fetcher.addEnhancer(new TikaExtractFullTextEnhancer());
-        fetcher.addEnhancer(new JsoupStripHtmlDescriptionEnhancer());
-
-        NewsFetchTimer timer = new NewsFetchTimer(dao, fetcher, 10000);
-        try {
-            String luceneIndex = bundle.getString("luceneIndexLocation");
-            String stopwordFile = bundle.getString("stopwordsFile");
-            INewsItemListener luceneListener = new LuceneNewsIndexer(luceneIndex, stopwordFile);
-            timer.addListener(luceneListener);
-            
-
-            
-        } catch (IOException ex) {
-            logger.fatal(ex.getMessage(), ex);
-        }
-        return timer;
-    }
+   
 
     public void testrecommendation() throws RecommendationException {
         List<NewsItem> results = rec.recommend(userid, 0, 20);
@@ -135,10 +111,21 @@ public class ConsoleNewsRecommender {
 
     private void startFetchTest() {
         try {
-            NewsFetchTimer t = getTimer();
-            t.start();
-            Thread.sleep(60000);
-            t.stop();
+            INewsSourceDao newsSourceDao = new MysqlNewsSourceDao();
+            
+            String luceneIndexLocation = bundle.getString("luceneIndexLocation");
+            String stopwordsFileLocation = bundle.getString("stopwordsFile");
+            
+            NewsFetchTopologyStarter starter = new NewsFetchTopologyStarter(
+                    newsSourceDao,
+                    trendsDao,
+                    "newsfetch",
+                    luceneIndexLocation,
+                    stopwordsFileLocation);
+            
+            starter.start();
+            Thread.sleep(1000*60*60);
+            starter.stop();
         } catch (InterruptedException ex) {
             java.util.logging.Logger.getLogger(ConsoleNewsRecommender.class.getName()).log(Level.SEVERE, null, ex);
         }

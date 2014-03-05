@@ -34,20 +34,34 @@ public class NewsSource implements Serializable{
     private String description;
     private URL rssUrl;
 
+    /**
+     *
+     * @return
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     *
+     * @param id
+     */
     public void setId(int id) {
         this.id = id;
     }
 
-    
-    
+    /**
+     *
+     * @return
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     *
+     * @param name
+     */
     public void setName(String name) {
         this.name = name;
     }
@@ -60,6 +74,10 @@ public class NewsSource implements Serializable{
         return lastArticleFetchTime;
     }
 
+    /**
+     *
+     * @param lastArticleFetchTime
+     */
     public void setLastArticleFetchTime(Date lastArticleFetchTime) {
         this.lastArticleFetchTime = lastArticleFetchTime;
     }
@@ -72,6 +90,10 @@ public class NewsSource implements Serializable{
         return lastFetchTry;
     }
 
+    /**
+     *
+     * @param lastFetchTry
+     */
     public void setLastFetchTry(Date lastFetchTry) {
         this.lastFetchTry = lastFetchTry;
     }
@@ -86,22 +108,42 @@ public class NewsSource implements Serializable{
         return fetchinterval;
     }
 
+    /**
+     *
+     * @param fetchinterval
+     */
     public void setFetchinterval(int fetchinterval) {
         this.fetchinterval = fetchinterval;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     *
+     * @param description
+     */
     public void setDescription(String description) {
         this.description = description;
     }
 
+    /**
+     *
+     * @return
+     */
     public URL getRssUrl() {
         return rssUrl;
     }
 
+    /**
+     *
+     * @param rssUrl
+     */
     public void setRssUrl(URL rssUrl) {
         this.rssUrl = rssUrl;
     }

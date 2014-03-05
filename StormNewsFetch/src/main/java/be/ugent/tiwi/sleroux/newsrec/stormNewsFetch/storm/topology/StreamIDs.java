@@ -22,23 +22,69 @@ package be.ugent.tiwi.sleroux.newsrec.stormNewsFetch.storm.topology;
  */
 public class StreamIDs {
     
+    /**
+     *
+     */
     public static final String NEWSSOURCESTREAM = "rssUrlStream";
+
+    /**
+     *
+     */
     public static final String NEWSSOURCEITEM = "newsSource";
     
+    /**
+     *
+     */
     public static final String NEWSARTICLENOCONTENTSTREAM = "articleNoContentStream";
+
+    /**
+     *
+     */
     public static final String NEWSARTICLENOCONTENT = "articleNoContent";
+
+    /**
+     *
+     */
     public static final String NEWSARTICLESOURCE = "sourcename";
     
+    /**
+     *
+     */
     public static final String UPDATEDNEWSSOURCESTREAM = "updatedNewsSourceStream";
+
+    /**
+     *
+     */
     public static final String UPDATEDNEWSSOURCE = "updatedNewsSource";
     
+    /**
+     *
+     */
     public static final String NEWSARTICLEWITHCONTENTSTREAM = "articleWithContentStream";
+
+    /**
+     *
+     */
     public static final String NEWSARTICLEWITHCONTENT = "articleWithContent";
     
+    /**
+     *
+     */
     public static final String INDEXEDITEMSTREAM = "indexedItemStream";
+
+    /**
+     *
+     */
     public static final String INDEXEDITEM = "indexeditem";
     
+    /**
+     *
+     */
     public static final String TERMSTREAM = "TermStream";
+
+    /**
+     *
+     */
     public static final String TERM = "term";
     
 }

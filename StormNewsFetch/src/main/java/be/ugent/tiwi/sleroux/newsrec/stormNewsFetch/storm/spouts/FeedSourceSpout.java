@@ -46,6 +46,10 @@ public class FeedSourceSpout extends BaseRichSpout {
     private final INewsSourceDao newsSourceDao;
     private static final Logger logger = Logger.getLogger(FeedSourceSpout.class);
 
+    /**
+     *
+     * @param newsSourceDao
+     */
     public FeedSourceSpout(INewsSourceDao newsSourceDao) {
         this.newsSourceDao = newsSourceDao;
     }

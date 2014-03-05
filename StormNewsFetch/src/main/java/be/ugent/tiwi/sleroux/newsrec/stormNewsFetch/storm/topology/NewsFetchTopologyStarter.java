@@ -24,7 +24,7 @@ import be.ugent.tiwi.sleroux.newsrec.stormNewsFetch.storm.StormRunner;
 import be.ugent.tiwi.sleroux.newsrec.stormNewsFetch.storm.bolts.FetchArticleContentBolt;
 import be.ugent.tiwi.sleroux.newsrec.stormNewsFetch.storm.bolts.LuceneIndexBolt;
 import be.ugent.tiwi.sleroux.newsrec.stormNewsFetch.storm.bolts.NewsItemToTermsBolt;
-import be.ugent.tiwi.sleroux.newsrec.stormNewsFetch.storm.bolts.FileOutputBolt;
+import be.ugent.tiwi.sleroux.newsrec.stormNewsFetch.storm.bolts.TermFileOutputBolt;
 import be.ugent.tiwi.sleroux.newsrec.stormNewsFetch.storm.bolts.RssFetchBolt;
 import be.ugent.tiwi.sleroux.newsrec.stormNewsFetch.storm.bolts.UpdateNewsSourceBolt;
 import be.ugent.tiwi.sleroux.newsrec.stormNewsFetch.storm.bolts.trendDetect.IntermediateRankingsBolt;
@@ -43,6 +43,13 @@ public class NewsFetchTopologyStarter {
     private final String luceneIndexLocation;
     private final String stopWordsLocation;
 
+    /**
+     *
+     * @param newsSourceDao
+     * @param name
+     * @param luceneIndexLocation
+     * @param stopWordsLocation
+     */
     public NewsFetchTopologyStarter(INewsSourceDao newsSourceDao, String name, String luceneIndexLocation, String stopWordsLocation) {
         this.newsSourceDao = newsSourceDao;
         this.name = name;
@@ -70,14 +77,14 @@ public class NewsFetchTopologyStarter {
                 .allGrouping("luceneIndexBolt", StreamIDs.INDEXEDITEMSTREAM);
 
         
-        builder.setBolt("counterBolt", new RollingCountBolt(2*60*60, 60), 4)
+        builder.setBolt("counterBolt", new RollingCountBolt(60*60, 240), 4)
                 .fieldsGrouping("termextractor", StreamIDs.TERMSTREAM, new Fields(StreamIDs.TERM));
         builder.setBolt("intermediateRankerBolt", new IntermediateRankingsBolt(25), 4)
                 .fieldsGrouping("counterBolt", new Fields("obj"));
         builder.setBolt("rankerBolt", new TotalRankingsBolt(25),1)
                 .globalGrouping("intermediateRankerBolt");
 
-        builder.setBolt("fileOutputBolt", new FileOutputBolt(), 1)
+        builder.setBolt("fileOutputBolt", new TermFileOutputBolt(), 1)
                 .allGrouping("rankerBolt");
         
         return builder.createTopology();
@@ -89,12 +96,19 @@ public class NewsFetchTopologyStarter {
         return conf;
     }
 
+    /**
+     *
+     * @throws InterruptedException
+     */
     public void start() throws InterruptedException {
         Config config = createTopologyConfiguration();
         StormTopology topology = buildTopology();
         StormRunner.runTopologyLocally(topology, name, config);
     }
 
+    /**
+     *
+     */
     public void stop() {
         StormRunner.stop(name);
     }

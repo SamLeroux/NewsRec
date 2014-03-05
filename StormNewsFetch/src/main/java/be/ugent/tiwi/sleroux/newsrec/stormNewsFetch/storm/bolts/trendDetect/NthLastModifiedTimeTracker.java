@@ -33,7 +33,11 @@ public class NthLastModifiedTimeTracker {
 
   private final CircularFifoBuffer lastModifiedTimesMillis;
 
-  public NthLastModifiedTimeTracker(int numTimesToTrack) {
+    /**
+     *
+     * @param numTimesToTrack
+     */
+    public NthLastModifiedTimeTracker(int numTimesToTrack) {
     if (numTimesToTrack < 1) {
       throw new IllegalArgumentException(
           "numTimesToTrack must be greater than zero (you requested " + numTimesToTrack + ")");
@@ -53,12 +57,19 @@ public class NthLastModifiedTimeTracker {
     return Time.currentTimeMillis();
   }
 
-  public int secondsSinceOldestModification() {
+    /**
+     *
+     * @return
+     */
+    public int secondsSinceOldestModification() {
     long modifiedTimeMillis = ((Long) lastModifiedTimesMillis.get()).longValue();
     return (int) ((now() - modifiedTimeMillis) / MILLIS_IN_SEC);
   }
 
-  public void markAsModified() {
+    /**
+     *
+     */
+    public void markAsModified() {
     updateLastModifiedTime();
   }
 

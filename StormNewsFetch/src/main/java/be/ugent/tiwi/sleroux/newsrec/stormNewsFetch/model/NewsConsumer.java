@@ -28,9 +28,19 @@ public class NewsConsumer {
     private String passwordHash;
     private Map<String, Double> interests;
 
+    /**
+     *
+     */
     public NewsConsumer() {
     }
 
+    /**
+     *
+     * @param id
+     * @param username
+     * @param passwordHash
+     * @param interests
+     */
     public NewsConsumer(int id, String username, String passwordHash, Map<String, Double> interests) {
         this.id = id;
         this.username = username;
@@ -38,34 +48,66 @@ public class NewsConsumer {
         this.interests = interests;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     *
+     * @param id
+     */
     public void setId(int id) {
         this.id = id;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getUsername() {
         return username;
     }
 
+    /**
+     *
+     * @param username
+     */
     public void setUsername(String username) {
         this.username = username;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getPasswordHash() {
         return passwordHash;
     }
 
+    /**
+     *
+     * @param passwordHash
+     */
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
     }
 
+    /**
+     *
+     * @return
+     */
     public Map<String, Double> getInterests() {
         return interests;
     }
 
+    /**
+     *
+     * @param interests
+     */
     public void setInterests(Map<String, Double> interests) {
         this.interests = interests;
     }

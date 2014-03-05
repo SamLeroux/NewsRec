@@ -17,26 +17,49 @@
 package be.ugent.tiwi.sleroux.newsrec.stormNewsFetch.utils;
 
 /**
- *
+ * Base for all custom exceptions.
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class NewsRecException extends Exception{
 
+    /**
+     *
+     */
     public NewsRecException() {
     }
 
+    /**
+     *
+     * @param message
+     */
     public NewsRecException(String message) {
         super(message);
     }
 
+    /**
+     *
+     * @param message
+     * @param cause
+     */
     public NewsRecException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     *
+     * @param cause
+     */
     public NewsRecException(Throwable cause) {
         super(cause);
     }
 
+    /**
+     *
+     * @param message
+     * @param cause
+     * @param enableSuppression
+     * @param writableStackTrace
+     */
     public NewsRecException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }

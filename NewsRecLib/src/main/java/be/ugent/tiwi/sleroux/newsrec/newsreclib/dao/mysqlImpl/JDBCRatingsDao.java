@@ -15,6 +15,7 @@
  */
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl;
 
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.RatingsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
 import java.sql.Connection;
@@ -23,53 +24,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ResourceBundle;
-import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.log4j.Logger;
 
 /**
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class JDBCRatingsDao implements IRatingsDao {
+public class JDBCRatingsDao extends AbstractJDBCBaseDao implements IRatingsDao {
 
-    private static BasicDataSource connectionPool = null;
     private PreparedStatement insertUpdateRatingStatement;
     private PreparedStatement selectStatement;
-    private static final Logger logger = Logger.getLogger(JDBCRatingsDao.class);
-    private static final ResourceBundle bundle = ResourceBundle.getBundle("newsRec");
 
-    public JDBCRatingsDao() throws RatingsDaoException {
-        logger.debug("constructor called");
-        if (connectionPool == null) {
-            try {
-                logger.debug("creating connectionpool");
-                String driver = bundle.getString("dbDriver");
-                String user = bundle.getString("dbUser");
-                String pass = bundle.getString("dbPass");
-                String url = bundle.getString("dbUrl");
-                url = url + "?user=" + user + "&password=" + pass;
-                connectionPool = new BasicDataSource();
-                connectionPool.setDriverClassName(driver);
-                connectionPool.setUsername(user);
-                connectionPool.setPassword(pass);
-                connectionPool.setUrl(url);
-                
-                logger.debug("connectionpool created");
-
-                logger.debug("creating preparedstatements");
-                String statementText = bundle.getString("selectRatingsQuery");
-                Connection conn = connectionPool.getConnection();
-                conn.setAutoCommit(true);
-                selectStatement = conn.prepareStatement(statementText);
-                statementText = bundle.getString("insertUpdateRatingsQuery");
-                insertUpdateRatingStatement = conn.prepareStatement(statementText);
-                logger.debug("created preparedstatements");
-            } catch (SQLException ex) {
-                logger.error(ex.getMessage(), ex);
-                throw new RatingsDaoException(ex);
-            }
-        }
+    public JDBCRatingsDao() throws DaoException {
     }
 
     @Override
@@ -127,6 +92,32 @@ public class JDBCRatingsDao implements IRatingsDao {
         } catch (SQLException ex) {
             logger.error("Error updating rating", ex);
             throw new RatingsDaoException("Error updating rating: " + ex.getMessage(), ex);
+        }
+    }
+
+    @Override
+    protected void createStatements() throws DaoException {
+        try {
+            logger.debug("creating preparedstatements");
+            String statementText = bundle.getString("selectRatingsQuery");
+            Connection conn = getConnection();
+            conn.setAutoCommit(true);
+            selectStatement = conn.prepareStatement(statementText);
+            statementText = bundle.getString("insertUpdateRatingsQuery");
+            insertUpdateRatingStatement = conn.prepareStatement(statementText);
+            logger.debug("created preparedstatements");
+        } catch (SQLException ex) {
+            throw new RatingsDaoException(ex);
+        }
+    }
+
+    @Override
+    protected void closeStatements() throws DaoException {
+        try {
+            selectStatement.close();
+            insertUpdateRatingStatement.close();
+        } catch (SQLException ex) {
+            throw new RatingsDaoException(ex);
         }
     }
 

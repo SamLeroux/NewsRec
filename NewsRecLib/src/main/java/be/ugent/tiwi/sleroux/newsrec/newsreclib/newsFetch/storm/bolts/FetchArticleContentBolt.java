@@ -13,15 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.enhance;
+package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts;
 
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.topology.StreamIDs;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.Locale;
+import java.util.Map;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import org.apache.log4j.Logger;
@@ -37,24 +46,40 @@ import org.apache.tika.sax.BodyContentHandler;
 import org.xml.sax.SAXException;
 
 /**
+ * Downloads the article content.
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class TikaExtractFullTextEnhancer implements IEnhancer {
-
-    private static final Logger logger = Logger.getLogger(TikaExtractFullTextEnhancer.class);
+public class FetchArticleContentBolt extends BaseRichBolt {
+    private static final Logger logger = Logger.getLogger(FetchArticleContentBolt.class);
     private static final ResourceBundle bundle = PropertyResourceBundle.getBundle("newsRec");
 
+    private OutputCollector collector;
+
     @Override
-    public void enhance(NewsItem item) throws EnhanceException {
-        logger.debug("start tika enhancement for " + item.getUrl());
+    public void declareOutputFields(OutputFieldsDeclarer declarer) {
+        declarer.declareStream(StreamIDs.NEWSARTICLEWITHCONTENTSTREAM, new Fields(StreamIDs.NEWSARTICLEWITHCONTENT));
+    }
+
+    @Override
+    public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+        this.collector = collector;
+    }
+
+    @Override
+    public void execute(Tuple input) {
+        collector.ack(input);
         InputStream in = null;
         try {
+            NewsItem item = (NewsItem) input.getValueByField(StreamIDs.NEWSARTICLENOCONTENT);
+
+            logger.info("Fetching full content from: " + item.getUrl());
+
             HttpURLConnection urlConnection = (HttpURLConnection) item.getUrl().openConnection();
             HttpURLConnection.setFollowRedirects(true);
             urlConnection.setRequestProperty("User-Agent", bundle.getString("useragent"));
-            urlConnection.setConnectTimeout(5000);
-            urlConnection.setReadTimeout(5000);
+            urlConnection.setConnectTimeout(10000);
+            urlConnection.setReadTimeout(10000);
             in = new BufferedInputStream(urlConnection.getInputStream());
             byte[] content = IOUtils.toByteArray(in);
             urlConnection.disconnect();
@@ -79,7 +104,8 @@ public class TikaExtractFullTextEnhancer implements IEnhancer {
             LanguageIdentifier identifier = new LanguageIdentifier(item.getFulltext());
             item.setLocale(new Locale(identifier.getLanguage()));
 
-        } catch (IOException | SAXException | TikaException ex) {
+            collector.emit(StreamIDs.NEWSARTICLEWITHCONTENTSTREAM, new Values(item));
+        } catch (IOException | SAXException | TikaException | IllegalArgumentException ex) {
             logger.error(ex.getMessage(), ex);
         } finally {
             try {
@@ -91,5 +117,4 @@ public class TikaExtractFullTextEnhancer implements IEnhancer {
             }
         }
     }
-
 }

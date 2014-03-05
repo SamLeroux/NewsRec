@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.stormNewsFetch.storm.bolts;
 
 import backtype.storm.task.OutputCollector;
@@ -47,14 +46,15 @@ import org.apache.tika.sax.BodyContentHandler;
 import org.xml.sax.SAXException;
 
 /**
+ * Downloads the article content.
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class FetchArticleContentBolt extends BaseRichBolt{
-    private OutputCollector collector;
+public class FetchArticleContentBolt extends BaseRichBolt {
     private static final Logger logger = Logger.getLogger(FetchArticleContentBolt.class);
     private static final ResourceBundle bundle = PropertyResourceBundle.getBundle("newsRec");
 
+    private OutputCollector collector;
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
@@ -71,15 +71,15 @@ public class FetchArticleContentBolt extends BaseRichBolt{
         collector.ack(input);
         InputStream in = null;
         try {
-            NewsItem item = (NewsItem)input.getValueByField(StreamIDs.NEWSARTICLENOCONTENT);
-           
-            logger.info("Fetching full content from: "+item.getUrl());
-            
+            NewsItem item = (NewsItem) input.getValueByField(StreamIDs.NEWSARTICLENOCONTENT);
+
+            logger.info("Fetching full content from: " + item.getUrl());
+
             HttpURLConnection urlConnection = (HttpURLConnection) item.getUrl().openConnection();
             HttpURLConnection.setFollowRedirects(true);
             urlConnection.setRequestProperty("User-Agent", bundle.getString("useragent"));
-            urlConnection.setConnectTimeout(5000);
-            urlConnection.setReadTimeout(5000);
+            urlConnection.setConnectTimeout(10000);
+            urlConnection.setReadTimeout(10000);
             in = new BufferedInputStream(urlConnection.getInputStream());
             byte[] content = IOUtils.toByteArray(in);
             urlConnection.disconnect();
@@ -116,7 +116,5 @@ public class FetchArticleContentBolt extends BaseRichBolt{
                 logger.error(ex.getMessage(), ex);
             }
         }
-        
     }
-    
 }

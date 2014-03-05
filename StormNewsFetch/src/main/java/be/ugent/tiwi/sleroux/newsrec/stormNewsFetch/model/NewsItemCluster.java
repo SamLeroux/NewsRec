@@ -28,10 +28,17 @@ public class NewsItemCluster {
     private final List<NewsItem> items;
     private NewsItem representative;
 
+    /**
+     *
+     */
     public NewsItemCluster() {
         items = new ArrayList<>();
     }
 
+    /**
+     *
+     * @param item
+     */
     public void addItem(NewsItem item) {
         if (representative == null || representative.getTimestamp().before(item.getTimestamp())) {
             items.add(representative);

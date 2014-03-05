@@ -25,8 +25,30 @@ import java.util.Map;
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public interface IRatingsDao {
+
+    /**
+     *
+     * @param userid
+     * @return
+     * @throws RatingsDaoException
+     */
     public Map<String, Double> getRatings(long userid) throws RatingsDaoException;
+
+    /**
+     *
+     * @param userid
+     * @param term
+     * @param rating
+     * @throws RatingsDaoException
+     */
     public void giveRating(long userid, String term, double rating) throws RatingsDaoException;
+
+    /**
+     *
+     * @param userid
+     * @param terms
+     * @throws RatingsDaoException
+     */
     public void giveRating(long userid, Map<String, Double> terms) throws RatingsDaoException;
 
 }

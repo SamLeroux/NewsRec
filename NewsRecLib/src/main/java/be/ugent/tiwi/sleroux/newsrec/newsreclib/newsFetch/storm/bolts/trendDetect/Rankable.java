@@ -14,14 +14,30 @@
  * limitations under the License.
  */
 
-package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.enhance;
-
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.NewsRecException;
+package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.trendDetect;
 
 /**
  *
- * @author Sam Leroux <sam.leroux@ugent.be>
+ * @author sam
  */
-public class EnhanceException extends NewsRecException {
-    
+public interface Rankable extends Comparable<Rankable> {
+
+    /**
+     *
+     * @return
+     */
+    Object getObject();
+
+    /**
+     *
+     * @return
+     */
+    long getCount();
+
+  /**
+* Note: We do not defensively copy the object wrapped by the Rankable. It is passed as is.
+*
+* @return a defensive copy
+*/
+  Rankable copy();
 }

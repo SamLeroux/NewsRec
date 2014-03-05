@@ -26,5 +26,11 @@ import be.ugent.tiwi.sleroux.newsrec.stormNewsFetch.model.NewsItem;
  * @see NewsItem
  */
 public interface INewsItemDao {
+
+    /**
+     *
+     * @param item
+     * @throws DaoException
+     */
     public void addNewsItem(NewsItem item) throws DaoException;
 }

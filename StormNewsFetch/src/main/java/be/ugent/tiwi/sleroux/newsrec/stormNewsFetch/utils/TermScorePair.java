@@ -15,8 +15,13 @@
  */
 package be.ugent.tiwi.sleroux.newsrec.stormNewsFetch.utils;
 
+import java.util.Objects;
+
 /**
- *
+ * Contains a Term (String) and a score attached to this term (double).
+ * TermScorePairs are comparable based on the scores. TermScorePairs with
+ * larger scores come before TermScorePairs with smaller scores in the natural ordering.
+ * {"abc", 2.5} < {"abc"}, 1.2}.
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class TermScorePair implements Comparable<Object> {
@@ -24,23 +29,44 @@ public class TermScorePair implements Comparable<Object> {
     private String term;
     private double score;
 
+    /**
+     *
+     * @param term
+     * @param score
+     */
     public TermScorePair(String term, double score) {
         this.term = term;
         this.score = score;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getTerm() {
         return term;
     }
 
+    /**
+     *
+     * @param term
+     */
     public void setTerm(String term) {
         this.term = term;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getScore() {
         return score;
     }
 
+    /**
+     *
+     * @param score
+     */
     public void setScore(double score) {
         this.score = score;
     }
@@ -52,5 +78,27 @@ public class TermScorePair implements Comparable<Object> {
         }
         return -1;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + Objects.hashCode(this.term);
+        hash = 97 * hash + (int) (Double.doubleToLongBits(this.score) ^ (Double.doubleToLongBits(this.score) >>> 32));
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final TermScorePair other = (TermScorePair) obj;
+        return Double.doubleToLongBits(this.score) == Double.doubleToLongBits(other.score);
+    }
+    
+    
 
 }

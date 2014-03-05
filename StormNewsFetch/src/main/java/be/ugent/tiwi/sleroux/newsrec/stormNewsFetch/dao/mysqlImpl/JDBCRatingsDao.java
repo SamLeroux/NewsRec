@@ -34,11 +34,15 @@ import org.apache.log4j.Logger;
 public class JDBCRatingsDao implements IRatingsDao {
 
     private static BasicDataSource connectionPool = null;
-    private PreparedStatement insertUpdateRatingStatement;
-    private PreparedStatement selectStatement;
     private static final Logger logger = Logger.getLogger(JDBCRatingsDao.class);
     private static final ResourceBundle bundle = ResourceBundle.getBundle("newsRec");
+    private PreparedStatement insertUpdateRatingStatement;
+    private PreparedStatement selectStatement;
 
+    /**
+     *
+     * @throws RatingsDaoException
+     */
     public JDBCRatingsDao() throws RatingsDaoException {
         logger.debug("constructor called");
         if (connectionPool == null) {
@@ -54,7 +58,7 @@ public class JDBCRatingsDao implements IRatingsDao {
                 connectionPool.setUsername(user);
                 connectionPool.setPassword(pass);
                 connectionPool.setUrl(url);
-                
+
                 logger.debug("connectionpool created");
 
                 logger.debug("creating preparedstatements");
@@ -72,6 +76,12 @@ public class JDBCRatingsDao implements IRatingsDao {
         }
     }
 
+    /**
+     *
+     * @param userid
+     * @return
+     * @throws RatingsDaoException
+     */
     @Override
     public Map<String, Double> getRatings(long userid) throws RatingsDaoException {
         try {
@@ -92,6 +102,13 @@ public class JDBCRatingsDao implements IRatingsDao {
 
     }
 
+    /**
+     *
+     * @param userid
+     * @param term
+     * @param rating
+     * @throws RatingsDaoException
+     */
     @Override
     public void giveRating(long userid, String term, double rating) throws RatingsDaoException {
         try {
@@ -109,6 +126,12 @@ public class JDBCRatingsDao implements IRatingsDao {
         }
     }
 
+    /**
+     *
+     * @param userid
+     * @param terms
+     * @throws RatingsDaoException
+     */
     @Override
     public void giveRating(long userid, Map<String, Double> terms) throws RatingsDaoException {
         try {

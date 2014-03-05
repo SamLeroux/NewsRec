@@ -21,6 +21,7 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 import java.util.Map;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -28,7 +29,9 @@ import java.util.Map;
  */
 public class LoggingBolt extends BaseRichBolt {
 
-    private OutputCollector collector;
+    private transient OutputCollector collector;
+    private static final Logger logger = Logger.getLogger(LoggingBolt.class);
+
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
     }
@@ -40,7 +43,11 @@ public class LoggingBolt extends BaseRichBolt {
 
     @Override
     public void execute(Tuple input) {
-        collector.ack(input);
+        if (collector != null) {
+            collector.ack(input);
+        } else {
+            logger.warn("collector == null !!!");
+        }
         System.out.println("--------------------------------------------------");
         System.out.println(input);
         System.out.println("--------------------------------------------------");

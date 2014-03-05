@@ -13,12 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch;
+package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts;
 
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.enhance.EnhanceException;
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsSource;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.HashCircularBuffer;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.topology.StreamIDs;
 import com.sun.syndication.feed.synd.SyndCategory;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -30,25 +37,41 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import org.apache.log4j.Logger;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 /**
- * Fetch news from an rss feed.
+ * Checks a news source for new articles.
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class RssNewsFetcher extends AbstractNewsfetcher {
+public class RssFetchBolt extends BaseRichBolt {
 
-    private static final Logger logger = Logger.getLogger(RssNewsFetcher.class);
-    private static final HashCircularBuffer<String> buffer = new HashCircularBuffer<>(2000);
+    private HashCircularBuffer<String> articlesurlBuffer;
+    private transient OutputCollector collector;
+    private static final Logger logger = Logger.getLogger(RssFetchBolt.class);
 
     @Override
-    public NewsItem[] fetch(NewsSource source) throws NewsFetchException {
-        logger.debug("fetching news from " + source.getName());
-        List<NewsItem> items = new ArrayList<>();
+    public void declareOutputFields(OutputFieldsDeclarer declarer) {
+        declarer.declareStream(StreamIDs.NEWSARTICLENOCONTENTSTREAM, new Fields(StreamIDs.NEWSARTICLENOCONTENT, StreamIDs.NEWSARTICLESOURCE));
+        declarer.declareStream(StreamIDs.UPDATEDNEWSSOURCESTREAM, new Fields(StreamIDs.UPDATEDNEWSSOURCE));
+    }
+
+    @Override
+    public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+        this.collector = collector;
+        articlesurlBuffer = new HashCircularBuffer<>(1000);
+    }
+
+    @Override
+    public void execute(Tuple input) {
+        collector.ack(input);
+        NewsSource source = (NewsSource) input.getValueByField(StreamIDs.NEWSSOURCEITEM);
+        logger.info("checking: " + source.getName());
         try {
             source.setLastFetchTry(new Date());
 
@@ -57,8 +80,8 @@ public class RssNewsFetcher extends AbstractNewsfetcher {
             httpcon.setConnectTimeout(5000);
             httpcon.setReadTimeout(5000);
 
-            SyndFeedInput input = new SyndFeedInput();
-            SyndFeed feed = input.build(new XmlReader(httpcon));
+            SyndFeedInput feedinput = new SyndFeedInput();
+            SyndFeed feed = feedinput.build(new XmlReader(httpcon));
             List<SyndEntry> entries = feed.getEntries();
 
             // update news source information
@@ -67,54 +90,32 @@ public class RssNewsFetcher extends AbstractNewsfetcher {
 
             // The timestamp of the article that was last fetched.
             Date lastSeen = null;
-
+            int count = 0;
             int i = 0;
             while (i < entries.size()
                     && (source.getLastArticleFetchTime() == null
                     || (entries.get(i).getPublishedDate() != null
                     && entries.get(i).getPublishedDate().after(source.getLastArticleFetchTime())))) {
+
                 SyndEntry entry = entries.get(i);
-                
-                if (!buffer.contains(entry.getTitle())) {
-                    NewsItem item = new NewsItem();
-                    item.setTitle(entry.getTitle());
-
-                    for (Object o : entry.getAuthors()) {
-                        SyndPerson p = (SyndPerson) o;
-                        item.addAuthor(p.getName());
-                    }
-
-                    item.setTimestamp(entry.getPublishedDate());
-
-                    if (entry.getDescription() != null) {
-                        item.setDescription(entry.getDescription().getValue());
-                    } else {
-                        item.setDescription("No description available.");
-                    }
-                    item.setUrl(new URL(entry.getLink()));
-                    item.setSource(source.getName());
-
-                    for (Object o : entry.getCategories()) {
-                        SyndCategory cat = (SyndCategory) o;
-                        item.addTerm(cat.getName(), 0.75F);
-                    }
-
-                    // Pass the article to the enhancement chain.
-                    enhance(item);
-
-                    items.add(item);
+                count++;
+                if (!articlesurlBuffer.contains(entry.getTitle())) {
+                    NewsItem item = generateNewsItem(source, entry);
 
                     // Store the timestamp to make sure we don't process this article
                     // again next time.
                     if (lastSeen == null || entry.getPublishedDate().after(lastSeen)) {
                         lastSeen = entry.getPublishedDate();
                     }
-                    
-                    buffer.putNoCheck(entry.getTitle());
+
+                    articlesurlBuffer.putNoCheck(entry.getTitle());
+
+                    collector.emit(StreamIDs.NEWSARTICLENOCONTENTSTREAM, new Values(item, item.getSource()));
+
                 }
                 i++;
             }
-            logger.debug(items.size() + " new articles");
+
             if (lastSeen != null) {
                 source.setLastArticleFetchTime(lastSeen);
             }
@@ -122,14 +123,15 @@ public class RssNewsFetcher extends AbstractNewsfetcher {
             // Exponential backoff
             // When there were no new articles, increase the interval, otherwise 
             // decrease the interval. Do not go below 30 seconds.
-            if (items.isEmpty()) {
+            if (count == 0) {
                 source.setFetchinterval(source.getFetchinterval() * 2);
             } else {
                 int interval = source.getFetchinterval() / 2;
                 interval = (interval < 30 ? 30 : interval);
                 source.setFetchinterval(interval);
             }
-            logger.debug("New fetchinterval " + source.getFetchinterval());
+            logger.info("found " + count + " new articles");
+            logger.info("New fetchinterval " + source.getFetchinterval());
 
         } catch (MalformedURLException ex) {
             source.setFetchinterval(source.getFetchinterval() * 4);
@@ -137,14 +139,39 @@ public class RssNewsFetcher extends AbstractNewsfetcher {
         } catch (IOException ex) {
             source.setFetchinterval(source.getFetchinterval() * 4);
             logger.error("IOexception", ex);
-        } catch (IllegalArgumentException | FeedException | EnhanceException ex) {
+        } catch (IllegalArgumentException | FeedException ex) {
             source.setFetchinterval(source.getFetchinterval() * 4);
             logger.error(ex.getMessage(), ex);
-
         }
+        collector.emit(StreamIDs.UPDATEDNEWSSOURCESTREAM, new Values(source));
 
-        return items.toArray(
-                new NewsItem[items.size()]);
     }
 
+    private NewsItem generateNewsItem(NewsSource source, SyndEntry entry) throws MalformedURLException {
+        logger.info("Generating news item from feed entry");
+        NewsItem item = new NewsItem();
+        item.setTitle(entry.getTitle());
+
+        for (Object o : entry.getAuthors()) {
+            SyndPerson p = (SyndPerson) o;
+            item.addAuthor(p.getName());
+        }
+
+        item.setTimestamp(entry.getPublishedDate());
+
+        if (entry.getDescription() != null) {
+            Document doc = Jsoup.parse(entry.getDescription().getValue());
+            item.setDescription(doc.text());
+        } else {
+            item.setDescription("No description available.");
+        }
+        item.setUrl(new URL(entry.getLink()));
+        item.setSource(source.getName());
+
+        for (Object o : entry.getCategories()) {
+            SyndCategory cat = (SyndCategory) o;
+            item.addTerm(cat.getName(), 0.75F);
+        }
+        return item;
+    }
 }

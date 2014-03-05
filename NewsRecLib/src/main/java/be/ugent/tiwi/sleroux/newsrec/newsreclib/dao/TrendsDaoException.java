@@ -14,14 +14,31 @@
  * limitations under the License.
  */
 
-package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.enhance;
-
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao;
 
 /**
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public interface IEnhancer {
-    public void enhance(NewsItem item) throws EnhanceException;
+public class TrendsDaoException extends DaoException{
+
+    public TrendsDaoException() {
+    }
+
+    public TrendsDaoException(String message) {
+        super(message);
+    }
+
+    public TrendsDaoException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public TrendsDaoException(Throwable cause) {
+        super(cause);
+    }
+
+    public TrendsDaoException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
+    
 }

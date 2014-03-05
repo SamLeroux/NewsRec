@@ -46,6 +46,9 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
 
 /**
+ * After the news item is indexed in Lucene, the information about term
+ * frequency and document frequency is available. This bolt extracts the top 10
+ * terms from the newsitem and makes them available for the next bolt.
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
@@ -53,10 +56,16 @@ public class NewsItemToTermsBolt extends BaseRichBolt {
 
     private SearcherManager searcherManager;
     private ReaderManager readerManager;
+
     private OutputCollector collector;
     private final String luceneIndexLocation;
+
     private static final Logger logger = Logger.getLogger(NewsItemToTermsBolt.class);
 
+    /**
+     *
+     * @param luceneIndexLocation The full path to the lucene index folder.
+     */
     public NewsItemToTermsBolt(String luceneIndexLocation) {
         this.luceneIndexLocation = luceneIndexLocation;
     }
@@ -74,33 +83,61 @@ public class NewsItemToTermsBolt extends BaseRichBolt {
             searcherManager = new SearcherManager(dir, null);
             readerManager = new ReaderManager(dir);
         } catch (IOException ex) {
-            logger.error(ex);
+            logger.fatal(ex);
         }
     }
 
     @Override
     public void execute(Tuple input) {
         collector.ack(input);
-        
+
         logger.debug(input);
-        NewsItem item = (NewsItem) input.getValueByField(StreamIDs.INDEXEDITEM);
-        logger.info("Extracting terms from document "+item.getId());
-        Map<String, Double> terms = getTopterms(item.getId());
-        for (String term : terms.keySet()) {
-            logger.debug("emitted term: " + term);
-            collector.emit(StreamIDs.TERMSTREAM, new Values(term));
+
+        DirectoryReader reader = null;
+        IndexSearcher searcher = null;
+
+        try {
+            readerManager.maybeRefreshBlocking();
+            searcherManager.maybeRefreshBlocking();
+            reader = readerManager.acquire();
+            searcher = searcherManager.acquire();
+
+            NewsItem item = (NewsItem) input.getValueByField(StreamIDs.INDEXEDITEM);
+            logger.info("Extracting terms from document " + item.getId());
+
+            Map<String, Double> terms = getTopterms(reader, searcher, item.getId());
+            logger.info("Found " + terms.size() + " terms");
+
+            for (String term : terms.keySet()) {
+                logger.debug("emitted term: " + term);
+                collector.emit(StreamIDs.TERMSTREAM, new Values(term));
+            }
+
+            
+
+        } catch (IOException ex) {
+            logger.error(ex);
+        } finally {
+            try {
+                readerManager.release(reader);
+                searcherManager.release(searcher);
+            } catch (IOException | NullPointerException ex) {
+                logger.error(ex);
+            }
         }
-        logger.info("Found "+terms.size()+" terms");
 
     }
 
-    private Map<String, Double> getTopterms(long id)  {
+    private Map<String, Double> getTopterms(DirectoryReader reader, IndexSearcher searcher, long id) throws IOException {
         // fetch the terms occuring in this document
         Map<String, Double> termMap = new HashMap<>(250);
-        updateTermMap(termMap, id, "text", 1);
+
+        updateTermMap(reader, searcher, termMap, id, "text", 1);
         // terms in the title adn description are more important than terms in the text.
-        updateTermMap(termMap, id, "description", 1.5);
-        updateTermMap(termMap, id, "title", 2);
+        updateTermMap(reader, searcher, termMap, id, "description", 1.5);
+        updateTermMap(reader, searcher, termMap, id, "title", 2);
+        updateTermMap(reader, searcher, termMap, id, "term", 4);
+
         Map<String, Double> termsToStore = new HashMap<>();
         if (termMap.size() > 0) {
             // Only store the n most important terms.
@@ -111,13 +148,16 @@ public class NewsItemToTermsBolt extends BaseRichBolt {
             }
             avg /= termMap.size();
 
+            double score;
             for (String term : termMap.keySet()) {
-                if (termMap.get(term) > avg) {
-                    TermScorePair p = new TermScorePair(term, termMap.get(term));
+                score = termMap.get(term);
+                if (score > avg) {
+                    TermScorePair p = new TermScorePair(term, score);
                     pq.add(p);
                 }
 
             }
+
             int n = (pq.size() < 10 ? pq.size() : 10);
             int i = 0;
             TermScorePair tsp = pq.poll();
@@ -131,65 +171,43 @@ public class NewsItemToTermsBolt extends BaseRichBolt {
         return termsToStore;
     }
 
-    private void updateTermMap(Map<String, Double> termMap, long id, String field, double weight)  {
-        IndexSearcher searcher = null;
-        DirectoryReader reader = null;
+    private void updateTermMap(DirectoryReader reader, IndexSearcher searcher, Map<String, Double> termMap, long id, String field, double weight) throws IOException {
+        Query query = NumericRangeQuery.newLongRange("id", id, id, true, true);
+        TopDocs topdocs = searcher.search(query, 1);
 
-        try {
-            readerManager.maybeRefreshBlocking();
-            searcherManager.maybeRefreshBlocking();
+        if (topdocs.totalHits > 0) {
+            int docNr = topdocs.scoreDocs[0].doc;
+            Terms vector = reader.getTermVector(docNr, field);
+            if (vector != null) {
+                TermsEnum termsEnum;
+                termsEnum = vector.iterator(TermsEnum.EMPTY);
+                BytesRef text;
+                while ((text = termsEnum.next()) != null) {
+                    String term = text.utf8ToString();
+                    int docFreq = reader.docFreq(new Term(field, text));
+                    // ignore really rare terms and really common terms
+                    //double minFreq = reader.numDocs() * 0.0001;
+                    //double maxFreq = reader.numDocs() / 3;
+                    double minFreq = 0;
+                    double maxFreq = Double.MAX_VALUE;
 
-            reader = readerManager.acquire();
-            searcher = searcherManager.acquire();
-
-            Query query = NumericRangeQuery.newLongRange("id", id, id, true, true);
-            TopDocs topdocs = searcher.search(query, 1);
-
-            if (topdocs.totalHits > 0) {
-                int docNr = topdocs.scoreDocs[0].doc;
-                Terms vector = reader.getTermVector(docNr, field);
-                if (vector != null) {
-                    TermsEnum termsEnum;
-                    termsEnum = vector.iterator(TermsEnum.EMPTY);
-                    BytesRef text;
-                    while ((text = termsEnum.next()) != null) {
-                        String term = text.utf8ToString();
-                        int docFreq = reader.docFreq(new Term(field, text));
-                        // ignore really rare terms and really common terms
-                        //double minFreq = reader.numDocs() * 0.0001;
-                        //double maxFreq = reader.numDocs() / 3;
-                        double minFreq = 0;
-                        double maxFreq = Double.MAX_VALUE;
-
-                        if (docFreq > minFreq && docFreq < maxFreq) {
-                            double tf = 1 + ((double) termsEnum.totalTermFreq()) / reader.getSumTotalTermFreq(field);
-                            double idf = Math.log((double) reader.numDocs() / docFreq);
-                            if (!Double.isInfinite(idf)) {
-                                if (!termMap.containsKey(term)) {
-                                    termMap.put(term, tf * idf * weight);
-                                } else {
-                                    termMap.put(term, termMap.get(term) + tf * idf * weight);
-                                }
+                    if (docFreq > minFreq && docFreq < maxFreq) {
+                        double tf = 1 + ((double) termsEnum.totalTermFreq()) / reader.getSumTotalTermFreq(field);
+                        double idf = Math.log((double) reader.numDocs() / docFreq);
+                        if (!Double.isInfinite(idf)) {
+                            if (!termMap.containsKey(term)) {
+                                termMap.put(term, tf * idf * weight);
+                            } else {
+                                termMap.put(term, termMap.get(term) + tf * idf * weight);
                             }
                         }
                     }
-                } else {
-                    logger.debug("no term available for doc=" + docNr + " and field=" + field);
                 }
             } else {
-                logger.warn("No documents found with id=" + id);
+                logger.debug("no term available for doc=" + docNr + " and field=" + field);
             }
-        } catch (IOException | NullPointerException ex) {
-            logger.fatal(ex.getMessage(), ex);
-        } finally {
-            try {
-                readerManager.release(reader);
-                searcherManager.release(searcher);
-                reader = null; // Do not use these again
-                searcher = null;
-            } catch (IOException | NullPointerException ex) {
-                logger.error(ex);
-            }
+        } else {
+            logger.warn("No documents found with id=" + id);
         }
     }
 }

@@ -43,38 +43,76 @@ public class EnAnalyzer extends Analyzer {
     private CharArraySet stopwords = null;
     private SynonymMap synonyms = null;
 
+    /**
+     *
+     */
     public EnAnalyzer() {
     }
 
+    /**
+     *
+     * @param stopwords
+     */
     public EnAnalyzer(CharArraySet stopwords) {
         this.stopwords = stopwords;
     }
 
+    /**
+     *
+     * @param synonyms
+     */
     public EnAnalyzer(SynonymMap synonyms) {
         this.synonyms = synonyms;
     }
 
+    /**
+     *
+     * @param stopwords
+     * @param synonyms
+     */
     public EnAnalyzer(CharArraySet stopwords, SynonymMap synonyms) {
         this.stopwords = stopwords;
         this.synonyms = synonyms;
     }
 
+    /**
+     *
+     * @return
+     */
     public CharArraySet getStopwords() {
         return stopwords;
     }
 
+    /**
+     *
+     * @param stopwords
+     */
     public void setStopwords(CharArraySet stopwords) {
         this.stopwords = stopwords;
     }
 
+    /**
+     *
+     * @return
+     */
     public SynonymMap getSynonyms() {
         return synonyms;
     }
 
+    /**
+     *
+     * @param synonyms
+     */
     public void setSynonyms(SynonymMap synonyms) {
         this.synonyms = synonyms;
     }
 
+    /**
+     *
+     * @param fieldName
+     * @param reader
+     * @return
+     */
     @Override
     protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
         //reader = new HTMLStripCharFilter(reader);

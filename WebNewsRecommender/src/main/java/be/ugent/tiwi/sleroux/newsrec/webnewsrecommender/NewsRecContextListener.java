@@ -15,20 +15,11 @@
  */
 package be.ugent.tiwi.sleroux.newsrec.webnewsrecommender;
 
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.INewsSourceDao;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.RatingsDaoException;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ViewsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCViewsDao;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.MysqlNewsSourceDao;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.AbstractNewsfetcher;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.NewsFetchTimer;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.RssNewsFetcher;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.enhance.JsoupStripHtmlDescriptionEnhancer;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.enhance.TikaExtractFullTextEnhancer;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsindex.LuceneNewsIndexer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.ColdStartLuceneRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.IRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.DatabaseLuceneScorer;
@@ -49,7 +40,7 @@ public class NewsRecContextListener implements ServletContextListener {
     private IRatingsDao ratingsDao;
     private IRecommender recommender;
     private IScorer scorer;
-    private NewsFetchTimer timer;
+
     private static final Logger logger = Logger.getLogger(NewsRecContextListener.class);
     private static final ResourceBundle bundle = ResourceBundle.getBundle("WebNewsrecommender");
 
@@ -68,20 +59,9 @@ public class NewsRecContextListener implements ServletContextListener {
             scorer = new DatabaseLuceneScorer(luceneLocation, ratingsDao);
             sce.getServletContext().setAttribute("scorer", scorer);
 
-            AbstractNewsfetcher newsfetcher = new RssNewsFetcher();
-            newsfetcher.addEnhancer(new TikaExtractFullTextEnhancer());
-            newsfetcher.addEnhancer(new JsoupStripHtmlDescriptionEnhancer());
-
-            INewsSourceDao newsSourceDao = new MysqlNewsSourceDao();
-            timer = new NewsFetchTimer(newsSourceDao, newsfetcher, 60000);
-            String stopwordFile = bundle.getString("stopwordsFile");
-            timer.addListener(new LuceneNewsIndexer(luceneLocation, stopwordFile));
-            timer.start();
-        } catch (RatingsDaoException ex) {
-            logger.error(ex);
-        } catch (ViewsDaoException ex) {
-            logger.error(ex);
         } catch (IOException ex) {
+            logger.error(ex);
+        } catch (DaoException ex) {
             logger.error(ex);
         }
 
@@ -89,9 +69,6 @@ public class NewsRecContextListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        if (timer != null) {
-            timer.stop();
-        }
     }
 
 }

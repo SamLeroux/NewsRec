@@ -65,7 +65,7 @@ public class DummyNewsSourceDao implements INewsSourceDao {
     }
 
     @Override
-    public void AddNewsSource(NewsSource source) throws DaoException {
+    public void addNewsSource(NewsSource source) throws DaoException {
         if (!started){
             throw new DaoException("Session not started");
         }
@@ -86,6 +86,10 @@ public class DummyNewsSourceDao implements INewsSourceDao {
             throw new DaoException("Session not started");
         }
         started = false;
+    }
+
+    @Override
+    public void updateNewsSource(NewsSource source) throws DaoException {
     }
 
 }

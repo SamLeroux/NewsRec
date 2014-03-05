@@ -45,18 +45,49 @@ public class NewsItem {
     
     private URL url;
     private URL imageUrl;
-    
 
+    /**
+     *
+     */
     public NewsItem() {
         terms = new HashMap<>();
         authors = new ArrayList<>();
         id = Math.abs(UUID.randomUUID().getMostSignificantBits());
     }
 
+    /**
+     *
+     * @param docNr
+     * @param title
+     * @param authors
+     * @param fulltext
+     * @param description
+     * @param timestamp
+     * @param terms
+     * @param locale
+     * @param source
+     * @param url
+     * @param imageUrl
+     */
     public NewsItem(int docNr,String title, List<String> authors,String fulltext, String description, Date timestamp, Map<String, Float> terms, Locale locale, String source, URL url, URL imageUrl) {
         this(Math.abs(UUID.randomUUID().getMostSignificantBits()), docNr, title, authors, fulltext, description, timestamp, terms, locale, source, url, imageUrl);
     }
 
+    /**
+     *
+     * @param id
+     * @param docNr
+     * @param title
+     * @param authors
+     * @param fulltext
+     * @param description
+     * @param timestamp
+     * @param terms
+     * @param locale
+     * @param source
+     * @param url
+     * @param imageUrl
+     */
     public NewsItem(long id, int docNr, String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Float> terms, Locale locale, String source, URL url, URL imageUrl) {
         this.id = id;
         this.docNr = docNr;
@@ -72,111 +103,203 @@ public class NewsItem {
         this.imageUrl = imageUrl;
     }
 
-    
-    
-    
-    
-
-    
-
+    /**
+     *
+     * @return
+     */
     public URL getImageUrl() {
         return imageUrl;
     }
 
+    /**
+     *
+     * @param imageUrl
+     */
     public void setImageUrl(URL imageUrl) {
         this.imageUrl = imageUrl;
     }
 
-    
-
+    /**
+     *
+     * @return
+     */
     public URL getUrl() {
         return url;
     }
 
+    /**
+     *
+     * @param url
+     */
     public void setUrl(URL url) {
         this.url = url;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getId() {
         return id;
     }
 
+    /**
+     *
+     * @param id
+     */
     public void setId(long id) {
         this.id = id;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getTitle() {
         return title;
     }
 
+    /**
+     *
+     * @param title
+     */
     public void setTitle(String title) {
         this.title = title;
     }
 
+    /**
+     *
+     * @return
+     */
     public String[] getAuthors() {
         return authors.toArray(new String[authors.size()]);
     }
 
+    /**
+     *
+     * @param author
+     */
     public void addAuthor(String author) {
         authors.add(author);
     }
 
+    /**
+     *
+     * @return
+     */
     public String getFulltext() {
         return fulltext;
     }
 
+    /**
+     *
+     * @param fulltext
+     */
     public void setFulltext(String fulltext) {
         this.fulltext = fulltext;
     }
 
+    /**
+     *
+     * @return
+     */
     public Date getTimestamp() {
         return timestamp;
     }
 
+    /**
+     *
+     * @param timestamp
+     */
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
     }
 
+    /**
+     *
+     * @return
+     */
     public Map<String, Float> getTerms() {
         return terms;
     }
 
+    /**
+     *
+     * @param terms
+     */
     public void setTerms(Map<String, Float> terms) {
         this.terms = terms;
     }
 
+    /**
+     *
+     * @return
+     */
     public Locale getLocale() {
         return locale;
     }
 
+    /**
+     *
+     * @param locale
+     */
     public void setLocale(Locale locale) {
         this.locale = locale;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     *
+     * @param description
+     */
     public void setDescription(String description) {
         this.description = description;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getSource() {
         return source;
     }
 
+    /**
+     *
+     * @param source
+     */
     public void setSource(String source) {
         this.source = source;
     }
     
+    /**
+     *
+     * @param term
+     * @param relevancy
+     */
     public void addTerm(String term, float relevancy){
         terms.put(term, relevancy);
     }
 
+    /**
+     *
+     * @return
+     */
     public int getDocNr() {
         return docNr;
     }
 
+    /**
+     *
+     * @param docNr
+     */
     public void setDocNr(int docNr) {
         this.docNr = docNr;
     }

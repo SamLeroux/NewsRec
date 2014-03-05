@@ -29,6 +29,11 @@ import org.hibernate.Query;
  */
 public class MysqlNewsSourceDao extends HibernateDaoTemplate implements INewsSourceDao {
 
+    /**
+     *
+     * @return
+     * @throws DaoException
+     */
     @Override
     public NewsSource[] getSourcesToCheck() throws DaoException {
         startSession();
@@ -38,6 +43,11 @@ public class MysqlNewsSourceDao extends HibernateDaoTemplate implements INewsSou
         return sources.toArray(new NewsSource[sources.size()]);
     }
 
+    /**
+     *
+     * @return
+     * @throws DaoException
+     */
     @Override
     public NewsSource[] getAllSources() throws DaoException {
         startSession();
@@ -47,13 +57,23 @@ public class MysqlNewsSourceDao extends HibernateDaoTemplate implements INewsSou
         return sources.toArray(new NewsSource[sources.size()]);
     }
 
+    /**
+     *
+     * @param source
+     * @throws DaoException
+     */
     @Override
-    public void AddNewsSource(NewsSource source) throws DaoException {
+    public void addNewsSource(NewsSource source) throws DaoException {
         startSession();
         session.saveOrUpdate(source);
         stopSession();
     }
 
+    /**
+     *
+     * @param source
+     * @throws DaoException
+     */
     @Override
     public void updateNewsSource(NewsSource source) throws DaoException {
         startSession();

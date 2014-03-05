@@ -23,21 +23,44 @@ package be.ugent.tiwi.sleroux.newsrec.stormNewsFetch.dao;
  */
 public class ViewsDaoException extends DaoException{
 
+    /**
+     *
+     */
     public ViewsDaoException() {
     }
 
+    /**
+     *
+     * @param message
+     */
     public ViewsDaoException(String message) {
         super(message);
     }
 
+    /**
+     *
+     * @param message
+     * @param cause
+     */
     public ViewsDaoException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     *
+     * @param cause
+     */
     public ViewsDaoException(Throwable cause) {
         super(cause);
     }
 
+    /**
+     *
+     * @param message
+     * @param cause
+     * @param enableSuppression
+     * @param writableStackTrace
+     */
     public ViewsDaoException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }

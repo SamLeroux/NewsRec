@@ -27,19 +27,33 @@ import org.hibernate.cfg.Configuration;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public abstract class HibernateDaoTemplate implements Serializable{
+public abstract class HibernateDaoTemplate implements Serializable {
 
-    private static SessionFactory sessionfactory = null;
-    protected Session session=null;
-    protected Transaction transaction=null;
+    private volatile static SessionFactory sessionfactory = null;
 
+    /**
+     *
+     */
+    protected Session session = null;
 
+    /**
+     *
+     */
+    protected Transaction transaction = null;
+
+    /**
+     *
+     */
     public HibernateDaoTemplate() {
         if (sessionfactory == null) {
             sessionfactory = new Configuration().configure().buildSessionFactory();
         }
     }
 
+    /**
+     *
+     * @throws DaoException
+     */
     protected void startSession() throws DaoException {
         try {
             session = sessionfactory.openSession();
@@ -50,18 +64,20 @@ public abstract class HibernateDaoTemplate implements Serializable{
 
     }
 
+    /**
+     *
+     * @throws DaoException
+     */
     protected void stopSession() throws DaoException {
 
-        try{
-            if (transaction != null){
+        try {
+            if (transaction != null) {
                 transaction.commit();
             }
-        }
-        catch (HibernateException ex){
+        } catch (HibernateException ex) {
             throw new DaoException();
-        }
-        finally{
-            if (session !=null){
+        } finally {
+            if (session != null) {
                 session.close();
             }
         }

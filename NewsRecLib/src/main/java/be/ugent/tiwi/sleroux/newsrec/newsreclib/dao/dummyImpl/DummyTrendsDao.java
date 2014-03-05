@@ -14,29 +14,31 @@
  * limitations under the License.
  */
 
-package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.enhance;
+package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.dummyImpl;
 
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
-import org.apache.log4j.Logger;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ITrendsDao;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.TrendsDaoException;
 
 /**
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class JsoupStripHtmlDescriptionEnhancer implements IEnhancer{
+public class DummyTrendsDao implements ITrendsDao{
 
-    private static final Logger logger = Logger.getLogger(JsoupStripHtmlDescriptionEnhancer.class);
+    private String[] trends;
+
+    public DummyTrendsDao() {
+        trends = new String[]{"linux","java","ubuntu"};
+    }
     
     @Override
-    public void enhance(NewsItem item) throws EnhanceException {
-        logger.debug("start jsoup description enhancer");
-        String description = item.getDescription();
-        if (description != null){
-            Document doc = Jsoup.parse(description);
-            item.setDescription(doc.text());
-        }
+    public String[] getTrends() throws TrendsDaoException {
+        return trends;
+    }
+
+    @Override
+    public void updateTrends(String[] trends) throws TrendsDaoException {
+        this.trends = trends;
     }
     
 }

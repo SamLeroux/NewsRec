@@ -19,12 +19,25 @@ import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.generated.StormTopology;
 
+/**
+ * Utility class to start a local cluster to run a Storm topology.
+ * @author Sam Leroux
+ */
 public final class StormRunner {
     private static LocalCluster cluster;
 
     private StormRunner() {
     }
 
+    /**
+     * Creates a new cluster if there is no running cluster, otherwise deploys 
+     * the topology to the running cluster.
+     * @param topology The topology to run
+     * @param topologyName The name of the new topology
+     * @param conf The configuration for the new topology.
+     * @throws InterruptedException
+     * @see Config
+     */
     public static void runTopologyLocally(StormTopology topology, String topologyName, Config conf)
             throws InterruptedException {
         if (cluster == null){
@@ -33,7 +46,12 @@ public final class StormRunner {
         cluster.submitTopology(topologyName, conf, topology);
     }
 
+    /**
+     * Stops a running cluster.
+     * @param name the name of the cluster to stop.
+     */
     public static void stop(String name) {
+        cluster.killTopology(name);
         cluster.shutdown();
     }
 }

@@ -46,15 +46,27 @@ public abstract class AbstractRankerBolt extends BaseBasicBolt {
   private final int count;
   private final Rankings rankings;
 
-  public AbstractRankerBolt() {
+    /**
+     *
+     */
+    public AbstractRankerBolt() {
     this(DEFAULT_COUNT, DEFAULT_EMIT_FREQUENCY_IN_SECONDS);
   }
 
-  public AbstractRankerBolt(int topN) {
+    /**
+     *
+     * @param topN
+     */
+    public AbstractRankerBolt(int topN) {
     this(topN, DEFAULT_EMIT_FREQUENCY_IN_SECONDS);
   }
 
-  public AbstractRankerBolt(int topN, int emitFrequencyInSeconds) {
+    /**
+     *
+     * @param topN
+     * @param emitFrequencyInSeconds
+     */
+    public AbstractRankerBolt(int topN, int emitFrequencyInSeconds) {
     if (topN < 1) {
       throw new IllegalArgumentException("topN must be >= 1 (you requested " + topN + ")");
     }
@@ -67,7 +79,11 @@ public abstract class AbstractRankerBolt extends BaseBasicBolt {
     rankings = new Rankings(count);
   }
 
-  protected Rankings getRankings() {
+    /**
+     *
+     * @return
+     */
+    protected Rankings getRankings() {
     return rankings;
   }
 
@@ -96,7 +112,7 @@ public abstract class AbstractRankerBolt extends BaseBasicBolt {
 
   @Override
   public Map<String, Object> getComponentConfiguration() {
-    Map<String, Object> conf = new HashMap<String, Object>();
+    Map<String, Object> conf = new HashMap<>();
     conf.put(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS, emitFrequencyInSeconds);
     return conf;
   }

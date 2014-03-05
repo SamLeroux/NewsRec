@@ -21,7 +21,6 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.BooleanClause;
@@ -41,7 +40,6 @@ import org.apache.lucene.search.TopScoreDocCollector;
 public class TopNRecommender extends LuceneRecommender {
 
     private IViewsDao viewsDao;
-    private static final Logger logger = Logger.getLogger(TopNRecommender.class);
 
     public TopNRecommender(String luceneIndexLocation, IViewsDao viewsDao) throws IOException {
         super(luceneIndexLocation);
@@ -100,9 +98,6 @@ public class TopNRecommender extends LuceneRecommender {
 
     protected Query buildQuery(List<Long> ids) {
         BooleanQuery q = new BooleanQuery();
-
-        BooleanQuery.setMaxClauseCount((ids.size() + 1) * 3);
-
         float boost = 1.0F;
         float d = 0.5F / ids.size();
         for (long id : ids) {

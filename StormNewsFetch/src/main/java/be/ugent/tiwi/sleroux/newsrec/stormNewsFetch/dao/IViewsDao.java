@@ -27,7 +27,30 @@ import java.util.List;
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public interface IViewsDao {
+
+    /**
+     *
+     * @param userId
+     * @return
+     * @throws ViewsDaoException
+     */
     public List<Integer> getSeenArticles(long userId) throws ViewsDaoException;
+
+    /**
+     *
+     * @param userId
+     * @param docNr
+     * @param itemId
+     * @throws ViewsDaoException
+     */
     public void see(long userId, int docNr, long itemId) throws ViewsDaoException;
+
+    /**
+     *
+     * @param start
+     * @param stop
+     * @return
+     * @throws ViewsDaoException
+     */
     public List<Long> getNMostSeenArticles(int start, int stop) throws ViewsDaoException;
 }

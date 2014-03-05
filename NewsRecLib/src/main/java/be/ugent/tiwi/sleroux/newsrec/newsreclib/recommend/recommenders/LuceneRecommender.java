@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.Locale;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.SearcherManager;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -39,8 +40,12 @@ public abstract class LuceneRecommender implements IRecommender {
     private Directory dir;
     protected SearcherManager manager;
 
-    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(LuceneRecommender.class);
+    protected static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(LuceneRecommender.class);
 
+    static {
+        BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
+    }
+    
     public LuceneRecommender(String luceneIndexLocation) throws IOException {
         this.luceneIndexLocation = luceneIndexLocation;
         openIndex();
@@ -148,5 +153,12 @@ public abstract class LuceneRecommender implements IRecommender {
 
         return item;
     }
+
+    
+    
+    
+    
+    
+    
 
 }

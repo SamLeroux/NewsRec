@@ -1,3 +1,5 @@
+package be.ugent.tiwi.sleroux.newsrec.newsreclib.lucene.analyzers;
+
 /*
  * Copyright 2014 Sam Leroux <sam.leroux@ugent.be>.
  *
@@ -13,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsindex;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.config.Config;
 import java.io.Reader;
@@ -43,38 +44,76 @@ public class EnAnalyzer extends Analyzer {
     private CharArraySet stopwords = null;
     private SynonymMap synonyms = null;
 
+    /**
+     *
+     */
     public EnAnalyzer() {
     }
 
+    /**
+     *
+     * @param stopwords
+     */
     public EnAnalyzer(CharArraySet stopwords) {
         this.stopwords = stopwords;
     }
 
+    /**
+     *
+     * @param synonyms
+     */
     public EnAnalyzer(SynonymMap synonyms) {
         this.synonyms = synonyms;
     }
 
+    /**
+     *
+     * @param stopwords
+     * @param synonyms
+     */
     public EnAnalyzer(CharArraySet stopwords, SynonymMap synonyms) {
         this.stopwords = stopwords;
         this.synonyms = synonyms;
     }
 
+    /**
+     *
+     * @return
+     */
     public CharArraySet getStopwords() {
         return stopwords;
     }
 
+    /**
+     *
+     * @param stopwords
+     */
     public void setStopwords(CharArraySet stopwords) {
         this.stopwords = stopwords;
     }
 
+    /**
+     *
+     * @return
+     */
     public SynonymMap getSynonyms() {
         return synonyms;
     }
 
+    /**
+     *
+     * @param synonyms
+     */
     public void setSynonyms(SynonymMap synonyms) {
         this.synonyms = synonyms;
     }
 
+    /**
+     *
+     * @param fieldName
+     * @param reader
+     * @return
+     */
     @Override
     protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
         //reader = new HTMLStripCharFilter(reader);

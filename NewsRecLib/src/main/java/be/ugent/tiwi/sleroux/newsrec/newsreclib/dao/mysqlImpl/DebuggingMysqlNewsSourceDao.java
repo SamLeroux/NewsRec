@@ -16,6 +16,7 @@
 
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl;
 
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.INewsSourceDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsSource;
 import java.util.List;
@@ -42,7 +43,12 @@ public class DebuggingMysqlNewsSourceDao extends HibernateDaoTemplate implements
     }
 
     @Override
-    public void AddNewsSource(NewsSource source) {
+    public void addNewsSource(NewsSource source) {
         session.saveOrUpdate(source);
+    }
+
+    @Override
+    public void updateNewsSource(NewsSource source) throws DaoException {
+        session.update(source);
     }
 }

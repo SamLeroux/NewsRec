@@ -15,6 +15,7 @@
  */
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl;
 
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ViewsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
 import java.sql.PreparedStatement;
@@ -22,56 +23,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
-import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class JDBCViewsDao implements IViewsDao {
+public class JDBCViewsDao extends AbstractJDBCBaseDao implements IViewsDao {
 
-    private static BasicDataSource connectionPool = null;
     private PreparedStatement insertViewsStatement;
     private PreparedStatement selectStatement;
     private PreparedStatement selectTopNStatement;
-    private static final Logger logger = Logger.getLogger(JDBCViewsDao.class);
-    private static final ResourceBundle bundle = ResourceBundle.getBundle("newsRec");
 
-    public JDBCViewsDao() throws ViewsDaoException {
-        logger.debug("JDBCViewsDao constructor called");
-        if (connectionPool == null) {
-            logger.debug("creating connectionpool");
-            String driver = bundle.getString("dbDriver");
-            String user = bundle.getString("dbUser");
-            String pass = bundle.getString("dbPass");
-            String url = bundle.getString("dbUrl");
-            url = url + "?user=" + user + "&password=" + pass;
-            connectionPool = new BasicDataSource();
-            connectionPool.setDriverClassName(driver);
-            connectionPool.setUsername(user);
-            connectionPool.setPassword(pass);
-            connectionPool.setUrl(url);
-            logger.debug("connectionpool created");
-        }
-        try {
-            logger.debug("creating preparedstatements");
-            
-            String statementText = bundle.getString("selectViewsQuery");
-            selectStatement = connectionPool.getConnection().prepareStatement(statementText);
-            
-            statementText = bundle.getString("insertUpdateViewsQuery");
-            insertViewsStatement = connectionPool.getConnection().prepareStatement(statementText);
-            
-            statementText = bundle.getString("selectTopNViewsQuery");
-            selectTopNStatement = connectionPool.getConnection().prepareStatement(statementText);
-            
-            logger.debug("created preparedstatements");
-        } catch (SQLException ex) {
-            logger.error(ex.getMessage(), ex);
-            throw new ViewsDaoException(ex);
-        }
+    public JDBCViewsDao() throws DaoException {
     }
 
     @Override
@@ -117,7 +82,7 @@ public class JDBCViewsDao implements IViewsDao {
             selectTopNStatement.setInt(1, start);
             selectTopNStatement.setInt(2, stop);
             List<Long> out = new ArrayList<>();
-            
+
             try (ResultSet results = selectTopNStatement.executeQuery()) {
                 while (results.next()) {
                     out.add(results.getLong(1));
@@ -129,6 +94,37 @@ public class JDBCViewsDao implements IViewsDao {
             return out;
         } catch (SQLException ex) {
             logger.error(ex);
+            throw new ViewsDaoException(ex);
+        }
+    }
+
+    @Override
+    protected void createStatements() throws DaoException {
+        try {
+            logger.debug("creating preparedstatements");
+            
+            String statementText = bundle.getString("selectViewsQuery");
+            selectStatement = getConnection().prepareStatement(statementText);
+            
+            statementText = bundle.getString("insertUpdateViewsQuery");
+            insertViewsStatement = getConnection().prepareStatement(statementText);
+            
+            statementText = bundle.getString("selectTopNViewsQuery");
+            selectTopNStatement = getConnection().prepareStatement(statementText);
+            
+            logger.debug("created preparedstatements");
+        } catch (SQLException ex) {
+            throw new ViewsDaoException(ex);
+        }
+    }
+
+    @Override
+    protected void closeStatements() throws DaoException {
+        try {
+            selectStatement.close();
+            insertViewsStatement.close();
+            selectTopNStatement.close();
+        } catch (SQLException ex) {
             throw new ViewsDaoException(ex);
         }
     }

@@ -15,8 +15,10 @@
  */
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl;
 
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.INewsSourceDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsSource;
+import java.io.Serializable;
 import java.util.List;
 import org.hibernate.Query;
 
@@ -25,26 +27,54 @@ import org.hibernate.Query;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class MysqlNewsSourceDao extends HibernateDaoTemplate implements INewsSourceDao {
+public class MysqlNewsSourceDao extends HibernateDaoTemplate implements INewsSourceDao, Serializable {
 
     @Override
-    public NewsSource[] getSourcesToCheck() {
+    public NewsSource[] getSourcesToCheck() throws DaoException {
+        startSession();
         Query query = session.createQuery("from NewsSource where lastFetchTry = null or (lastFetchTry + fetchinterval < CURRENT_TIMESTAMP())");
         List<NewsSource> sources = query.list();
-
+        stopSession();
         return sources.toArray(new NewsSource[sources.size()]);
     }
 
+    /**
+     *
+     * @return
+     * @throws DaoException
+     */
     @Override
-    public NewsSource[] getAllSources() {
+    public NewsSource[] getAllSources() throws DaoException {
+        startSession();
         Query query = session.createQuery("from NewsSource");
         List<NewsSource> sources = query.list();
+        stopSession();
         return sources.toArray(new NewsSource[sources.size()]);
     }
 
+    /**
+     *
+     * @param source
+     * @throws DaoException
+     */
     @Override
-    public void AddNewsSource(NewsSource source) {
+    public void addNewsSource(NewsSource source) throws DaoException {
+        startSession();
         session.saveOrUpdate(source);
+        stopSession();
     }
+
+    /**
+     *
+     * @param source
+     * @throws DaoException
+     */
+    @Override
+    public void updateNewsSource(NewsSource source) throws DaoException {
+        startSession();
+        session.update(source);
+        stopSession();
+    }
+
 
 }

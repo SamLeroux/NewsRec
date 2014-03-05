@@ -16,33 +16,49 @@
 
 package be.ugent.tiwi.sleroux.newsrec.stormNewsFetch.utils;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 
 /**
- *
+ * Fixed size FIFO buffer with constant time push(), pop() and contains()
+ * operations.
+ * Duplicates are not allowed.
  * @author Sam Leroux <sam.leroux@ugent.be>
  * @param <T>
  */
-public class HashCircularBuffer<T> {
+public class HashCircularBuffer<T> implements Serializable{
     private final Queue<T> queue;
     private final Set<T> set;
     private final int capacity;
     
+    /**
+     *
+     * @param capacity The fixed size of the buffer
+     */
     public HashCircularBuffer(int capacity) {
         this.capacity = capacity;
         queue = new ArrayBlockingQueue<>(capacity);
         set = new HashSet<>(capacity);
     }
     
+    /**
+     * Adds a new item to the queue if it does not already exists in the queue.
+     * @param t The item to add to the buffer
+     */
     public synchronized void put(T t){
         if (!set.contains(t)){
             putNoCheck(t);
         }
     }
     
+    /**
+     * Adds a new item to the queue. Does not check if the item already exists in
+     * the queue. Does nothing if the item already exists in the queue.
+     * @param t
+     */
     public synchronized void putNoCheck(T t){
         if (queue.size() == capacity){
             T delete = queue.remove();
@@ -52,14 +68,27 @@ public class HashCircularBuffer<T> {
         queue.offer(t);
     }
     
+    /**
+     * Checks if the queue contains this item.
+     * @param t
+     * @return
+     */
     public boolean contains(T t){
         return set.contains(t);
     }
     
+    /**
+     *
+     * @return
+     */
     public int size(){
         return queue.size();
     }
     
+    /**
+     *
+     * @return
+     */
     public int capacity(){
         return this.capacity;
     }

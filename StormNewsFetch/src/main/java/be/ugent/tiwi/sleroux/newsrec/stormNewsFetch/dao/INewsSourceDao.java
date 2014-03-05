@@ -28,15 +28,36 @@ import be.ugent.tiwi.sleroux.newsrec.stormNewsFetch.model.NewsSource;
  */
 public interface INewsSourceDao {
 
+    /**
+     *
+     * @return
+     * @throws DaoException
+     */
     NewsSource[] getSourcesToCheck() throws DaoException;
 
+    /**
+     *
+     * @return
+     * @throws DaoException
+     */
     NewsSource[] getAllSources() throws DaoException;
 
-    void AddNewsSource(NewsSource source) throws DaoException;
+    /**
+     *
+     * @param source
+     * @throws DaoException
+     */
+    void addNewsSource(NewsSource source) throws DaoException;
 
 //    void startSession() throws DaoException;
 //
 //    void stopSession() throws DaoException;
     
+    /**
+     *
+     * @param source
+     * @throws DaoException
+     */
+        
     void updateNewsSource(NewsSource source) throws DaoException;
 }

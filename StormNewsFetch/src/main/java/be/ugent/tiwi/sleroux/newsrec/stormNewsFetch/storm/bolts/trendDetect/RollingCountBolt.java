@@ -63,11 +63,19 @@ public class RollingCountBolt extends BaseRichBolt {
   private OutputCollector collector;
   private NthLastModifiedTimeTracker lastModifiedTracker;
 
-  public RollingCountBolt() {
+    /**
+     *
+     */
+    public RollingCountBolt() {
     this(DEFAULT_SLIDING_WINDOW_IN_SECONDS, DEFAULT_EMIT_FREQUENCY_IN_SECONDS);
   }
 
-  public RollingCountBolt(int windowLengthInSeconds, int emitFrequencyInSeconds) {
+    /**
+     *
+     * @param windowLengthInSeconds
+     * @param emitFrequencyInSeconds
+     */
+    public RollingCountBolt(int windowLengthInSeconds, int emitFrequencyInSeconds) {
     this.windowLengthInSeconds = windowLengthInSeconds;
     this.emitFrequencyInSeconds = emitFrequencyInSeconds;
     counter = new SlidingWindowCounter<>(deriveNumWindowChunksFrom(this.windowLengthInSeconds,

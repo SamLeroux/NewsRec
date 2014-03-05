@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch;
-
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao;
 
 /**
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public interface INewsItemListener {
-    public void newItem(NewsItem[] items);
+public interface ITrendsDao {
+    public String[] getTrends() throws TrendsDaoException;
+    public void updateTrends(String[] trends) throws TrendsDaoException;
 }

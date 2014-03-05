@@ -28,18 +28,17 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import org.apache.log4j.Logger;
 
 /**
- *
+ * Writes all incoming terms to a text file. 
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class FileOutputBolt extends BaseRichBolt {
+public class TermFileOutputBolt extends BaseRichBolt {
 
     private BufferedWriter writer;
     private OutputCollector collector;
-    private static final Logger logger = Logger.getLogger(FileOutputBolt.class);
+    private static final Logger logger = Logger.getLogger(TermFileOutputBolt.class);
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
@@ -47,7 +46,7 @@ public class FileOutputBolt extends BaseRichBolt {
 
     @Override
     public void cleanup() {
-        super.cleanup(); //To change body of generated methods, choose Tools | Templates.
+        super.cleanup();
         try {
             writer.close();
         } catch (IOException ex) {
@@ -60,7 +59,7 @@ public class FileOutputBolt extends BaseRichBolt {
         this.collector = collector;
         try {
             logger.info("Open term output file");
-            writer = new BufferedWriter(new FileWriter("/home/sam/Bureaublad/terms.txt"));
+            writer = new BufferedWriter(new FileWriter("/home/sam/Bureaublad/terms.txt", true));
         } catch (IOException ex) {
             logger.error(ex);
         }

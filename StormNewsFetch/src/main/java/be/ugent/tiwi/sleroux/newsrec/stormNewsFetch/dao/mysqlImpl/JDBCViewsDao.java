@@ -40,6 +40,10 @@ public class JDBCViewsDao implements IViewsDao {
     private static final Logger logger = Logger.getLogger(JDBCViewsDao.class);
     private static final ResourceBundle bundle = ResourceBundle.getBundle("newsRec");
 
+    /**
+     *
+     * @throws ViewsDaoException
+     */
     public JDBCViewsDao() throws ViewsDaoException {
         logger.debug("JDBCViewsDao constructor called");
         if (connectionPool == null) {
@@ -75,6 +79,12 @@ public class JDBCViewsDao implements IViewsDao {
         }
     }
 
+    /**
+     *
+     * @param userId
+     * @return
+     * @throws ViewsDaoException
+     */
     @Override
     public List<Integer> getSeenArticles(long userId) throws ViewsDaoException {
         try {
@@ -96,6 +106,13 @@ public class JDBCViewsDao implements IViewsDao {
 
     }
 
+    /**
+     *
+     * @param userid
+     * @param docnr
+     * @param itemid
+     * @throws ViewsDaoException
+     */
     @Override
     public void see(long userid, int docnr, long itemid) throws ViewsDaoException {
         try {
@@ -112,6 +129,13 @@ public class JDBCViewsDao implements IViewsDao {
         }
     }
 
+    /**
+     *
+     * @param start
+     * @param stop
+     * @return
+     * @throws ViewsDaoException
+     */
     @Override
     public List<Long> getNMostSeenArticles(int start, int stop) throws ViewsDaoException {
         try {

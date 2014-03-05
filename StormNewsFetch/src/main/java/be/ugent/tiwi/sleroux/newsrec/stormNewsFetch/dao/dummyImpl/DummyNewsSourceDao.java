@@ -37,6 +37,9 @@ public class DummyNewsSourceDao implements INewsSourceDao, Serializable {
     private boolean started = false;
     private static final Random rnd = new Random();
 
+    /**
+     *
+     */
     public DummyNewsSourceDao() {
         try {
             newsSources = new ArrayList<>();
@@ -51,6 +54,11 @@ public class DummyNewsSourceDao implements INewsSourceDao, Serializable {
 
     }
 
+    /**
+     *
+     * @return
+     * @throws DaoException
+     */
     @Override
     public NewsSource[] getSourcesToCheck() throws DaoException {
         if (!started) {
@@ -63,6 +71,11 @@ public class DummyNewsSourceDao implements INewsSourceDao, Serializable {
         }
     }
 
+    /**
+     *
+     * @return
+     * @throws DaoException
+     */
     @Override
     public NewsSource[] getAllSources() throws DaoException {
         if (!started) {
@@ -73,8 +86,13 @@ public class DummyNewsSourceDao implements INewsSourceDao, Serializable {
 
     }
 
+    /**
+     *
+     * @param source
+     * @throws DaoException
+     */
     @Override
-    public void AddNewsSource(NewsSource source) throws DaoException {
+    public void addNewsSource(NewsSource source) throws DaoException {
         if (!started) {
             throw new DaoException("Session not started");
         }
@@ -97,6 +115,12 @@ public class DummyNewsSourceDao implements INewsSourceDao, Serializable {
 //        started = false;
 //    }
 
+    /**
+     *
+     * @param source
+     * @throws DaoException
+     */
+    
     @Override
     public void updateNewsSource(NewsSource source) throws DaoException {
     }

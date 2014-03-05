@@ -14,18 +14,28 @@
  * limitations under the License.
  */
 
-package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsfetch.enhance;
+package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.trendDetect;
 
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import backtype.storm.Constants;
+import backtype.storm.tuple.Tuple;
 
 /**
  *
- * @author Sam Leroux <sam.leroux@ugent.be>
+ * @author sam
  */
-public class DummyEnhancer implements IEnhancer{
+public final class TupleHelpers {
 
-    @Override
-    public void enhance(NewsItem item) throws EnhanceException {
-    }
-    
+  private TupleHelpers() {
+  }
+
+    /**
+     *
+     * @param tuple
+     * @return
+     */
+    public static boolean isTickTuple(Tuple tuple) {
+    return tuple.getSourceComponent().equals(Constants.SYSTEM_COMPONENT_ID) && tuple.getSourceStreamId().equals(
+        Constants.SYSTEM_TICK_STREAM_ID);
+  }
+
 }

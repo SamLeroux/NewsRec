@@ -24,19 +24,30 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ *
+ * @author sam
+ */
 public class Rankings implements Serializable {
 
   private static final long serialVersionUID = -1549827195410578903L;
   private static final int DEFAULT_COUNT = 10;
 
   private final int maxSize;
-  private final List<Rankable> rankedItems = new ArrayList<Rankable>();
+  private final List<Rankable> rankedItems = new ArrayList<>();
 
-  public Rankings() {
+    /**
+     *
+     */
+    public Rankings() {
     this(DEFAULT_COUNT);
   }
 
-  public Rankings(int topN) {
+    /**
+     *
+     * @param topN
+     */
+    public Rankings(int topN) {
     if (topN < 1) {
       throw new IllegalArgumentException("topN must be >= 1");
     }
@@ -75,20 +86,28 @@ public class Rankings implements Serializable {
    * @return a somewhat defensive copy of ranked items
    */
   public List<Rankable> getRankings() {
-    List<Rankable> copy = new LinkedList<Rankable>();
+    List<Rankable> copy = new LinkedList<>();
     for (Rankable r: rankedItems) {
       copy.add(r.copy());
     }
     return copy;
   }
 
-  public void updateWith(Rankings other) {
+    /**
+     *
+     * @param other
+     */
+    public void updateWith(Rankings other) {
     for (Rankable r : other.getRankings()) {
       updateWith(r);
     }
   }
 
-  public void updateWith(Rankable r) {
+    /**
+     *
+     * @param r
+     */
+    public void updateWith(Rankable r) {
     synchronized(rankedItems) {
       addOrReplace(r);
       rerank();

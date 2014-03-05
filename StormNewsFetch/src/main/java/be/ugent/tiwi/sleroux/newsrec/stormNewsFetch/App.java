@@ -19,6 +19,11 @@ import org.apache.log4j.Logger;
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class App {
+
+    /**
+     *
+     * @param args
+     */
     public static void main(String[] args) {
         try {
             INewsSourceDao newsSourceDao = new MysqlNewsSourceDao();
@@ -34,7 +39,7 @@ public class App {
                     stopwordsFileLocation);
             
             starter.start();
-            Thread.sleep(2500000);
+            Thread.sleep(1000*60*60);
             starter.stop();
             
         } catch (InterruptedException ex) {

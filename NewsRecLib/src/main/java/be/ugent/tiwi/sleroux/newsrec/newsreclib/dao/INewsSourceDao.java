@@ -28,8 +28,10 @@ public interface INewsSourceDao {
     NewsSource[] getSourcesToCheck() throws DaoException;
 
     NewsSource[] getAllSources() throws DaoException;
+    
+    void updateNewsSource(NewsSource source) throws DaoException;
 
-    void AddNewsSource(NewsSource source) throws DaoException;
+    void addNewsSource(NewsSource source) throws DaoException;
 
     void startSession() throws DaoException;
 
