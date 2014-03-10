@@ -124,7 +124,7 @@ public class ConsoleNewsRecommender {
                     stopwordsFileLocation);
             
             starter.start();
-            Thread.sleep(1000*60*60);
+            Thread.sleep(1000*60*60*24);
             starter.stop();
         } catch (InterruptedException ex) {
             java.util.logging.Logger.getLogger(ConsoleNewsRecommender.class.getName()).log(Level.SEVERE, null, ex);

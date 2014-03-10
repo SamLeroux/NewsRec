@@ -42,9 +42,9 @@ public class JDBCTrendsDao extends AbstractJDBCBaseDao implements ITrendsDao, Se
     public String[] getTrends() throws TrendsDaoException {
         logger.debug("Get trends");
         try {
-            selectStatement.setInt(1, 25);
+            selectStatement.setInt(1, 100);
             try (ResultSet results = selectStatement.executeQuery()) {
-                List<String> trends = new ArrayList<>(25);
+                List<String> trends = new ArrayList<>(100);
                 while (results.next()) {
                     trends.add(results.getString(1));
                 }

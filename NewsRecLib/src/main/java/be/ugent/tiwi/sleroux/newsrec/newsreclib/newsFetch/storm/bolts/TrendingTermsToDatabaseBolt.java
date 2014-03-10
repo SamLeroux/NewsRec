@@ -58,6 +58,7 @@ public class TrendingTermsToDatabaseBolt extends BaseRichBolt {
 
     @Override
     public void execute(Tuple input) {
+        //logger.info("Storing trending term in database");
         collector.ack(input);
         try {
             List<String> terms = new ArrayList<>();
@@ -68,6 +69,7 @@ public class TrendingTermsToDatabaseBolt extends BaseRichBolt {
                 terms.add(rowf.getObject().toString());
             }
             if (!terms.isEmpty()) {
+                logger.info("Storing "+terms.size()+" trending terms in database");
                 trendsDao.updateTrends(terms.toArray(new String[terms.size()]));
             }
         } catch (TrendsDaoException ex) {

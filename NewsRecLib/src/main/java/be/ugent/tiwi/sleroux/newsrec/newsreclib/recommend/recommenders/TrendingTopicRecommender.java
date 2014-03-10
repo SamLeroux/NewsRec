@@ -13,21 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ITrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.RatingsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.TrendsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
@@ -43,22 +37,25 @@ import org.apache.lucene.search.TopScoreDocCollector;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class TrendingTopicsRecommender extends LuceneRecommender{
+public class TrendingTopicRecommender extends LuceneRecommender implements IRecommender {
 
     private ITrendsDao trendsDao;
     private IViewsDao viewsDao;
-    
-    public TrendingTopicsRecommender(ITrendsDao trendsDao, String luceneIndexLocation) throws IOException {
+
+    public TrendingTopicRecommender(ITrendsDao trendsDao, IViewsDao viewsDao, String luceneIndexLocation) throws IOException {
         super(luceneIndexLocation);
         this.trendsDao = trendsDao;
+        this.viewsDao = viewsDao;
     }
+
     
-    
+
     @Override
     public List<NewsItem> recommend(long userid, int start, int count) throws RecommendationException {
         IndexSearcher searcher = null;
         try {
-            Query query = buildQuery(trendsDao.getTrends());
+            String[] trends = trendsDao.getTrends();
+            Query query = buildQuery(trends);
             int hitsPerPage = count;
 
             TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
@@ -77,8 +74,6 @@ public class TrendingTopicsRecommender extends LuceneRecommender{
                 int docId = hits[i].doc;
                 Document d = searcher.doc(docId);
                 results.add(toNewsitem(d, docId));
-                //System.out.println(docId);
-                //System.out.println(searcher.explain(query, docId).toString());
             }
 
             return results;
@@ -86,7 +81,7 @@ public class TrendingTopicsRecommender extends LuceneRecommender{
         } catch (TrendsDaoException | IOException ex) {
             logger.error(ex);
             throw new RecommendationException(ex);
-        }  finally{
+        } finally {
             try {
                 manager.release(searcher);
             } catch (IOException ex) {
@@ -95,17 +90,14 @@ public class TrendingTopicsRecommender extends LuceneRecommender{
             searcher = null;
         }
     }
-    
-    protected Query buildQuery(String[] terms) {
+
+    protected Query buildQuery(String[] trends) {
         BooleanQuery q = new BooleanQuery();
-        for (String term : terms) {
-            Query query = new TermQuery(new Term("text", term));
-            q.add(query, BooleanClause.Occur.SHOULD);
+        for (String term : trends) {
             Query query2 = new TermQuery(new Term("title", term));
             q.add(query2, BooleanClause.Occur.SHOULD);
         }
-        //return q;
         return new RecencyBoostQuery(q);
     }
-    
+
 }

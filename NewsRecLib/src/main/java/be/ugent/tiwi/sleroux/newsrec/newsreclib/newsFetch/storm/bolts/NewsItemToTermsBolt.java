@@ -186,10 +186,10 @@ public class NewsItemToTermsBolt extends BaseRichBolt {
                     String term = text.utf8ToString();
                     int docFreq = reader.docFreq(new Term(field, text));
                     // ignore really rare terms and really common terms
-                    //double minFreq = reader.numDocs() * 0.0001;
-                    //double maxFreq = reader.numDocs() / 3;
-                    double minFreq = 0;
-                    double maxFreq = Double.MAX_VALUE;
+                    double minFreq = reader.numDocs() * 0.0001;
+                    double maxFreq = reader.numDocs() / 3;
+                    //double minFreq = 0;
+                    //double maxFreq = Double.MAX_VALUE;
 
                     if (docFreq > minFreq && docFreq < maxFreq) {
                         double tf = 1 + ((double) termsEnum.totalTermFreq()) / reader.getSumTotalTermFreq(field);

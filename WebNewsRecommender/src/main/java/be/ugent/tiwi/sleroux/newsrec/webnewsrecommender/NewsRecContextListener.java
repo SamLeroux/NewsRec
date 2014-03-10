@@ -17,11 +17,13 @@ package be.ugent.tiwi.sleroux.newsrec.webnewsrecommender;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ITrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCRatingsDao;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCTrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCViewsDao;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.ColdStartLuceneRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.IRecommender;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.TrendingTopicRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.DatabaseLuceneScorer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.IScorer;
 import java.io.IOException;
@@ -38,6 +40,7 @@ public class NewsRecContextListener implements ServletContextListener {
 
     private IViewsDao viewsDao;
     private IRatingsDao ratingsDao;
+    private ITrendsDao trendsDao;
     private IRecommender recommender;
     private IScorer scorer;
 
@@ -51,9 +54,11 @@ public class NewsRecContextListener implements ServletContextListener {
             sce.getServletContext().setAttribute("viewsDao", viewsDao);
 
             ratingsDao = new JDBCRatingsDao();
+            trendsDao = new JDBCTrendsDao();
 
             String luceneLocation = bundle.getString("luceneIndexLocation");
-            recommender = new ColdStartLuceneRecommender(luceneLocation, ratingsDao, viewsDao);
+            //recommender = new ColdStartLuceneRecommender(luceneLocation, ratingsDao, viewsDao);
+            recommender = new TrendingTopicRecommender(trendsDao, viewsDao, luceneLocation);
             sce.getServletContext().setAttribute("recommender", recommender);
 
             scorer = new DatabaseLuceneScorer(luceneLocation, ratingsDao);

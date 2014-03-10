@@ -13,12 +13,10 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.RssFetchBo
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.UpdateNewsSourceBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.spouts.FeedSourceSpout;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.StormRunner;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.TermFileOutputBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.TrendingTermsToDatabaseBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.trendDetect.IntermediateRankingsBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.trendDetect.RollingCountBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.trendDetect.TotalRankingsBolt;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.topology.StreamIDs;
 
 /*
  * Copyright 2014 Sam Leroux <sam.leroux@ugent.be>.
@@ -73,31 +71,31 @@ public class NewsFetchTopologyStarter {
         builder.setSpout("feedurlspout", new FeedSourceSpout(newsSourceDao));
 
         builder.setBolt("rssfetchbolt", new RssFetchBolt(), 1)
-                .allGrouping("feedurlspout", StreamIDs.NEWSSOURCESTREAM);
+                .globalGrouping("feedurlspout", StreamIDs.NEWSSOURCESTREAM);
 
         builder.setBolt("contentFetchBolt", new FetchArticleContentBolt(), 1)
-                .allGrouping("rssfetchbolt", StreamIDs.NEWSARTICLENOCONTENTSTREAM);
+                .globalGrouping("rssfetchbolt", StreamIDs.NEWSARTICLENOCONTENTSTREAM);
         builder.setBolt("updatesourcebolt", new UpdateNewsSourceBolt(newsSourceDao), 1)
-                .allGrouping("rssfetchbolt", StreamIDs.UPDATEDNEWSSOURCESTREAM);
+                .globalGrouping("rssfetchbolt", StreamIDs.UPDATEDNEWSSOURCESTREAM);
 
         builder.setBolt("luceneIndexBolt", new LuceneIndexBolt(luceneIndexLocation, stopWordsLocation), 1)
-                .allGrouping("contentFetchBolt", StreamIDs.NEWSARTICLEWITHCONTENTSTREAM);
+                .globalGrouping("contentFetchBolt", StreamIDs.NEWSARTICLEWITHCONTENTSTREAM);
 
         builder.setBolt("termextractor", new NewsItemToTermsBolt(luceneIndexLocation), 1)
-                .allGrouping("luceneIndexBolt", StreamIDs.INDEXEDITEMSTREAM);
+                .globalGrouping("luceneIndexBolt", StreamIDs.INDEXEDITEMSTREAM);
 
         
-        builder.setBolt("counterBolt", new RollingCountBolt(60*60, 240), 4)
+        builder.setBolt("counterBolt", new RollingCountBolt(60*60, 120), 4)
                 .fieldsGrouping("termextractor", StreamIDs.TERMSTREAM, new Fields(StreamIDs.TERM));
         builder.setBolt("intermediateRankerBolt", new IntermediateRankingsBolt(25), 4)
                 .fieldsGrouping("counterBolt", new Fields("obj"));
         builder.setBolt("rankerBolt", new TotalRankingsBolt(25),1)
                 .globalGrouping("intermediateRankerBolt");
 
-        builder.setBolt("fileOutputBolt", new TermFileOutputBolt(), 1)
-                .allGrouping("rankerBolt");
+//        builder.setBolt("fileOutputBolt", new TermFileOutputBolt(), 1)
+//                .allGrouping("rankerBolt");
         builder.setBolt("databaseTermsBolt", new TrendingTermsToDatabaseBolt(trendsDao), 1)
-                .allGrouping("rankerBolt");
+                .globalGrouping("rankerBolt");
         
         return builder.createTopology();
     }
@@ -114,6 +112,7 @@ public class NewsFetchTopologyStarter {
      */
     public void start() throws InterruptedException {
         Config config = createTopologyConfiguration();
+        //config.put(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS, 120);
         StormTopology topology = buildTopology();
         StormRunner.runTopologyLocally(topology, name, config);
     }

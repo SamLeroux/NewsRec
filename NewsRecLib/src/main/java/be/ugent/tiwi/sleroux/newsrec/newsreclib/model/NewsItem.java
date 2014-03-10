@@ -41,19 +41,18 @@ public class NewsItem {
     private Map<String, Float> terms;
     private Locale locale;
     private String source;
-    
+
     private URL url;
     private URL imageUrl;
-    
 
     public NewsItem() {
         terms = new HashMap<>();
         authors = new ArrayList<>();
-        id = UUID.randomUUID().getLeastSignificantBits();
+        id = Math.abs(UUID.randomUUID().getLeastSignificantBits());
     }
 
-    public NewsItem(int docNr,String title, List<String> authors,String fulltext, String description, Date timestamp, Map<String, Float> terms, Locale locale, String source, URL url, URL imageUrl) {
-        this(UUID.randomUUID().getLeastSignificantBits(), docNr, title, authors, fulltext, description, timestamp, terms, locale, source, url, imageUrl);
+    public NewsItem(int docNr, String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Float> terms, Locale locale, String source, URL url, URL imageUrl) {
+        this(Math.abs(UUID.randomUUID().getLeastSignificantBits()), docNr, title, authors, fulltext, description, timestamp, terms, locale, source, url, imageUrl);
     }
 
     public NewsItem(long id, int docNr, String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Float> terms, Locale locale, String source, URL url, URL imageUrl) {
@@ -71,13 +70,6 @@ public class NewsItem {
         this.imageUrl = imageUrl;
     }
 
-    
-    
-    
-    
-
-    
-
     public URL getImageUrl() {
         return imageUrl;
     }
@@ -85,8 +77,6 @@ public class NewsItem {
     public void setImageUrl(URL imageUrl) {
         this.imageUrl = imageUrl;
     }
-
-    
 
     public URL getUrl() {
         return url;
@@ -167,8 +157,8 @@ public class NewsItem {
     public void setSource(String source) {
         this.source = source;
     }
-    
-    public void addTerm(String term, float relevancy){
+
+    public void addTerm(String term, float relevancy) {
         terms.put(term, relevancy);
     }
 
@@ -179,14 +169,10 @@ public class NewsItem {
     public void setDocNr(int docNr) {
         this.docNr = docNr;
     }
-    
-    
 
     @Override
     public String toString() {
         return "NewsItem{" + "id=" + id + ", title=" + title + ", authors=" + authors + ", fulltext=" + fulltext + ", description=" + description + ", timestamp=" + timestamp + ", terms=" + terms + ", locale=" + locale + ", source=" + source + ", url=" + url + '}';
     }
-    
-    
 
 }

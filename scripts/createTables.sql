@@ -1,12 +1,11 @@
-/*
 
 CREATE TABLE NewsSource (
 	id INT NOT NULL AUTO_INCREMENT,
-	description VARCHAR,
+	description VARCHAR(40000),
 	fetchinterval INT,
 	lastArticleFetchTime DATETIME,
 	lastFetchTry DATETIME,
-	`name` VARCHAR(255),
+	name VARCHAR(255),
 	rssUrl VARCHAR(255),
 	PRIMARY KEY (id)
 );
@@ -25,7 +24,6 @@ CREATE TABLE Views (
 	itemId NUMERIC(21,0),
 	PRIMARY KEY (userId, docNr, itemId)
 );
-*/
 
 CREATE TABLE Trends (
 	term VARCHAR(50),

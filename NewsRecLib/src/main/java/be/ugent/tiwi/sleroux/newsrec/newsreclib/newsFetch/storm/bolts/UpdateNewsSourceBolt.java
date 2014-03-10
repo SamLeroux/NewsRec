@@ -59,6 +59,7 @@ public class UpdateNewsSourceBolt extends BaseRichBolt{
     public void execute(Tuple input) {
         try {
             NewsSource source = (NewsSource)input.getValueByField(StreamIDs.UPDATEDNEWSSOURCE);
+            logger.info("updating newssource: "+source.getName());
             newsSourceDao.updateNewsSource(source);
         } catch (DaoException ex) {
             logger.error(ex);

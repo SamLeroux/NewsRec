@@ -19,63 +19,43 @@ function btnClicked() {
 }
 
 function getItemDisplayDiv(item) {
-    var div = document.createElement("div");
-    div.className = 'search_item';
-    div.onclick = function(event) {
-        ratingClick(event, item.id, item.docNr);
-        return false;
-    };
+    var div = $("<div>");
+    div.className = "item";
+    var article = $("<article>");
 
-    var table = document.createElement("table");
-    table.width = '100%';
-    div.appendChild(table);
-
-    var tr = document.createElement("tr");
-    table.appendChild(tr);
-
-    var tdImage = document.createElement("td");
-    tdImage.vAlign = 'top';
-    tdImage.align = 'left';
-    tr.appendChild(tdImage);
-
-    var img = document.createElement("img");
-    img.width = 120;
-    img.height = 80;
-    img.src = "img/nia.jpeg";
-    tdImage.appendChild(img);
-
-    var tdDescription = document.createElement("td");
-    tdDescription.vAlign = 'top';
-    tdDescription.align = 'left';
-    tdDescription.width = '100%';
-    tr.appendChild(tdDescription);
-
-
-    var description = "";
-    description += "<b>" + item.title + "</b><br/>";
-    description += "<i>" + item.timestamp + "</i></br>";
-
-    description += "<span class='videoDescription'>" + item.description + "</span><br/>";
-    description += "<br/><table><tr>";
-
-
-
-    description += '</div></td>';
-
-    description += "<tr></table>";
-
-    tdDescription.innerHTML = description;
-
-    // http://viralpatel.net/blogs/dynamically-shortened-text-show-more-link-jquery/
-    $(tdDescription).shorten({
-        "showChars": 200
+    var title = $("<h1>");
+    title.text(item.title);
+    title.on("click", function (event){
+        ratingClick(event,item.id, item.docNr) 
     });
 
-    // Horizontale lijn onderaan
-    var hr = document.createElement("hr");
-    div.appendChild(hr);
+    var timestamp = $("<h2>");
+    timestamp.addClass("time");
+    timestamp.text(item.timestamp);
+    
+    /*var source = $("<p>");
+    source.className = "source";
+    source.text(item.source);
+    */
+   
+    var description = $("<p>");
+    description.className = "description";
+    var descriptionText = item.description;
+    if (description.length > 200){
+        descriptionText = descriptionText.substr(0,200)+"...";
+    }
+    description.text(descriptionText);
+    
+    article.append(title);
+    article.append(timestamp);
+    //article.append(source);
+    article.append(description);
+    
+    div.append(article);
+    div.append("<hr/>");
 
     return div;
+
 }
 
 
@@ -165,7 +145,7 @@ function fetchRecommendations() {
     $("#loader").show();
 
     $.ajax({
-        url: "GetRecommendations.do?count=25&start=0",
+        url: "GetRecommendations.do?count=100&start=0",
         dataType: "json",
         success: recommendationsFetched,
         error: recommendationsFetchError

@@ -77,8 +77,8 @@ public class RssFetchBolt extends BaseRichBolt {
 
             URL url = source.getRssUrl();
             HttpURLConnection httpcon = (HttpURLConnection) url.openConnection();
-            httpcon.setConnectTimeout(5000);
-            httpcon.setReadTimeout(5000);
+            httpcon.setConnectTimeout(15000);
+            httpcon.setReadTimeout(15000);
 
             SyndFeedInput feedinput = new SyndFeedInput();
             SyndFeed feed = feedinput.build(new XmlReader(httpcon));
@@ -113,6 +113,9 @@ public class RssFetchBolt extends BaseRichBolt {
                     collector.emit(StreamIDs.NEWSARTICLENOCONTENTSTREAM, new Values(item, item.getSource()));
 
                 }
+                else{
+                    logger.info("Skipping: article, article with same title has already been added");
+                }
                 i++;
             }
 
@@ -123,11 +126,12 @@ public class RssFetchBolt extends BaseRichBolt {
             // Exponential backoff
             // When there were no new articles, increase the interval, otherwise 
             // decrease the interval. Do not go below 30 seconds.
+            logger.info("current fetchinterval: "+source.getFetchinterval());
             if (count == 0) {
                 source.setFetchinterval(source.getFetchinterval() * 2);
             } else {
                 int interval = source.getFetchinterval() / 2;
-                interval = (interval < 30 ? 30 : interval);
+                interval = (interval < 300 ? 300 : interval);
                 source.setFetchinterval(interval);
             }
             logger.info("found " + count + " new articles");
@@ -150,7 +154,7 @@ public class RssFetchBolt extends BaseRichBolt {
     private NewsItem generateNewsItem(NewsSource source, SyndEntry entry) throws MalformedURLException {
         logger.info("Generating news item from feed entry");
         NewsItem item = new NewsItem();
-        item.setTitle(entry.getTitle());
+        item.setTitle(Jsoup.parse(entry.getTitle()).text());
 
         for (Object o : entry.getAuthors()) {
             SyndPerson p = (SyndPerson) o;
