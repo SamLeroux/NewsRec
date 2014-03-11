@@ -15,13 +15,17 @@
  */
 package be.ugent.tiwi.sleroux.newsrec.webnewsrecommender;
 
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering.IClusterer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItemCluster;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.IRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.RecommendationException;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.topTerms.LuceneDocTopTermsExtract;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -44,6 +48,7 @@ public class GetRecommendationsServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     private static final Logger logger = Logger.getLogger(GetRecommendationsServlet.class);
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/json");
@@ -56,20 +61,36 @@ public class GetRecommendationsServlet extends HttpServlet {
 
             IRecommender recommender = (IRecommender) getServletContext().getAttribute("recommender");
             List<NewsItem> items = recommender.recommend(user, start, count);
-            
+
             // No need to send the full text over the network.
             String empty = "";
-            for (NewsItem n : items){
+            for (NewsItem n : items) {
                 n.setFulltext(empty);
             }
+
+            updateTermInfo(items);
             
+            IClusterer clusterer = (IClusterer) getServletContext().getAttribute("clusterer");
+            List<NewsItemCluster> clusters = clusterer.cluster(items);
+
             Gson gson = new Gson();
-            String json = gson.toJson(items);
+            String json = gson.toJson(clusters.toArray(new NewsItemCluster[clusters.size()]));
+            System.out.println(json);
             out.write(json);
         } catch (RecommendationException ex) {
             logger.error(ex);
         } finally {
             out.close();
+        }
+    }
+
+    private void updateTermInfo(List<NewsItem> items) {
+        LuceneDocTopTermsExtract extract = (LuceneDocTopTermsExtract) getServletContext().getAttribute("temp");
+        for (NewsItem item : items) {
+            Map<String, Double> terms = extract.getTopTerms(item.getDocNr());
+            for (String s : terms.keySet()){
+                item.addTerm(s, terms.get(s).floatValue());
+            }
         }
     }
 

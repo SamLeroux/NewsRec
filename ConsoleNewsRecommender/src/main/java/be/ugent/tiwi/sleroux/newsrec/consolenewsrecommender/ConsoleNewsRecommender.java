@@ -15,6 +15,8 @@
  */
 package be.ugent.tiwi.sleroux.newsrec.consolenewsrecommender;
 
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering.IClusterer;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering.LingPipeHierarchicalClustering;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.INewsSourceDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
@@ -25,14 +27,18 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCTrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItemCluster;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.ColdStartLuceneRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.IRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.RecommendationException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.DatabaseLuceneScorer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.IScorer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.topology.NewsFetchTopologyStarter;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.TrendingTopicRecommender;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.topTerms.LuceneDocTopTermsExtract;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import org.apache.log4j.Logger;
@@ -50,11 +56,12 @@ public class ConsoleNewsRecommender {
     private final long userid = 4L;
     private IViewsDao viewsDao;
     private ITrendsDao trendsDao;
+    private LuceneDocTopTermsExtract termExtract;
 
     public ConsoleNewsRecommender() {
         try {
             IRatingsDao dao = new JDBCRatingsDao();
-            String luceneLoc = bundle.getString("luceneIndexLocation");
+            String luceneLoc = "/home/sam/Bureaublad/index2";
             scorer = new DatabaseLuceneScorer(luceneLoc, dao);
             viewsDao = new JDBCViewsDao();
             trendsDao = new JDBCTrendsDao();
@@ -64,7 +71,9 @@ public class ConsoleNewsRecommender {
 //            rec = new CombinedRecommender();
 //            rec.addRecommender(new LuceneTermRecommender(bundle.getString("luceneIndexLocation"),dao, viewsDao));
 //            rec.addRecommender(new TopNRecommender(bundle.getString("luceneIndexLocation"), viewsDao));
-            rec = new ColdStartLuceneRecommender(luceneLoc, dao, viewsDao);
+            //rec = new ColdStartLuceneRecommender(luceneLoc, dao, viewsDao);
+            rec = new TrendingTopicRecommender(trendsDao, viewsDao, luceneLoc);
+            termExtract = new LuceneDocTopTermsExtract(luceneLoc);
         } catch (IOException | DaoException ex) {
             java.util.logging.Logger.getLogger(ConsoleNewsRecommender.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -72,9 +81,12 @@ public class ConsoleNewsRecommender {
     }
 
     public void start() {
-        //startAddArticles();
-        //startRectest();
-        startFetchTest();
+     
+            //startAddArticles();
+            //startRectest();
+            startFetchTest();
+            //testClustering();
+       
     }
     
     public void startAddArticles(){
@@ -93,6 +105,27 @@ public class ConsoleNewsRecommender {
         }
     }
 
+    public void testClustering() throws RecommendationException{
+        List<NewsItem> results = rec.recommend(userid, 0, 250);
+        for(NewsItem item: results){
+            Map<String, Double> topTerms = termExtract.getTopTerms(item.getDocNr());
+            for (String term: topTerms.keySet()){
+                item.addTerm(term, topTerms.get(term).floatValue());
+            }
+        }
+        long start = System.currentTimeMillis();
+        IClusterer clusterer = new LingPipeHierarchicalClustering();
+        List<NewsItemCluster> clusters = clusterer.cluster(results);
+        System.out.println("Time: "+(System.currentTimeMillis()- start));
+        System.out.println(clusters.size() + " clusters");
+        for (NewsItemCluster cluster: clusters){
+            System.out.println(cluster.getRepresentative().getTitle() + " ( "+cluster.getSize()+") members");
+            for (NewsItem item: cluster.getItems()){
+                System.out.println("\t"+item.getTitle());
+            }
+        }
+        
+    }
    
 
     public void testrecommendation() throws RecommendationException {

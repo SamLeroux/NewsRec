@@ -41,5 +41,19 @@ public class NewsItemCluster {
             items.add(item);
         }
     }
+    
+    public int getSize(){
+        return items.size();
+    }
+
+    public List<NewsItem> getItems() {
+        return items;
+    }
+
+    public NewsItem getRepresentative() {
+        return representative;
+    }
+    
+    
 
 }

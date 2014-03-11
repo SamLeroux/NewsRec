@@ -24,14 +24,14 @@ function getItemDisplayDiv(item) {
     var article = $("<article>");
 
     var title = $("<h1>");
-    title.text(item.title);
+    title.text(item.representative.title + " ("+item.items.length+" members)");
     title.on("click", function (event){
-        ratingClick(event,item.id, item.docNr) 
+        ratingClick(event,item.representative.id, item.representative.docNr) 
     });
 
     var timestamp = $("<h2>");
     timestamp.addClass("time");
-    timestamp.text(item.timestamp);
+    timestamp.text(item.representative.timestamp);
     
     /*var source = $("<p>");
     source.className = "source";
@@ -40,7 +40,7 @@ function getItemDisplayDiv(item) {
    
     var description = $("<p>");
     description.className = "description";
-    var descriptionText = item.description;
+    var descriptionText = item.representative.description;
     if (description.length > 200){
         descriptionText = descriptionText.substr(0,200)+"...";
     }
@@ -145,7 +145,7 @@ function fetchRecommendations() {
     $("#loader").show();
 
     $.ajax({
-        url: "GetRecommendations.do?count=100&start=0",
+        url: "GetRecommendations.do?count=250&start=0",
         dataType: "json",
         success: recommendationsFetched,
         error: recommendationsFetchError

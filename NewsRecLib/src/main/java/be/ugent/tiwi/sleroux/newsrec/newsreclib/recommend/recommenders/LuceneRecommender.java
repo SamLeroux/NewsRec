@@ -23,6 +23,7 @@ import java.net.URL;
 import java.util.Date;
 import java.util.Locale;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.SearcherManager;
@@ -149,6 +150,10 @@ public abstract class LuceneRecommender implements IRecommender {
             }
         } else {
             item.setTitle("");
+        }
+        
+        for (IndexableField f: d.getFields("term")){
+            item.addTerm(f.stringValue(), 1);
         }
 
         return item;

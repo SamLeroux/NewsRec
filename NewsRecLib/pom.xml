@@ -145,5 +145,12 @@
             <artifactId>commons-collections</artifactId>
             <version>3.0</version>
         </dependency>
+        
+        <!-- lingpipe -->
+        <dependency>
+            <groupId>com.aliasi</groupId>
+            <artifactId>lingpipe</artifactId>
+            <version>4.0.1</version>
+        </dependency>
     </dependencies>
 </project>

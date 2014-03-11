@@ -15,6 +15,8 @@
  */
 package be.ugent.tiwi.sleroux.newsrec.webnewsrecommender;
 
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering.IClusterer;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering.LingPipeHierarchicalClustering;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ITrendsDao;
@@ -26,6 +28,7 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.IRecommen
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.TrendingTopicRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.DatabaseLuceneScorer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.IScorer;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.topTerms.LuceneDocTopTermsExtract;
 import java.io.IOException;
 import java.util.ResourceBundle;
 import javax.servlet.ServletContextEvent;
@@ -43,6 +46,7 @@ public class NewsRecContextListener implements ServletContextListener {
     private ITrendsDao trendsDao;
     private IRecommender recommender;
     private IScorer scorer;
+    private IClusterer clusterer;
 
     private static final Logger logger = Logger.getLogger(NewsRecContextListener.class);
     private static final ResourceBundle bundle = ResourceBundle.getBundle("WebNewsrecommender");
@@ -63,7 +67,11 @@ public class NewsRecContextListener implements ServletContextListener {
 
             scorer = new DatabaseLuceneScorer(luceneLocation, ratingsDao);
             sce.getServletContext().setAttribute("scorer", scorer);
+            
+            clusterer = new LingPipeHierarchicalClustering();
+            sce.getServletContext().setAttribute("clusterer", clusterer);
 
+            sce.getServletContext().setAttribute("temp", new LuceneDocTopTermsExtract(luceneLocation));
         } catch (IOException ex) {
             logger.error(ex);
         } catch (DaoException ex) {

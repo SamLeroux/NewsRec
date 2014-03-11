@@ -172,10 +172,10 @@ public class RssFetchBolt extends BaseRichBolt {
         item.setUrl(new URL(entry.getLink()));
         item.setSource(source.getName());
 
-        for (Object o : entry.getCategories()) {
-            SyndCategory cat = (SyndCategory) o;
-            item.addTerm(cat.getName(), 0.75F);
-        }
+//        for (Object o : entry.getCategories()) {
+//            SyndCategory cat = (SyndCategory) o;
+//            item.addTerm(cat.getName(), 0.75F);
+//        }
         return item;
     }
 }

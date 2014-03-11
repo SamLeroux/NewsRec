@@ -26,6 +26,7 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.config.Config;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.lucene.analyzers.EnAnalyzer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.topology.StreamIDs;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.topTerms.LuceneDocTopTermsExtract;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -40,8 +41,16 @@ import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.NumericRangeQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
@@ -53,6 +62,7 @@ public class LuceneIndexBolt extends BaseRichBolt {
 
     private IndexWriter writer;
     private OutputCollector collector;
+    private LuceneDocTopTermsExtract termExtractor;
     private final String indexLocation;
     private final String stopwordsLocation;
     private static final Logger logger = Logger.getLogger(LuceneIndexBolt.class);
@@ -65,6 +75,7 @@ public class LuceneIndexBolt extends BaseRichBolt {
     public LuceneIndexBolt(String indexLocation, String stopwordsLocation) {
         this.indexLocation = indexLocation;
         this.stopwordsLocation = stopwordsLocation;
+
     }
 
     @Override
@@ -82,6 +93,7 @@ public class LuceneIndexBolt extends BaseRichBolt {
             analyzer.setStopwords(getStopwords(stopwordsLocation));
             IndexWriterConfig config = new IndexWriterConfig(Config.LUCENE_VERSION, analyzer);
             writer = new IndexWriter(dir, config);
+            termExtractor = new LuceneDocTopTermsExtract(indexLocation);
         } catch (IOException ex) {
             logger.error(ex);
         }
@@ -89,15 +101,13 @@ public class LuceneIndexBolt extends BaseRichBolt {
 
     @Override
     public void cleanup() {
-        super.cleanup(); 
+        super.cleanup();
         try {
             writer.close();
         } catch (IOException ex) {
             logger.error(ex);
         }
     }
-    
-    
 
     @Override
     public void execute(Tuple input) {
@@ -108,14 +118,14 @@ public class LuceneIndexBolt extends BaseRichBolt {
             Document doc = newsItemToDoc(item);
             writer.addDocument(doc);
             writer.commit();
-            collector.emit(StreamIDs.INDEXEDITEMSTREAM,new Values(item));
+            updateDocterms(item, doc);
+            writer.commit();
+            collector.emit(StreamIDs.INDEXEDITEMSTREAM, new Values(item));
             logger.info("New item in Lucene index");
         } catch (IOException ex) {
             logger.error(ex);
         }
-        
-        
-        
+
     }
 
     private FieldType getType() {
@@ -128,10 +138,10 @@ public class LuceneIndexBolt extends BaseRichBolt {
 
     private Document newsItemToDoc(NewsItem item) {
         logger.info("converting item to document");
-        
+
         Document doc = new Document();
         FieldType ftype = getType();
-        
+
         if (item.getTitle() != null) {
             doc.add(new Field("title", item.getTitle(), ftype));
         }
@@ -186,5 +196,26 @@ public class LuceneIndexBolt extends BaseRichBolt {
         }
 
         return stopw;
+    }
+
+    private void updateDocterms(NewsItem item, Document doc) throws IOException {
+        IndexReader reader = DirectoryReader.open(writer, true);
+        IndexSearcher searcher = new IndexSearcher(reader);
+        Query q = NumericRangeQuery.newLongRange("id", item.getId(), item.getId(), true, true);
+        TopScoreDocCollector col = TopScoreDocCollector.create(1, true);
+        searcher.search(q, col);
+        ScoreDoc[] hits = col.topDocs().scoreDocs;
+        if (hits.length == 1) {
+            int docnr = hits[0].doc;
+            Map<String, Double> terms = termExtractor.getTopterms(docnr, reader);
+            for (String term : terms.keySet()) {
+                item.addTerm(term, terms.get(term).floatValue());
+                doc.add(new StringField("term", term, Field.Store.YES));
+            }
+            writer.updateDocument(new Term("id", Long.toString(item.getId())), doc);
+        } else {
+            logger.error("Hits.length should be 1, was " + hits.length);
+        }
+
     }
 }

@@ -18,11 +18,12 @@ package be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItemCluster;
+import java.util.List;
 
 /**
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public interface IClusterer {
-    public NewsItemCluster[] cluster(NewsItem[] items);
+    public List<NewsItemCluster> cluster(List<NewsItem> items);
 }
