@@ -52,6 +52,7 @@ import org.apache.lucene.util.BytesRef;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
+@Deprecated
 public class NewsItemToTermsBolt extends BaseRichBolt {
 
     private SearcherManager searcherManager;

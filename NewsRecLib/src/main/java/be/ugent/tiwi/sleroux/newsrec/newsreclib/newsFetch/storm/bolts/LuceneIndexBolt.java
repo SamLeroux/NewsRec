@@ -80,7 +80,7 @@ public class LuceneIndexBolt extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declareStream(StreamIDs.INDEXEDITEMSTREAM, new Fields(StreamIDs.INDEXEDITEM));
+        declarer.declareStream(StreamIDs.TERMSTREAM, new Fields(StreamIDs.TERM));
     }
 
     @Override
@@ -117,10 +117,12 @@ public class LuceneIndexBolt extends BaseRichBolt {
             NewsItem item = (NewsItem) input.getValueByField(StreamIDs.NEWSARTICLEWITHCONTENT);
             Document doc = newsItemToDoc(item);
             writer.addDocument(doc);
+            updateDocterms(item);
             writer.commit();
-            updateDocterms(item, doc);
-            writer.commit();
-            collector.emit(StreamIDs.INDEXEDITEMSTREAM, new Values(item));
+            logger.info("emitting terms");
+            for (String term: item.getTerms().keySet()){
+                collector.emit(StreamIDs.TERMSTREAM, new Values(term));
+            }
             logger.info("New item in Lucene index");
         } catch (IOException ex) {
             logger.error(ex);
@@ -198,7 +200,7 @@ public class LuceneIndexBolt extends BaseRichBolt {
         return stopw;
     }
 
-    private void updateDocterms(NewsItem item, Document doc) throws IOException {
+    private void updateDocterms(NewsItem item) throws IOException {
         IndexReader reader = DirectoryReader.open(writer, true);
         IndexSearcher searcher = new IndexSearcher(reader);
         Query q = NumericRangeQuery.newLongRange("id", item.getId(), item.getId(), true, true);
@@ -207,12 +209,17 @@ public class LuceneIndexBolt extends BaseRichBolt {
         ScoreDoc[] hits = col.topDocs().scoreDocs;
         if (hits.length == 1) {
             int docnr = hits[0].doc;
+            Document doc = reader.document(docnr);
             Map<String, Double> terms = termExtractor.getTopterms(docnr, reader);
             for (String term : terms.keySet()) {
                 item.addTerm(term, terms.get(term).floatValue());
                 doc.add(new StringField("term", term, Field.Store.YES));
             }
-            writer.updateDocument(new Term("id", Long.toString(item.getId())), doc);
+            //writer.updateDocument(new Term("id", doc.get("id")), doc);
+            if (!writer.tryDeleteDocument(reader, docnr)){
+                logger.warn("could not delete document with docnr="+docnr);
+            }
+            writer.addDocument(doc);
         } else {
             logger.error("Hits.length should be 1, was " + hits.length);
         }

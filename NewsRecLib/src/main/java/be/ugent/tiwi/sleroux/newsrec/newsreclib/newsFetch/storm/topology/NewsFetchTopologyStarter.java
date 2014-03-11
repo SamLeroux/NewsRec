@@ -81,12 +81,12 @@ public class NewsFetchTopologyStarter {
         builder.setBolt("luceneIndexBolt", new LuceneIndexBolt(luceneIndexLocation, stopWordsLocation), 1)
                 .globalGrouping("contentFetchBolt", StreamIDs.NEWSARTICLEWITHCONTENTSTREAM);
 
-        builder.setBolt("termextractor", new NewsItemToTermsBolt(luceneIndexLocation), 1)
-                .globalGrouping("luceneIndexBolt", StreamIDs.INDEXEDITEMSTREAM);
+//        builder.setBolt("termextractor", new NewsItemToTermsBolt(luceneIndexLocation), 1)
+//                .globalGrouping("luceneIndexBolt", StreamIDs.INDEXEDITEMSTREAM);
 
         
         builder.setBolt("counterBolt", new RollingCountBolt(60*60, 120), 4)
-                .fieldsGrouping("termextractor", StreamIDs.TERMSTREAM, new Fields(StreamIDs.TERM));
+                .fieldsGrouping("luceneIndexBolt", StreamIDs.TERMSTREAM, new Fields(StreamIDs.TERM));
         builder.setBolt("intermediateRankerBolt", new IntermediateRankingsBolt(25), 4)
                 .fieldsGrouping("counterBolt", new Fields("obj"));
         builder.setBolt("rankerBolt", new TotalRankingsBolt(25),1)
