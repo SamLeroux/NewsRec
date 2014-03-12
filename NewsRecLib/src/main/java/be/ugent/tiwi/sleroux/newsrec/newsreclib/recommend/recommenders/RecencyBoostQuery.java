@@ -17,8 +17,10 @@ package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders;
 
 import java.io.IOException;
 import java.util.Date;
+import org.apache.log4j.Logger;
 import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.queries.CustomScoreProvider;
 import org.apache.lucene.queries.CustomScoreQuery;
 import org.apache.lucene.search.Query;
@@ -37,6 +39,7 @@ public class RecencyBoostQuery extends CustomScoreQuery {
     private double a = 1.1;
     private double b = 1.0;
     private double m = 9e-10;
+    private static final Logger logger = Logger.getLogger(RecencyBoostQuery.class);
 
     /**
      *
@@ -87,10 +90,25 @@ public class RecencyBoostQuery extends CustomScoreQuery {
         @Override
         public float customScore(int doc, float subQueryScore, float valSrcScore) throws IOException {
             float score = super.customScore(doc, subQueryScore, valSrcScore);
-            float timestamp = atomicReader.document(doc).getField("timestamp").numericValue().longValue();
-            Date now = new Date();
-            float diff = now.getTime() - timestamp;
-            score *= (float) (a / (diff * m + b));
+            IndexableField f = atomicReader.document(doc).getField("timestamp");
+            if (f != null) {
+                logger.info(doc);
+                Number numericValue = f.numericValue();
+                if (numericValue != null) {
+                    float timestamp = numericValue.longValue();
+                    Date now = new Date();
+                    float diff = now.getTime() - timestamp;
+                    score *= (float) (a / (diff * m + b));
+                } else {
+                    logger.warn("timestamp field for document with docNr="
+                            + doc
+                            + " does not contain a numeric value,"
+                            + "no custom recency boost for this document");
+                }
+            } else {
+                logger.warn("No timestamp found in document with docNr=" + doc
+                        + ", no custom recencyboost for this document");
+            }
             return score;
         }
 

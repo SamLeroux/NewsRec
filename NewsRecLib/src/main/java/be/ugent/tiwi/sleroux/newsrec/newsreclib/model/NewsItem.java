@@ -31,7 +31,7 @@ import java.util.UUID;
  */
 public class NewsItem {
 
-    private long id;
+    private String id;
     private int docNr;
     private String title;
     private List<String> authors;
@@ -48,14 +48,14 @@ public class NewsItem {
     public NewsItem() {
         terms = new HashMap<>();
         authors = new ArrayList<>();
-        id = Math.abs(UUID.randomUUID().getLeastSignificantBits());
+        id = Long.toString(Math.abs(UUID.randomUUID().getLeastSignificantBits()));
     }
 
     public NewsItem(int docNr, String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Float> terms, Locale locale, String source, URL url, URL imageUrl) {
-        this(Math.abs(UUID.randomUUID().getLeastSignificantBits()), docNr, title, authors, fulltext, description, timestamp, terms, locale, source, url, imageUrl);
+        this(Long.toString(Math.abs(UUID.randomUUID().getLeastSignificantBits())), docNr, title, authors, fulltext, description, timestamp, terms, locale, source, url, imageUrl);
     }
 
-    public NewsItem(long id, int docNr, String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Float> terms, Locale locale, String source, URL url, URL imageUrl) {
+    public NewsItem(String id, int docNr, String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Float> terms, Locale locale, String source, URL url, URL imageUrl) {
         this.id = id;
         this.docNr = docNr;
         this.title = title;
@@ -86,11 +86,11 @@ public class NewsItem {
         this.url = url;
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

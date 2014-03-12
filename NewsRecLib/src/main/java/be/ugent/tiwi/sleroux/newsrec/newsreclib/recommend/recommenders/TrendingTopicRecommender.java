@@ -39,8 +39,8 @@ import org.apache.lucene.search.TopScoreDocCollector;
  */
 public class TrendingTopicRecommender extends LuceneRecommender implements IRecommender {
 
-    private ITrendsDao trendsDao;
-    private IViewsDao viewsDao;
+    private final ITrendsDao trendsDao;
+    private final IViewsDao viewsDao;
 
     public TrendingTopicRecommender(ITrendsDao trendsDao, IViewsDao viewsDao, String luceneIndexLocation) throws IOException {
         super(luceneIndexLocation);

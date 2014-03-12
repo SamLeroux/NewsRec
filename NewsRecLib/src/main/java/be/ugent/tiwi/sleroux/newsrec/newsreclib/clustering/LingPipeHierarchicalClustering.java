@@ -22,16 +22,18 @@ import com.aliasi.cluster.HierarchicalClusterer;
 import com.aliasi.cluster.SingleLinkClusterer;
 import com.aliasi.util.Distance;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class LingPipeHierarchicalClustering implements IClusterer {
+
+    private static final Logger logger = Logger.getLogger(LingPipeHierarchicalClustering.class);
 
     @Override
     public List<NewsItemCluster> cluster(List<NewsItem> items) {
@@ -56,17 +58,21 @@ public class LingPipeHierarchicalClustering implements IClusterer {
 
         @Override
         public double distance(Object e, Object e1) {
-            NewsItem n1 = (NewsItem)e;
-            NewsItem n2 = (NewsItem)e1;
-            
+            NewsItem n1 = (NewsItem) e;
+            NewsItem n2 = (NewsItem) e1;
+
             Set<String> obs1 = n1.getTerms().keySet();
             Set<String> obs2 = n2.getTerms().keySet();
 
-            Set<String> different = new HashSet<>(obs1.size() + obs2.size());
-            different.addAll(obs1);
-            different.addAll(obs2);
-
-            return (double) different.size() / (double) (obs1.size() + obs2.size());
+            if (obs1.isEmpty() || obs2.isEmpty()) {
+                logger.warn("distance between " + n1.getId() + " and " + n2.getId() + " not defined, termset is empty");
+                return Double.POSITIVE_INFINITY;
+            } else {
+                Set<String> different = new HashSet<>(obs1.size() + obs2.size());
+                different.addAll(obs1);
+                different.addAll(obs2);
+                return (double) different.size() / (double) (obs1.size() + obs2.size());
+            }
         }
 
     }

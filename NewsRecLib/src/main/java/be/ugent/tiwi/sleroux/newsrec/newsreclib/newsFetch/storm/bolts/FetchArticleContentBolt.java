@@ -68,7 +68,7 @@ public class FetchArticleContentBolt extends BaseRichBolt {
 
     @Override
     public void execute(Tuple input) {
-        collector.ack(input);
+        
         InputStream in = null;
         try {
             NewsItem item = (NewsItem) input.getValueByField(StreamIDs.NEWSARTICLENOCONTENT);
@@ -116,5 +116,6 @@ public class FetchArticleContentBolt extends BaseRichBolt {
                 logger.error(ex.getMessage(), ex);
             }
         }
+        collector.ack(input);
     }
 }

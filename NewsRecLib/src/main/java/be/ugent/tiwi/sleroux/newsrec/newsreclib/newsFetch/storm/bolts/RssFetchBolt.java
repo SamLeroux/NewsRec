@@ -69,7 +69,7 @@ public class RssFetchBolt extends BaseRichBolt {
 
     @Override
     public void execute(Tuple input) {
-        collector.ack(input);
+        
         NewsSource source = (NewsSource) input.getValueByField(StreamIDs.NEWSSOURCEITEM);
         logger.info("checking: " + source.getName());
         try {
@@ -147,6 +147,7 @@ public class RssFetchBolt extends BaseRichBolt {
             source.setFetchinterval(source.getFetchinterval() * 4);
             logger.error(ex.getMessage(), ex);
         }
+        collector.ack(input);
         collector.emit(StreamIDs.UPDATEDNEWSSOURCESTREAM, new Values(source));
 
     }

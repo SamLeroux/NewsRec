@@ -103,6 +103,7 @@ public class NewsFetchTopologyStarter {
     private Config createTopologyConfiguration() {
         Config conf = new Config();
         conf.setDebug(false);
+        conf.put(Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS, 240);
         return conf;
     }
 

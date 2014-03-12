@@ -37,9 +37,9 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SearcherManager;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -129,7 +129,7 @@ public class NewsItemToTermsBolt extends BaseRichBolt {
 
     }
 
-    private Map<String, Double> getTopterms(DirectoryReader reader, IndexSearcher searcher, long id) throws IOException {
+    private Map<String, Double> getTopterms(DirectoryReader reader, IndexSearcher searcher, String id) throws IOException {
         // fetch the terms occuring in this document
         Map<String, Double> termMap = new HashMap<>(250);
 
@@ -172,8 +172,8 @@ public class NewsItemToTermsBolt extends BaseRichBolt {
         return termsToStore;
     }
 
-    private void updateTermMap(DirectoryReader reader, IndexSearcher searcher, Map<String, Double> termMap, long id, String field, double weight) throws IOException {
-        Query query = NumericRangeQuery.newLongRange("id", id, id, true, true);
+    private void updateTermMap(DirectoryReader reader, IndexSearcher searcher, Map<String, Double> termMap, String id, String field, double weight) throws IOException {
+        Query query = new TermQuery(new Term("id",id));
         TopDocs topdocs = searcher.search(query, 1);
 
         if (topdocs.totalHits > 0) {

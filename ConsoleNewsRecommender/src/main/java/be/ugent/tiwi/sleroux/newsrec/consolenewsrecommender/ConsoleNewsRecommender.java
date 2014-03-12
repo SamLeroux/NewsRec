@@ -28,17 +28,14 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCTrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItemCluster;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.ColdStartLuceneRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.IRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.RecommendationException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.DatabaseLuceneScorer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.IScorer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.topology.NewsFetchTopologyStarter;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.TrendingTopicRecommender;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.topTerms.LuceneDocTopTermsExtract;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import org.apache.log4j.Logger;
@@ -56,12 +53,12 @@ public class ConsoleNewsRecommender {
     private final long userid = 4L;
     private IViewsDao viewsDao;
     private ITrendsDao trendsDao;
-    private LuceneDocTopTermsExtract termExtract;
+    private final String luceneLoc = "/home/sam/Bureaublad/index";
+    private final String stopwordsFileLocation = "/home/sam/Bureaublad/dev/stopwords_EN.txt";
 
     public ConsoleNewsRecommender() {
         try {
             IRatingsDao dao = new JDBCRatingsDao();
-            String luceneLoc = "/home/sam/Bureaublad/index2";
             scorer = new DatabaseLuceneScorer(luceneLoc, dao);
             viewsDao = new JDBCViewsDao();
             trendsDao = new JDBCTrendsDao();
@@ -73,7 +70,6 @@ public class ConsoleNewsRecommender {
 //            rec.addRecommender(new TopNRecommender(bundle.getString("luceneIndexLocation"), viewsDao));
             //rec = new ColdStartLuceneRecommender(luceneLoc, dao, viewsDao);
             rec = new TrendingTopicRecommender(trendsDao, viewsDao, luceneLoc);
-            termExtract = new LuceneDocTopTermsExtract(luceneLoc);
         } catch (IOException | DaoException ex) {
             java.util.logging.Logger.getLogger(ConsoleNewsRecommender.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -107,12 +103,6 @@ public class ConsoleNewsRecommender {
 
     public void testClustering() throws RecommendationException{
         List<NewsItem> results = rec.recommend(userid, 0, 250);
-        for(NewsItem item: results){
-            Map<String, Double> topTerms = termExtract.getTopTerms(item.getDocNr());
-            for (String term: topTerms.keySet()){
-                item.addTerm(term, topTerms.get(term).floatValue());
-            }
-        }
         long start = System.currentTimeMillis();
         IClusterer clusterer = new LingPipeHierarchicalClustering();
         List<NewsItemCluster> clusters = clusterer.cluster(results);
@@ -146,14 +136,12 @@ public class ConsoleNewsRecommender {
         try {
             INewsSourceDao newsSourceDao = new MysqlNewsSourceDao();
             
-            String luceneIndexLocation = bundle.getString("luceneIndexLocation");
-            String stopwordsFileLocation = bundle.getString("stopwordsFile");
             
             NewsFetchTopologyStarter starter = new NewsFetchTopologyStarter(
                     newsSourceDao,
                     trendsDao,
                     "newsfetch",
-                    luceneIndexLocation,
+                    luceneLoc,
                     stopwordsFileLocation);
             
             starter.start();

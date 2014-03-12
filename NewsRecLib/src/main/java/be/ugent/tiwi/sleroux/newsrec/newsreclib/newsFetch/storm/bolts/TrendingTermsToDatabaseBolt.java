@@ -38,14 +38,11 @@ public class TrendingTermsToDatabaseBolt extends BaseRichBolt {
 
     private OutputCollector collector;
     private final ITrendsDao trendsDao;
-    private static final Logger logger = Logger.getLogger(TermFileOutputBolt.class);
+    private static final Logger logger = Logger.getLogger(TrendingTermsToDatabaseBolt.class);
 
     public TrendingTermsToDatabaseBolt(ITrendsDao trendsDao) {
         this.trendsDao = trendsDao;
     }
-
-    
-        
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
@@ -58,8 +55,6 @@ public class TrendingTermsToDatabaseBolt extends BaseRichBolt {
 
     @Override
     public void execute(Tuple input) {
-        //logger.info("Storing trending term in database");
-        collector.ack(input);
         try {
             List<String> terms = new ArrayList<>();
             Rankings rankings = (Rankings) input.getValueByField("rankings");
@@ -69,12 +64,13 @@ public class TrendingTermsToDatabaseBolt extends BaseRichBolt {
                 terms.add(rowf.getObject().toString());
             }
             if (!terms.isEmpty()) {
-                logger.info("Storing "+terms.size()+" trending terms in database");
+                logger.info("Storing " + terms.size() + " trending terms in database");
                 trendsDao.updateTrends(terms.toArray(new String[terms.size()]));
             }
         } catch (TrendsDaoException ex) {
             logger.error(ex);
         }
+        collector.ack(input);
     }
 
 }

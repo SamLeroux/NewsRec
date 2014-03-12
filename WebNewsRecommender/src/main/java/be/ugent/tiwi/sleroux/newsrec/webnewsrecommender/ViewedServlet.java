@@ -53,12 +53,12 @@ public class ViewedServlet extends HttpServlet {
             long itemId = Long.parseLong(request.getParameter("itemId"));
             
             IScorer scorer = (IScorer)getServletContext().getAttribute("scorer");
-            scorer.view(user, docNr);
+            scorer.view(user, itemId);
             
             IViewsDao viewsdao = (IViewsDao)getServletContext().getAttribute(("viewsDao"));
             viewsdao.see(user, docNr, itemId);
             out.write("{\"response\":\"OK\"}");
-            logger.debug("returned recommendations");
+            logger.debug("recorded view");
         } catch (ViewsDaoException ex) {
             logger.error(ex);
             out.write("{\"exception\":\""+ex.getMessage()+"\"}");

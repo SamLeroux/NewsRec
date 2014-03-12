@@ -20,12 +20,10 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItemCluster;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.IRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.RecommendationException;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.topTerms.LuceneDocTopTermsExtract;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -68,8 +66,6 @@ public class GetRecommendationsServlet extends HttpServlet {
                 n.setFulltext(empty);
             }
 
-            updateTermInfo(items);
-            
             IClusterer clusterer = (IClusterer) getServletContext().getAttribute("clusterer");
             List<NewsItemCluster> clusters = clusterer.cluster(items);
 
@@ -81,16 +77,6 @@ public class GetRecommendationsServlet extends HttpServlet {
             logger.error(ex);
         } finally {
             out.close();
-        }
-    }
-
-    private void updateTermInfo(List<NewsItem> items) {
-        LuceneDocTopTermsExtract extract = (LuceneDocTopTermsExtract) getServletContext().getAttribute("temp");
-        for (NewsItem item : items) {
-            Map<String, Double> terms = extract.getTopTerms(item.getDocNr());
-            for (String s : terms.keySet()){
-                item.addTerm(s, terms.get(s).floatValue());
-            }
         }
     }
 

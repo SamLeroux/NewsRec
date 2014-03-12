@@ -22,8 +22,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
 import java.util.Locale;
+import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.SearcherManager;
@@ -41,7 +41,7 @@ public abstract class LuceneRecommender implements IRecommender {
     private Directory dir;
     protected SearcherManager manager;
 
-    protected static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(LuceneRecommender.class);
+    protected static final Logger logger = Logger.getLogger(LuceneRecommender.class);
 
     static {
         BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
@@ -98,9 +98,9 @@ public abstract class LuceneRecommender implements IRecommender {
 
         field = d.getField("id");
         if (field != null) {
-            item.setId(field.numericValue().longValue());
+            item.setId(field.stringValue());
         } else {
-            item.setId(0);
+            item.setId("");
         }
 
         item.setDocNr(docId);
