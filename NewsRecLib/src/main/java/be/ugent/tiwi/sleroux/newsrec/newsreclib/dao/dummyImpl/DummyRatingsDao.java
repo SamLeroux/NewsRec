@@ -16,6 +16,7 @@
 
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.dummyImpl;
 
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.RatingsDaoException;
 import java.util.HashMap;
@@ -47,6 +48,10 @@ public class DummyRatingsDao implements IRatingsDao{
     @Override
     public void giveRating(long userid, Map<String, Double> terms) throws RatingsDaoException {
         ratings.putAll(terms);
+    }
+
+    @Override
+    public void close() throws DaoException {
     }
     
 }

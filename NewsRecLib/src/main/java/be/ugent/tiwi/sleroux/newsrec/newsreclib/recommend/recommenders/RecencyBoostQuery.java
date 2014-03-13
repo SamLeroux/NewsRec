@@ -92,7 +92,6 @@ public class RecencyBoostQuery extends CustomScoreQuery {
             float score = super.customScore(doc, subQueryScore, valSrcScore);
             IndexableField f = atomicReader.document(doc).getField("timestamp");
             if (f != null) {
-                logger.info(doc);
                 Number numericValue = f.numericValue();
                 if (numericValue != null) {
                     float timestamp = numericValue.longValue();

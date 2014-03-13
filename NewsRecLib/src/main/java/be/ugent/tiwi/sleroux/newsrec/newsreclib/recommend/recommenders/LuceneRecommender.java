@@ -16,15 +16,15 @@
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.termExtract.LuceneTopTermExtract;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.NewsItemLuceneDocConverter;
-import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.SearcherManager;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 
 /**
  * Recommend newsitems by creating a query and issuing it to Lucene.
@@ -33,38 +33,26 @@ import org.apache.lucene.store.FSDirectory;
  */
 public abstract class LuceneRecommender implements IRecommender {
 
-    private String luceneIndexLocation;
-    private Directory dir;
     protected SearcherManager manager;
+    private LuceneTopTermExtract termExtract;
 
-    protected static final Logger logger = Logger.getLogger(LuceneRecommender.class);
+    private static final Logger logger = Logger.getLogger(LuceneRecommender.class);
 
     static {
         BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
     }
 
-    public LuceneRecommender(String luceneIndexLocation) throws IOException {
-        this.luceneIndexLocation = luceneIndexLocation;
-        openIndex();
+    public LuceneRecommender(SearcherManager manager) {
+        this.manager = manager;
+        termExtract = new LuceneTopTermExtract();
     }
 
-    public String getLuceneIndexLocation() {
-        return luceneIndexLocation;
-    }
-
-    public void setLuceneIndexLocation(String luceneIndexLocation) {
-        this.luceneIndexLocation = luceneIndexLocation;
-    }
-
-    private void openIndex() throws IOException {
-        dir = FSDirectory.open(new File(luceneIndexLocation));
-        manager = new SearcherManager(dir, null);
-    }
-
-    protected NewsItem toNewsitem(Document d, int docId) {
+    protected NewsItem toNewsitem(Document d, int docId, IndexSearcher searcher) throws IOException {
         logger.debug("Converting document to newsitem");
         NewsItem item = NewsItemLuceneDocConverter.DocumentToNewsItem(d);
         item.setDocNr(docId);
+        Map<String, Double> terms = termExtract.getTopTerms(docId, searcher.getIndexReader());
+        item.addTerms(terms);
         return item;
     }
 

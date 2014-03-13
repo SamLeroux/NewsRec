@@ -59,13 +59,11 @@ public class GetRecommendationsServlet extends HttpServlet {
 
             IRecommender recommender = (IRecommender) getServletContext().getAttribute("recommender");
             List<NewsItem> items = recommender.recommend(user, start, count);
-
             // No need to send the full text over the network.
             String empty = "";
             for (NewsItem n : items) {
                 n.setFulltext(empty);
             }
-
             IClusterer clusterer = (IClusterer) getServletContext().getAttribute("clusterer");
             List<NewsItemCluster> clusters = clusterer.cluster(items);
 

@@ -26,4 +26,5 @@ public interface IViewsDao {
     public List<Integer> getSeenArticles(long userId) throws ViewsDaoException;
     public void see(long userId, int docNr, String itemId) throws ViewsDaoException;
     public List<Long> getNMostSeenArticles(int start, int stop) throws ViewsDaoException;
+    public void close() throws DaoException;
 }

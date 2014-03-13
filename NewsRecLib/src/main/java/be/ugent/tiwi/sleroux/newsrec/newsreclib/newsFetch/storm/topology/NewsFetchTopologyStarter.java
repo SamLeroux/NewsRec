@@ -33,8 +33,6 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.trendDetec
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 /**
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
@@ -46,16 +44,18 @@ public class NewsFetchTopologyStarter {
     private final String name;
     private final String luceneIndexLocation;
     private final String stopWordsLocation;
+    private final int tickFreq = 60;
+    private final int window = 60 * 60;
+    private final int topN = 25;
 
     /**
      *
      * @param newsSourceDao
-     * @param trendsDao 
+     * @param trendsDao
      * @param name
      * @param luceneIndexLocation
      * @param stopWordsLocation
      */
-    
     public NewsFetchTopologyStarter(INewsSourceDao newsSourceDao, ITrendsDao trendsDao, String name, String luceneIndexLocation, String stopWordsLocation) {
         this.newsSourceDao = newsSourceDao;
         this.trendsDao = trendsDao;
@@ -64,8 +64,8 @@ public class NewsFetchTopologyStarter {
         this.stopWordsLocation = stopWordsLocation;
     }
 
-    
     private StormTopology buildTopology() {
+
         TopologyBuilder builder = new TopologyBuilder();
 
         builder.setSpout("feedurlspout", new FeedSourceSpout(newsSourceDao));
@@ -83,20 +83,18 @@ public class NewsFetchTopologyStarter {
 
 //        builder.setBolt("termextractor", new NewsItemToTermsBolt(luceneIndexLocation), 1)
 //                .globalGrouping("luceneIndexBolt", StreamIDs.INDEXEDITEMSTREAM);
-
-        
-        builder.setBolt("counterBolt", new RollingCountBolt(60*60, 120), 4)
+        builder.setBolt("counterBolt", new RollingCountBolt(window, tickFreq), 4)
                 .fieldsGrouping("luceneIndexBolt", StreamIDs.TERMSTREAM, new Fields(StreamIDs.TERM));
-        builder.setBolt("intermediateRankerBolt", new IntermediateRankingsBolt(25), 4)
+        builder.setBolt("intermediateRankerBolt", new IntermediateRankingsBolt(topN, tickFreq), 4)
                 .fieldsGrouping("counterBolt", new Fields("obj"));
-        builder.setBolt("rankerBolt", new TotalRankingsBolt(25),1)
+        builder.setBolt("rankerBolt", new TotalRankingsBolt(topN, tickFreq), 1)
                 .globalGrouping("intermediateRankerBolt");
 
 //        builder.setBolt("fileOutputBolt", new TermFileOutputBolt(), 1)
 //                .allGrouping("rankerBolt");
         builder.setBolt("databaseTermsBolt", new TrendingTermsToDatabaseBolt(trendsDao), 1)
                 .globalGrouping("rankerBolt");
-        
+
         return builder.createTopology();
     }
 
@@ -113,7 +111,6 @@ public class NewsFetchTopologyStarter {
      */
     public void start() throws InterruptedException {
         Config config = createTopologyConfiguration();
-        //config.put(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS, 120);
         StormTopology topology = buildTopology();
         StormRunner.runTopologyLocally(topology, name, config);
     }

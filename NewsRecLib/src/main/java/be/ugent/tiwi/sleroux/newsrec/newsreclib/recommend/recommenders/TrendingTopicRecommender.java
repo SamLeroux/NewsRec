@@ -22,6 +22,7 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
@@ -30,6 +31,7 @@ import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.SearcherManager;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopScoreDocCollector;
 
@@ -41,13 +43,15 @@ public class TrendingTopicRecommender extends LuceneRecommender implements IReco
 
     private final ITrendsDao trendsDao;
     private final IViewsDao viewsDao;
+    private static final Logger logger = Logger.getLogger(TrendingTopicRecommender.class);
 
-    public TrendingTopicRecommender(ITrendsDao trendsDao, IViewsDao viewsDao, String luceneIndexLocation) throws IOException {
-        super(luceneIndexLocation);
+    public TrendingTopicRecommender(ITrendsDao trendsDao, IViewsDao viewsDao, SearcherManager manager) {
+        super(manager);
         this.trendsDao = trendsDao;
         this.viewsDao = viewsDao;
     }
 
+    
     
 
     @Override
@@ -73,7 +77,7 @@ public class TrendingTopicRecommender extends LuceneRecommender implements IReco
             for (int i = start; i < stop; i++) {
                 int docId = hits[i].doc;
                 Document d = searcher.doc(docId);
-                results.add(toNewsitem(d, docId));
+                results.add(toNewsitem(d, docId, searcher));
             }
 
             return results;

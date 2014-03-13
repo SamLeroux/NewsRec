@@ -32,6 +32,7 @@ import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.SearcherManager;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopScoreDocCollector;
 
@@ -45,11 +46,13 @@ public class LuceneTermRecommender extends LuceneRecommender {
     private static final Logger logger = Logger.getLogger(LuceneTermRecommender.class);
     private final IViewsDao viewsDao;
 
-    public LuceneTermRecommender(String luceneIndexLocation, IRatingsDao ratingsDao, IViewsDao viewsDao) throws IOException {
-        super(luceneIndexLocation);
+    public LuceneTermRecommender(IRatingsDao ratingsDao, IViewsDao viewsDao, SearcherManager manager) {
+        super(manager);
         this.ratingsDao = ratingsDao;
         this.viewsDao = viewsDao;
     }
+
+    
 
     @Override
     public List<NewsItem> recommend(long userid, int start, int count) throws RecommendationException {
@@ -65,7 +68,7 @@ public class LuceneTermRecommender extends LuceneRecommender {
             searcher = manager.acquire();
             manager.maybeRefresh();
             searcher.search(query, filter, collector);
-
+            
             ScoreDoc[] hits = collector.topDocs().scoreDocs;
 
             int stop = (start + count < hits.length ? start + count : hits.length);
@@ -74,7 +77,7 @@ public class LuceneTermRecommender extends LuceneRecommender {
             for (int i = start; i < stop; i++) {
                 int docId = hits[i].doc;
                 Document d = searcher.doc(docId);
-                results.add(toNewsitem(d, docId));
+                results.add(toNewsitem(d, docId, searcher));
                 //System.out.println(docId);
                 //System.out.println(searcher.explain(query, docId).toString());
             }

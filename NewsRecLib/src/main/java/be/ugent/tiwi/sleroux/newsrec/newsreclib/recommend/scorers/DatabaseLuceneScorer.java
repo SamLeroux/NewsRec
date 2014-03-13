@@ -18,15 +18,12 @@ package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.RatingsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.termExtract.LuceneTopTermExtract;
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.SearcherManager;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 
 /**
  * Updates the user model stored in a database with the information of the
@@ -38,20 +35,17 @@ public class DatabaseLuceneScorer implements IScorer {
 
     private final IRatingsDao ratingsDao;
     private final SearcherManager manager;
-    private final Directory dir;
     private final LuceneTopTermExtract termExtractor;
     private static final Logger logger = Logger.getLogger(DatabaseLuceneScorer.class);
 
     /**
      *
-     * @param luceneIndexLocation Location where the index is stored
-     * @param dao The RatingsDao to use
-     * @throws IOException when there was an error opening the Lucene index.
+     * @param manager
+     * @param dao
      */
-    public DatabaseLuceneScorer(String luceneIndexLocation, IRatingsDao dao) throws IOException {
+    public DatabaseLuceneScorer(SearcherManager manager, IRatingsDao dao) {
         ratingsDao = dao;
-        dir = FSDirectory.open(new File(luceneIndexLocation));
-        manager = new SearcherManager(dir, null);
+        this.manager = manager;
         termExtractor = new LuceneTopTermExtract();
     }
 

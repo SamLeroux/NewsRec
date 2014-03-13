@@ -122,7 +122,8 @@ public class LuceneTopTermExtract implements Serializable{
                 BytesRef text;
                 while ((text = termsEnum.next()) != null) {
                     String term = text.utf8ToString();
-                    int docFreq = reader.docFreq(new Term(field, text));
+                    //int docFreq = reader.docFreq(new Term(field, text)); // EXTREMELY SLOW !!!!
+                    int docFreq = termsEnum.docFreq();
                     // ignore really rare terms and really common terms
                     double minFreq = reader.numDocs() * 0.0001;
                     double maxFreq = reader.numDocs() / 3;

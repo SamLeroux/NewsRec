@@ -44,7 +44,7 @@ public class NewsItem {
     private String fulltext;
     private String description;
     private Date timestamp;
-    private Map<String, Float> terms;
+    private Map<String, Double> terms;
     private Locale locale;
     private String source;
 
@@ -57,11 +57,11 @@ public class NewsItem {
         id = Long.toString(Math.abs(UUID.randomUUID().getLeastSignificantBits()));
     }
 
-    public NewsItem(int docNr, String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Float> terms, Locale locale, String source, URL url, URL imageUrl) {
+    public NewsItem(int docNr, String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Double> terms, Locale locale, String source, URL url, URL imageUrl) {
         this(Long.toString(Math.abs(UUID.randomUUID().getLeastSignificantBits())), docNr, title, authors, fulltext, description, timestamp, terms, locale, source, url, imageUrl);
     }
 
-    public NewsItem(String id, int docNr, String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Float> terms, Locale locale, String source, URL url, URL imageUrl) {
+    public NewsItem(String id, int docNr, String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Double> terms, Locale locale, String source, URL url, URL imageUrl) {
         this.id = id;
         this.docNr = docNr;
         this.title = title;
@@ -132,12 +132,16 @@ public class NewsItem {
         this.timestamp = timestamp;
     }
 
-    public Map<String, Float> getTerms() {
+    public Map<String, Double> getTerms() {
         return terms;
     }
 
-    public void setTerms(Map<String, Float> terms) {
+    public void setTerms(Map<String, Double> terms) {
         this.terms = terms;
+    }
+    
+    public void addTerms(Map<String, Double> terms){
+        this.terms.putAll(terms);
     }
 
     public Locale getLocale() {
@@ -164,7 +168,7 @@ public class NewsItem {
         this.source = source;
     }
 
-    public void addTerm(String term, float relevancy) {
+    public void addTerm(String term, double relevancy) {
         terms.put(term, relevancy);
     }
 

@@ -21,6 +21,7 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import java.io.IOException;
 import java.util.List;
+import org.apache.lucene.search.SearcherManager;
 
 /**
  *
@@ -30,9 +31,9 @@ public class ColdStartLuceneRecommender implements IRecommender{
     private final LuceneTermRecommender r1;
     private final TopNRecommender r2;
 
-    public ColdStartLuceneRecommender(String luceneIndexLocation, IRatingsDao rdao, IViewsDao vdao) throws IOException {
-        r1 = new LuceneTermRecommender(luceneIndexLocation, rdao, vdao);
-        r2 = new TopNRecommender(luceneIndexLocation, vdao);
+    public ColdStartLuceneRecommender(SearcherManager manager, IRatingsDao rdao, IViewsDao vdao) throws IOException {
+        r1 = new LuceneTermRecommender(rdao, vdao, manager);
+        r2 = new TopNRecommender(vdao, manager);
     }
 
     

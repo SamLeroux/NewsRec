@@ -30,6 +30,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.SearcherManager;
 import org.apache.lucene.search.TopScoreDocCollector;
 
 /**
@@ -40,11 +41,14 @@ import org.apache.lucene.search.TopScoreDocCollector;
 public class TopNRecommender extends LuceneRecommender {
 
     private IViewsDao viewsDao;
+    private static final Logger logger = Logger.getLogger(TopNRecommender.class);
 
-    public TopNRecommender(String luceneIndexLocation, IViewsDao viewsDao) throws IOException {
-        super(luceneIndexLocation);
+    public TopNRecommender(IViewsDao viewsDao, SearcherManager manager) {
+        super(manager);
         this.viewsDao = viewsDao;
     }
+
+    
 
     public IViewsDao getViewsDao() {
         return viewsDao;
@@ -76,7 +80,7 @@ public class TopNRecommender extends LuceneRecommender {
             for (int i = start; i < stop; i++) {
                 int docId = hits[i].doc;
                 Document d = searcher.doc(docId);
-                results.add(toNewsitem(d, docId));
+                results.add(toNewsitem(d, docId, searcher));
             }
 
             return results;

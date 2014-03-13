@@ -26,5 +26,5 @@ public interface IRatingsDao {
     public Map<String, Double> getRatings(long userid) throws RatingsDaoException;
     public void giveRating(long userid, String term, double rating) throws RatingsDaoException;
     public void giveRating(long userid, Map<String, Double> terms) throws RatingsDaoException;
-
+    public void close() throws DaoException;
 }

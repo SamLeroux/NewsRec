@@ -72,10 +72,10 @@ public class NewsItemLuceneDocConverter {
         for (String author : item.getAuthors()) {
             doc.add(new StringField("author", author, Field.Store.YES));
         }
-        Map<String, Float> terms = item.getTerms();
+        Map<String, Double> terms = item.getTerms();
         for (String term : terms.keySet()) {
             TextField tf = new TextField("term", term, Field.Store.YES);
-            tf.setBoost(terms.get(term));
+            tf.setBoost(terms.get(term).floatValue());
             doc.add(tf);
         }
         return doc;

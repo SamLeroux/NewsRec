@@ -31,20 +31,6 @@ public final class TotalRankingsBolt extends AbstractRankerBolt {
   private static final long serialVersionUID = -8447525895532302198L;
   private static final Logger LOG = Logger.getLogger(TotalRankingsBolt.class);
 
-    /**
-     *
-     */
-    public TotalRankingsBolt() {
-    super();
-  }
-
-    /**
-     *
-     * @param topN
-     */
-    public TotalRankingsBolt(int topN) {
-    super(topN);
-  }
 
     /**
      *

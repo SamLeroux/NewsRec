@@ -16,6 +16,7 @@
 
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.dummyImpl;
 
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ITrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.TrendsDaoException;
 
@@ -39,6 +40,10 @@ public class DummyTrendsDao implements ITrendsDao{
     @Override
     public void updateTrends(String[] trends) throws TrendsDaoException {
         this.trends = trends;
+    }
+
+    @Override
+    public void close() throws DaoException {
     }
     
 }

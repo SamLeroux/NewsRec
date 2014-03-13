@@ -76,7 +76,7 @@ public abstract class AbstractJDBCBaseDao {
             closeStatements();
             connectionPool.close();
             connectionPool = null;
-        } catch (SQLException ex) {
+        } catch (NullPointerException| SQLException ex) {
             logger.error(ex);
         }
     }

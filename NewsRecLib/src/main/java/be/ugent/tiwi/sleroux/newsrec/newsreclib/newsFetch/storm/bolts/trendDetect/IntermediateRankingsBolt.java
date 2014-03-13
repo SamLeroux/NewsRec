@@ -31,20 +31,7 @@ public final class IntermediateRankingsBolt extends AbstractRankerBolt {
   private static final long serialVersionUID = -1369800530256637409L;
   private static final Logger LOG = Logger.getLogger(IntermediateRankingsBolt.class);
 
-    /**
-     *
-     */
-    public IntermediateRankingsBolt() {
-    super();
-  }
-
-    /**
-     *
-     * @param topN
-     */
-    public IntermediateRankingsBolt(int topN) {
-    super(topN);
-  }
+    
 
     /**
      *

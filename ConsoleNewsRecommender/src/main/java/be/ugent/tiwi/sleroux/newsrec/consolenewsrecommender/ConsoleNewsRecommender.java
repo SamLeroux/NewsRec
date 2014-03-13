@@ -30,11 +30,10 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItemCluster;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.IRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.RecommendationException;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.DatabaseLuceneScorer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.IScorer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.topology.NewsFetchTopologyStarter;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.TrendingTopicRecommender;
-import java.io.IOException;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.RecommenderBuildException;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.RecommenderBuilder;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -48,40 +47,42 @@ public class ConsoleNewsRecommender {
 
     private static final Logger logger = Logger.getLogger(ConsoleNewsRecommender.class);
     private static final ResourceBundle bundle = ResourceBundle.getBundle("newsRec");
+    
     private IScorer scorer;
     private IRecommender rec;
     private final long userid = 4L;
     private IViewsDao viewsDao;
     private ITrendsDao trendsDao;
+    private IRatingsDao ratingsDao;
+    private RecommenderBuilder builder;
     private final String luceneLoc = "/home/sam/Bureaublad/index";
     private final String stopwordsFileLocation = "/home/sam/Bureaublad/dev/stopwords_EN.txt";
 
     public ConsoleNewsRecommender() {
         try {
-            IRatingsDao dao = new JDBCRatingsDao();
-            scorer = new DatabaseLuceneScorer(luceneLoc, dao);
-            viewsDao = new JDBCViewsDao();
+            ratingsDao = new JDBCRatingsDao();
             trendsDao = new JDBCTrendsDao();
-            //rec = new LuceneTermRecommender(bundle.getString("luceneIndexLocation"),dao, viewsDao);
-            //rec = new TopNRecommender(bundle.getString("luceneIndexLocation"), viewsDao);
-            //rec.setRatingsDao(dao);
-//            rec = new CombinedRecommender();
-//            rec.addRecommender(new LuceneTermRecommender(bundle.getString("luceneIndexLocation"),dao, viewsDao));
-//            rec.addRecommender(new TopNRecommender(bundle.getString("luceneIndexLocation"), viewsDao));
-            //rec = new ColdStartLuceneRecommender(luceneLoc, dao, viewsDao);
-            rec = new TrendingTopicRecommender(trendsDao, viewsDao, luceneLoc);
-        } catch (IOException | DaoException ex) {
+            viewsDao = new JDBCViewsDao();
+            
+            builder = new RecommenderBuilder(ratingsDao, trendsDao, viewsDao, luceneLoc);
+            scorer = builder.getScorer();
+            rec = builder.getRecommender();
+        } catch (DaoException | RecommenderBuildException ex) {
             java.util.logging.Logger.getLogger(ConsoleNewsRecommender.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
 
     public void start() {
-     
+        try {     
             //startAddArticles();
             //startRectest();
             startFetchTest();
             //testClustering();
+            builder.close();
+        } catch (RecommenderBuildException ex) {
+            java.util.logging.Logger.getLogger(ConsoleNewsRecommender.class.getName()).log(Level.SEVERE, null, ex);
+        }
        
     }
     

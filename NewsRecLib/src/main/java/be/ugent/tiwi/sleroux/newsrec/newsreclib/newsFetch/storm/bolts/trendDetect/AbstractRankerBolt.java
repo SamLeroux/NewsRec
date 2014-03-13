@@ -39,28 +39,14 @@ import java.util.Map;
 public abstract class AbstractRankerBolt extends BaseBasicBolt {
 
   private static final long serialVersionUID = 4931640198501530202L;
-  private static final int DEFAULT_EMIT_FREQUENCY_IN_SECONDS = 2;
-  private static final int DEFAULT_COUNT = 10;
+
 
   private final int emitFrequencyInSeconds;
   private final int count;
   private final Rankings rankings;
 
-    /**
-     *
-     */
-    public AbstractRankerBolt() {
-    this(DEFAULT_COUNT, DEFAULT_EMIT_FREQUENCY_IN_SECONDS);
-  }
-
-    /**
-     *
-     * @param topN
-     */
-    public AbstractRankerBolt(int topN) {
-    this(topN, DEFAULT_EMIT_FREQUENCY_IN_SECONDS);
-  }
-
+   
+ 
     /**
      *
      * @param topN

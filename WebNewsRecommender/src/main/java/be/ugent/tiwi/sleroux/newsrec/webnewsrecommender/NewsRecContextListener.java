@@ -24,11 +24,10 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCTrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCViewsDao;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.RecommenderBuildException;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.RecommenderBuilder;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.IRecommender;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.TrendingTopicRecommender;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.DatabaseLuceneScorer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.IScorer;
-import java.io.IOException;
 import java.util.ResourceBundle;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -46,13 +45,14 @@ public class NewsRecContextListener implements ServletContextListener {
     private IRecommender recommender;
     private IScorer scorer;
     private IClusterer clusterer;
-    
+    private RecommenderBuilder builder;
     private static final Logger logger = Logger.getLogger(NewsRecContextListener.class);
     private static final ResourceBundle bundle = ResourceBundle.getBundle("WebNewsrecommender");
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         try {
+            
             viewsDao = new JDBCViewsDao();
             sce.getServletContext().setAttribute("viewsDao", viewsDao);
 
@@ -60,19 +60,20 @@ public class NewsRecContextListener implements ServletContextListener {
             trendsDao = new JDBCTrendsDao();
 
             String luceneLocation = bundle.getString("luceneIndexLocation");
-            //recommender = new ColdStartLuceneRecommender(luceneLocation, ratingsDao, viewsDao);
-            recommender = new TrendingTopicRecommender(trendsDao, viewsDao, luceneLocation);
+            builder = new RecommenderBuilder(ratingsDao, trendsDao, viewsDao, luceneLocation);
+
+            recommender = builder.getRecommender();
             sce.getServletContext().setAttribute("recommender", recommender);
 
-            scorer = new DatabaseLuceneScorer(luceneLocation, ratingsDao);
+            scorer = builder.getScorer();
             sce.getServletContext().setAttribute("scorer", scorer);
             
             clusterer = new LingPipeHierarchicalClustering();
             sce.getServletContext().setAttribute("clusterer", clusterer);
          
-        } catch (IOException ex) {
-            logger.error(ex);
         } catch (DaoException ex) {
+            logger.error(ex);
+        } catch (RecommenderBuildException ex) {
             logger.error(ex);
         }
 
@@ -80,6 +81,11 @@ public class NewsRecContextListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
+        try {
+            builder.close();
+        } catch (RecommenderBuildException ex) {
+            logger.error(ex);
+        }
     }
 
 }
