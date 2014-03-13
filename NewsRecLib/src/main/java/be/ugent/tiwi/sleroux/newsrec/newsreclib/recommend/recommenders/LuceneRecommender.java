@@ -16,15 +16,11 @@
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.NewsItemLuceneDocConverter;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Date;
-import java.util.Locale;
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.SearcherManager;
 import org.apache.lucene.store.Directory;
@@ -46,7 +42,7 @@ public abstract class LuceneRecommender implements IRecommender {
     static {
         BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
     }
-    
+
     public LuceneRecommender(String luceneIndexLocation) throws IOException {
         this.luceneIndexLocation = luceneIndexLocation;
         openIndex();
@@ -62,108 +58,14 @@ public abstract class LuceneRecommender implements IRecommender {
 
     private void openIndex() throws IOException {
         dir = FSDirectory.open(new File(luceneIndexLocation));
-        manager = new SearcherManager(dir,null);     
-        
-//        reader = DirectoryReader.open(dir, 1);
-//        searcher = new IndexSearcher(reader);
-//        searcher.setSimilarity(new DefaultSimilarity());
+        manager = new SearcherManager(dir, null);
     }
 
     protected NewsItem toNewsitem(Document d, int docId) {
         logger.debug("Converting document to newsitem");
-        NewsItem item = new NewsItem();
-
-        IndexableField field;
-
-        field = d.getField("description");
-        if (field != null) {
-            item.setDescription(field.stringValue());
-        } else {
-            item.setDescription("No description available");
-        }
-        
-        field = d.getField("source");
-        if (field != null) {
-            item.setSource(field.stringValue());
-        } else {
-            item.setSource("No source available");
-        }
-
-        field = d.getField("text");
-        if (field != null) {
-            item.setFulltext(field.stringValue());
-        } else {
-            item.setFulltext("No text available");
-        }
-
-        field = d.getField("id");
-        if (field != null) {
-            item.setId(field.stringValue());
-        } else {
-            item.setId("");
-        }
-
+        NewsItem item = NewsItemLuceneDocConverter.DocumentToNewsItem(d);
         item.setDocNr(docId);
-        
-        field = d.getField("imageUrl");
-        if (field != null) {
-            try {
-                item.setImageUrl(new URL(field.stringValue()));
-            } catch (MalformedURLException ex) {
-                logger.debug(field.stringValue());
-                logger.error(ex.getMessage(), ex);
-                item.setImageUrl(null);
-            }
-        }
-
-        field = d.getField("locale");
-        if (field != null) {
-            item.setLocale(Locale.forLanguageTag(field.stringValue()));
-        } else {
-            item.setLocale(Locale.getDefault());
-        }
-
-    
-
-        field = d.getField("timestamp");
-        if (field != null) {
-            item.setTimestamp(new Date(field.numericValue().longValue()));
-        } else {
-            item.setTimestamp(new Date());
-        }
-
-        field = d.getField("title");
-        if (field != null) {
-            item.setTitle(field.stringValue());
-        } else {
-            item.setTitle("");
-        }
-
-        field = d.getField("url");
-        if (field != null) {
-            try {
-                item.setUrl(new URL(field.stringValue()));
-            } catch (MalformedURLException ex) {
-                logger.debug(field.stringValue());
-                logger.error(ex.getMessage(), ex);
-                item.setUrl(null);
-            }
-        } else {
-            item.setTitle("");
-        }
-        
-        for (IndexableField f: d.getFields("term")){
-            item.addTerm(f.stringValue(), 1);
-        }
-
         return item;
     }
-
-    
-    
-    
-    
-    
-    
 
 }

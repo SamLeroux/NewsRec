@@ -50,7 +50,7 @@ public class ViewedServlet extends HttpServlet {
         try {            
             long user = 2L;
             int docNr = Integer.parseInt(request.getParameter("docNr"));
-            long itemId = Long.parseLong(request.getParameter("itemId"));
+            String itemId = request.getParameter("itemId");
             
             IScorer scorer = (IScorer)getServletContext().getAttribute("scorer");
             scorer.view(user, itemId);

@@ -87,7 +87,7 @@ public class ConsoleNewsRecommender {
     
     public void startAddArticles(){
         try {
-            score(16100, -4959261087675326762L);
+            score(16100, "-4959261087675326762");
         } catch (DaoException ex) {
             java.util.logging.Logger.getLogger(ConsoleNewsRecommender.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -127,8 +127,8 @@ public class ConsoleNewsRecommender {
         }
     }
 
-    private void score(int docNr, long itemid) throws DaoException {
-        scorer.view(userid, docNr);
+    private void score(int docNr, String itemid) throws DaoException {
+        scorer.view(userid, itemid);
         viewsDao.see(userid, docNr, itemid);
     }
 

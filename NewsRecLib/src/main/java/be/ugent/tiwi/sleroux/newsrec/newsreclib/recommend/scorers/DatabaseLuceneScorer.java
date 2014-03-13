@@ -17,21 +17,14 @@ package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.RatingsDaoException;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.termExtract.LuceneTopTermExtract;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import org.apache.log4j.Logger;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.SearcherManager;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
@@ -46,6 +39,7 @@ public class DatabaseLuceneScorer implements IScorer {
     private final IRatingsDao ratingsDao;
     private final SearcherManager manager;
     private final Directory dir;
+    private final LuceneTopTermExtract termExtractor;
     private static final Logger logger = Logger.getLogger(DatabaseLuceneScorer.class);
 
     /**
@@ -58,10 +52,11 @@ public class DatabaseLuceneScorer implements IScorer {
         ratingsDao = dao;
         dir = FSDirectory.open(new File(luceneIndexLocation));
         manager = new SearcherManager(dir, null);
+        termExtractor = new LuceneTopTermExtract();
     }
 
     @Override
-    public void score(long user, long item, double rating) {
+    public void score(long user, String item, double rating) {
         try {
             Map<String, Double> termsToStore = getTopTerms(item);
             if (!termsToStore.isEmpty()) {
@@ -78,35 +73,16 @@ public class DatabaseLuceneScorer implements IScorer {
     }
 
     @Override
-    public void view(long user, long item) {
+    public void view(long user, String item) {
         score(user, item, 0.75);
     }
 
-    private Map<String, Double> getTopTerms(long item) throws IOException {
-        Query q = new TermQuery(new Term("id", Long.toString(item)));
-        TopScoreDocCollector col = TopScoreDocCollector.create(1, true);
-
+    private Map<String, Double> getTopTerms(String item) throws IOException {
         manager.maybeRefreshBlocking();
         IndexSearcher searcher = manager.acquire();
         IndexReader reader = searcher.getIndexReader();
 
-        searcher.search(q, col);
-        ScoreDoc[] hits = col.topDocs().scoreDocs;
-
-        Map<String, Double> terms = new HashMap<>(10);
-        if (hits.length > 0) {
-            if (hits.length > 1) {
-                logger.warn("hits.length should be 1 for id=" + item + " it is " + hits.length);
-            }
-            int docnr = hits[0].doc;
-            Document doc = reader.document(docnr);
-            for (String term : doc.getValues("term")) {
-                terms.put(term, 1.0);
-            }
-
-        } else {
-            logger.error("Could not find document with id=" + item);
-        }
+        Map<String, Double> terms = termExtractor.getTopTerms(item, reader);
         manager.release(searcher);
         return terms;
     }

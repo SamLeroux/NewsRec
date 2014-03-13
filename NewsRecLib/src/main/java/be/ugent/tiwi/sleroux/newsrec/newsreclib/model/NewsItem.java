@@ -22,6 +22,7 @@ import java.util.Map;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -31,6 +32,11 @@ import java.util.UUID;
  */
 public class NewsItem {
 
+    /**
+     *The id is a numeric identification (long) but is stored as a String.
+     * There were some problems retrieving documents from the lucene index based
+     * on the numeric value.
+     */
     private String id;
     private int docNr;
     private String title;
@@ -174,5 +180,26 @@ public class NewsItem {
     public String toString() {
         return "NewsItem{" + "id=" + id + ", title=" + title + ", authors=" + authors + ", fulltext=" + fulltext + ", description=" + description + ", timestamp=" + timestamp + ", terms=" + terms + ", locale=" + locale + ", source=" + source + ", url=" + url + '}';
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + Objects.hashCode(this.title);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final NewsItem other = (NewsItem) obj;
+        return Objects.equals(this.title, other.title);
+    }
+    
+    
 
 }

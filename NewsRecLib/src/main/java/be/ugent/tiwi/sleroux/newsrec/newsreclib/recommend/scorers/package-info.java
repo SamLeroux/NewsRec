@@ -14,16 +14,8 @@
  * limitations under the License.
  */
 
-package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao;
-
-import java.util.List;
 
 /**
- *
- * @author Sam Leroux <sam.leroux@ugent.be>
+ * Scorers record views or ratings. All scorers must implement the IScorer interface.
  */
-public interface IViewsDao {
-    public List<Integer> getSeenArticles(long userId) throws ViewsDaoException;
-    public void see(long userId, int docNr, String itemId) throws ViewsDaoException;
-    public List<Long> getNMostSeenArticles(int start, int stop) throws ViewsDaoException;
-}
+package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers;

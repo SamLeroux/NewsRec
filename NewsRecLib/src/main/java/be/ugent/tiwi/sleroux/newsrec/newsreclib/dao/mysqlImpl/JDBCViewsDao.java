@@ -23,8 +23,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -61,12 +59,12 @@ public class JDBCViewsDao extends AbstractJDBCBaseDao implements IViewsDao {
     }
 
     @Override
-    public void see(long userid, int docnr, long itemid) throws ViewsDaoException {
+    public void see(long userid, int docnr, String itemid) throws ViewsDaoException {
         try {
             logger.debug(userid + " has seen " + docnr);
             insertViewsStatement.setLong(1, userid);
             insertViewsStatement.setInt(2, docnr);
-            insertViewsStatement.setLong(3, itemid);
+            insertViewsStatement.setLong(3, Long.parseLong(itemid));
 
             int result = insertViewsStatement.executeUpdate();
             logger.debug("return value insert/update: " + result);

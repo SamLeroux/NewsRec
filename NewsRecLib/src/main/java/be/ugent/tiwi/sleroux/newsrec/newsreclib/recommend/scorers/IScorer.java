@@ -21,6 +21,6 @@ package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers;
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public interface IScorer {
-    public void score(long user, long item, double rating);
-    public void view(long user, long item);
+    public void score(long user, String item, double rating);
+    public void view(long user, String item);
 }
