@@ -77,7 +77,7 @@ public class LuceneTermRecommender extends LuceneRecommender {
             for (int i = start; i < stop; i++) {
                 int docId = hits[i].doc;
                 Document d = searcher.doc(docId);
-                results.add(toNewsitem(d, docId, searcher));
+                results.add(toNewsitem(d, docId));
                 //System.out.println(docId);
                 //System.out.println(searcher.explain(query, docId).toString());
             }

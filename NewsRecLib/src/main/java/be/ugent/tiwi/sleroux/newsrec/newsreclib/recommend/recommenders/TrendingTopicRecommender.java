@@ -77,7 +77,7 @@ public class TrendingTopicRecommender extends LuceneRecommender implements IReco
             for (int i = start; i < stop; i++) {
                 int docId = hits[i].doc;
                 Document d = searcher.doc(docId);
-                results.add(toNewsitem(d, docId, searcher));
+                results.add(toNewsitem(d, docId));
             }
 
             return results;

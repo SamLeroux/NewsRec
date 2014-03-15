@@ -28,17 +28,13 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.topology.StreamIDs;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.termExtract.LuceneTopTermExtract;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.NewsItemLuceneDocConverter;
-import java.io.BufferedReader;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.StopWordsReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
 import org.apache.log4j.Logger;
-import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
@@ -75,12 +71,12 @@ public class LuceneIndexBolt extends BaseRichBolt {
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.collector = collector;
-        this.termExtract = new LuceneTopTermExtract();
         try {
             logger.info("Opening index");
             Directory dir = FSDirectory.open(new File(indexLocation));
             EnAnalyzer analyzer = new EnAnalyzer();
-            analyzer.setStopwords(getStopwords(stopwordsLocation));
+            analyzer.setStopwords(StopWordsReader.getStopwords(stopwordsLocation));
+            this.termExtract = new LuceneTopTermExtract(analyzer);
             IndexWriterConfig config = new IndexWriterConfig(Config.LUCENE_VERSION, analyzer);
             writer = new IndexWriter(dir, config);
         } catch (IOException ex) {
@@ -104,27 +100,26 @@ public class LuceneIndexBolt extends BaseRichBolt {
     public void execute(Tuple input) {
         try {
             logger.info("New item to add to lucene index");
-            
+
             // input newsitem
             NewsItem item = (NewsItem) input.getValueByField(StreamIDs.NEWSARTICLEWITHCONTENT);
-
+           
+            DirectoryReader reader = DirectoryReader.open(writer, true);
+            termExtract.addTopTerms(item, reader);
+            reader.close();
+            
             // Convert to lucene document and add to index
             Document doc = NewsItemLuceneDocConverter.NewsItemToDocument(item);
             writer.addDocument(doc);
             writer.commit();
             
-            // fetch the important terms from this document and pass them on to the
-            // next bolt.
-            try (IndexReader reader = DirectoryReader.open(writer, true)) {
-                Map<String, Double> terms = termExtract.getTopTerms(item.getId(), reader);
-
-                logger.info("emitting " + terms.size() + " terms");
-                for (String term : terms.keySet()) {
-                    collector.emit(StreamIDs.TERMSTREAM, new Values(term));
-                }
-
-                logger.info("New item in Lucene index");
+            logger.info("emitting " + item.getTerms().size() + " terms");
+            for (String term : item.getTerms().keySet()) {
+                collector.emit(StreamIDs.TERMSTREAM, new Values(term));
             }
+
+            logger.info("New item in Lucene index");
+            
         } catch (IOException ex) {
             logger.error(ex);
         }
@@ -132,18 +127,6 @@ public class LuceneIndexBolt extends BaseRichBolt {
 
     }
 
-    private CharArraySet getStopwords(String stopwordsLocation) throws FileNotFoundException, IOException {
-        logger.info("reading stopwords file: " + stopwordsLocation);
-        CharArraySet stopw;
-        try (BufferedReader reader = new BufferedReader(new FileReader(stopwordsLocation))) {
-            stopw = new CharArraySet(Config.LUCENE_VERSION, 1000, true);
-            String line = reader.readLine();
-            while (line != null) {
-                stopw.add(line);
-                line = reader.readLine();
-            }
-        }
-        return stopw;
-    }
+    
 
 }

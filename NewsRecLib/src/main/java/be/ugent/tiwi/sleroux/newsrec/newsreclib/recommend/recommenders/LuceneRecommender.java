@@ -21,6 +21,7 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.NewsItemLuceneDocConverter
 import java.io.IOException;
 import java.util.Map;
 import org.apache.log4j.Logger;
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
@@ -34,7 +35,6 @@ import org.apache.lucene.search.SearcherManager;
 public abstract class LuceneRecommender implements IRecommender {
 
     protected SearcherManager manager;
-    private LuceneTopTermExtract termExtract;
 
     private static final Logger logger = Logger.getLogger(LuceneRecommender.class);
 
@@ -44,15 +44,12 @@ public abstract class LuceneRecommender implements IRecommender {
 
     public LuceneRecommender(SearcherManager manager) {
         this.manager = manager;
-        termExtract = new LuceneTopTermExtract();
     }
 
-    protected NewsItem toNewsitem(Document d, int docId, IndexSearcher searcher) throws IOException {
+    protected NewsItem toNewsitem(Document d, int docId) throws IOException {
         logger.debug("Converting document to newsitem");
         NewsItem item = NewsItemLuceneDocConverter.DocumentToNewsItem(d);
         item.setDocNr(docId);
-        Map<String, Double> terms = termExtract.getTopTerms(docId, searcher.getIndexReader());
-        item.addTerms(terms);
         return item;
     }
 

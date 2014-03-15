@@ -83,7 +83,7 @@ public class FeedSourceSpout extends BaseRichSpout {
             collector.emit(StreamIDs.NEWSSOURCESTREAM,new Values(source));
         } else {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(200);
             } catch (InterruptedException ex) {
                 logger.error(ex);
             }

@@ -17,13 +17,20 @@ package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.RatingsDaoException;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.termExtract.LuceneTopTermExtract;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.NewsItemLuceneDocConverter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import org.apache.log4j.Logger;
+import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SearcherManager;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopScoreDocCollector;
 
 /**
  * Updates the user model stored in a database with the information of the
@@ -35,18 +42,17 @@ public class DatabaseLuceneScorer implements IScorer {
 
     private final IRatingsDao ratingsDao;
     private final SearcherManager manager;
-    private final LuceneTopTermExtract termExtractor;
     private static final Logger logger = Logger.getLogger(DatabaseLuceneScorer.class);
 
     /**
      *
      * @param manager
      * @param dao
+     * @param analyzer
      */
     public DatabaseLuceneScorer(SearcherManager manager, IRatingsDao dao) {
         ratingsDao = dao;
         this.manager = manager;
-        termExtractor = new LuceneTopTermExtract();
     }
 
     @Override
@@ -75,10 +81,20 @@ public class DatabaseLuceneScorer implements IScorer {
         manager.maybeRefreshBlocking();
         IndexSearcher searcher = manager.acquire();
         IndexReader reader = searcher.getIndexReader();
-
-        Map<String, Double> terms = termExtractor.getTopTerms(item, reader);
+        TopScoreDocCollector collector = TopScoreDocCollector.create(1, true);
+        Query q = new TermQuery(new Term("id",item));
+        searcher.search(q,collector);
+        if (collector.getTotalHits() > 0){
+            int docNr = collector.topDocs().scoreDocs[0].doc;
+            Document doc = reader.document(docNr);
+            NewsItem nitem = NewsItemLuceneDocConverter.DocumentToNewsItem(doc);
+            return nitem.getTerms();
+        }else{
+            logger.warn("Could not find document with id="+item);
+        }
+        reader.close();
         manager.release(searcher);
-        return terms;
+        return new HashMap<>();
     }
 
 }

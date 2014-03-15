@@ -55,8 +55,8 @@ public class ConsoleNewsRecommender {
     private ITrendsDao trendsDao;
     private IRatingsDao ratingsDao;
     private RecommenderBuilder builder;
-    private final String luceneLoc = "/home/sam/Bureaublad/index";
-    private final String stopwordsFileLocation = "/home/sam/Bureaublad/dev/stopwords_EN.txt";
+    private final String luceneLoc = "/home/sam/index";
+    private final String stopwordsFileLocation = "/home/sam/stopwords_EN.txt";
 
     public ConsoleNewsRecommender() {
         try {
@@ -65,6 +65,7 @@ public class ConsoleNewsRecommender {
             viewsDao = new JDBCViewsDao();
             
             builder = new RecommenderBuilder(ratingsDao, trendsDao, viewsDao, luceneLoc);
+     
             scorer = builder.getScorer();
             rec = builder.getRecommender();
         } catch (DaoException | RecommenderBuildException ex) {

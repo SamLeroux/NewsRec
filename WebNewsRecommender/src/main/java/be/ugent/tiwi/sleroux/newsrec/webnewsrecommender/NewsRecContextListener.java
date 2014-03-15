@@ -24,14 +24,20 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCTrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCViewsDao;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.lucene.analyzers.EnAnalyzer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.RecommenderBuildException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.RecommenderBuilder;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.IRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.IScorer;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.StopWordsReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ResourceBundle;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import org.apache.log4j.Logger;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.util.CharArraySet;
 
 /**
  *
@@ -52,7 +58,7 @@ public class NewsRecContextListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         try {
-            
+
             viewsDao = new JDBCViewsDao();
             sce.getServletContext().setAttribute("viewsDao", viewsDao);
 
@@ -60,6 +66,7 @@ public class NewsRecContextListener implements ServletContextListener {
             trendsDao = new JDBCTrendsDao();
 
             String luceneLocation = bundle.getString("luceneIndexLocation");
+
             builder = new RecommenderBuilder(ratingsDao, trendsDao, viewsDao, luceneLocation);
 
             recommender = builder.getRecommender();
@@ -67,10 +74,10 @@ public class NewsRecContextListener implements ServletContextListener {
 
             scorer = builder.getScorer();
             sce.getServletContext().setAttribute("scorer", scorer);
-            
+
             clusterer = new LingPipeHierarchicalClustering();
             sce.getServletContext().setAttribute("clusterer", clusterer);
-         
+
         } catch (DaoException ex) {
             logger.error(ex);
         } catch (RecommenderBuildException ex) {

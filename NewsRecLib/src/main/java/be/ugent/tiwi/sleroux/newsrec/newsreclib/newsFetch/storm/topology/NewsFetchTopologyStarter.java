@@ -102,6 +102,8 @@ public class NewsFetchTopologyStarter {
         Config conf = new Config();
         conf.setDebug(false);
         conf.put(Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS, 240);
+        conf.put(Config.NIMBUS_SUPERVISOR_TIMEOUT_SECS,240);
+        conf.put(Config.SUPERVISOR_WORKER_TIMEOUT_SECS,240);
         return conf;
     }
 

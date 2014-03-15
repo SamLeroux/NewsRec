@@ -16,17 +16,19 @@
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.utils;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import com.google.gson.Gson;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.LongField;
+import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.StringField;
-import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexableField;
 
 /**
@@ -37,6 +39,7 @@ import org.apache.lucene.index.IndexableField;
  * @see Document
  */
 public class NewsItemLuceneDocConverter {
+    private static Gson gson = new Gson();
 
     public static Document NewsItemToDocument(NewsItem item) {
         Document doc = new Document();
@@ -72,12 +75,11 @@ public class NewsItemLuceneDocConverter {
         for (String author : item.getAuthors()) {
             doc.add(new StringField("author", author, Field.Store.YES));
         }
+        
         Map<String, Double> terms = item.getTerms();
-        for (String term : terms.keySet()) {
-            TextField tf = new TextField("term", term, Field.Store.YES);
-            tf.setBoost(terms.get(term).floatValue());
-            doc.add(tf);
-        }
+        String termsJson = gson.toJson(terms);
+        doc.add(new StoredField("terms", termsJson));
+        
         return doc;
     }
 
@@ -154,8 +156,10 @@ public class NewsItemLuceneDocConverter {
             item.setTitle("");
         }
 
-        for (IndexableField f : d.getFields("term")) {
-            item.addTerm(f.stringValue(), 1);
+        field = d.getField("terms");
+        if (field != null){
+            Map<String, Double> terms = gson.fromJson(field.stringValue(), HashMap.class);
+            item.addTerms(terms);
         }
 
         return item;

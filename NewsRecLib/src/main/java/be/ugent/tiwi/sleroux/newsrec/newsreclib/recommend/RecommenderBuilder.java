@@ -26,6 +26,7 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.IScorer;
 import java.io.File;
 import java.io.IOException;
 import org.apache.log4j.Logger;
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.SearcherManager;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
