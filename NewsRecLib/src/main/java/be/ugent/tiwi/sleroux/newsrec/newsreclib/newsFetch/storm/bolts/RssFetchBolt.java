@@ -114,7 +114,7 @@ public class RssFetchBolt extends BaseRichBolt {
 
                 }
                 else{
-                    logger.info("Skipping: article, article with same title has already been added");
+                    logger.info("Skipping: article, article with same title has already been added (title="+entry.getTitle()+")");
                 }
                 i++;
             }

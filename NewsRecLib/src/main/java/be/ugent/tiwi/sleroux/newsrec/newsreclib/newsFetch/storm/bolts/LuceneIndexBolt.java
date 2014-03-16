@@ -103,10 +103,9 @@ public class LuceneIndexBolt extends BaseRichBolt {
 
             // input newsitem
             NewsItem item = (NewsItem) input.getValueByField(StreamIDs.NEWSARTICLEWITHCONTENT);
-           
-            DirectoryReader reader = DirectoryReader.open(writer, true);
-            termExtract.addTopTerms(item, reader);
-            reader.close();
+            try (DirectoryReader reader = DirectoryReader.open(writer, true)) {
+                termExtract.addTopTerms(item, reader);
+            }
             
             // Convert to lucene document and add to index
             Document doc = NewsItemLuceneDocConverter.NewsItemToDocument(item);
