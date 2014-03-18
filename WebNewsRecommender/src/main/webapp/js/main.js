@@ -9,8 +9,9 @@ $(function() {
     fetchRecommendations();
     // Volledig naar boven scrollen
     window.scrollTo(0, 0);
-
-
+//    $(document).on("click","a", function(){
+//       console.log("click: "); 
+//    });
 });
 
 function btnClicked() {
@@ -28,6 +29,11 @@ function getItemDisplayLi(item) {
     h1.addClass("myHeader");
     h1.text(item.representative.title);
     a.append(h1);
+    
+    var h3 = $("<h3>");
+    h3.addClass("timestamp");
+    h3.text(item.representative.timestamp + "  (" + item.items.length+" members)");
+    a.append(h3);
 
     var p = $("<p>");
     p.addClass("myParagraph");
@@ -50,6 +56,9 @@ function displayArticle(url) {
     iframe.load(function() {
         $.mobile.hidePageLoadingMsg();
     });
+    iframe.error(function(){
+        $.mobile.hidePageLoadingMsg();
+    });
 }
 
 
@@ -69,15 +78,6 @@ function ratingClick(event, id, docNr) {
 
 }
 
-function display(what) {
-    if (currentShown !== what) {
-
-        currentShown = what;
-    }
-}
-
-
-
 function fetchRecommendations() {
     $.mobile.showPageLoadingMsg();
 
@@ -96,8 +96,6 @@ function recommendationsFetched(data) {
         var li = getItemDisplayLi(data[item]);
         $("#results").append(li);
     }
-    $("#loader").hide();
-
     $("#resultsDiv").show();
     $("#results").listview("refresh");
     $.mobile.hidePageLoadingMsg();

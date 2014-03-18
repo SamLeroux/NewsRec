@@ -13,25 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.trendDetect;
 
 import backtype.storm.tuple.Tuple;
 import org.apache.log4j.Logger;
 
-
 /**
-* This bolt ranks incoming objects by their count.
-* <p/>
-* It assumes the input tuples to adhere to the following format: (object, object_count, additionalField1,
-* additionalField2, ..., additionalFieldN).
-*/
+ * This bolt ranks incoming objects by their count.
+ * <p/>
+ * It assumes the input tuples to adhere to the following format: (object,
+ * object_count, additionalField1, additionalField2, ..., additionalFieldN).
+ */
 public final class IntermediateRankingsBolt extends AbstractRankerBolt {
 
-  private static final long serialVersionUID = -1369800530256637409L;
-  private static final Logger LOG = Logger.getLogger(IntermediateRankingsBolt.class);
-
-    
+    private static final long serialVersionUID = -1369800530256637409L;
+    private static final Logger LOG = Logger.getLogger(IntermediateRankingsBolt.class);
 
     /**
      *
@@ -39,17 +35,18 @@ public final class IntermediateRankingsBolt extends AbstractRankerBolt {
      * @param emitFrequencyInSeconds
      */
     public IntermediateRankingsBolt(int topN, int emitFrequencyInSeconds) {
-    super(topN, emitFrequencyInSeconds);
-  }
+        super(topN, emitFrequencyInSeconds);
+    }
 
-  @Override
-  void updateRankingsWithTuple(Tuple tuple) {
-    Rankable rankable = RankableObjectWithFields.from(tuple);
-    super.getRankings().updateWith(rankable);
-  }
+    @Override
+    void updateRankingsWithTuple(Tuple tuple) {
+        Rankable rankable = RankableObjectWithFields.from(tuple);
+        super.getRankings().updateWith(rankable);
 
-  @Override
-  Logger getLogger() {
-    return LOG;
-  }
+    }
+
+    @Override
+    Logger getLogger() {
+        return LOG;
+    }
 }

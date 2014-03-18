@@ -26,7 +26,6 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsSource;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.HashCircularBuffer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.topology.StreamIDs;
-import com.sun.syndication.feed.synd.SyndCategory;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.feed.synd.SyndPerson;
@@ -64,7 +63,7 @@ public class RssFetchBolt extends BaseRichBolt {
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.collector = collector;
-        articlesurlBuffer = new HashCircularBuffer<>(1000);
+        articlesurlBuffer = new HashCircularBuffer<>(2500);
     }
 
     @Override

@@ -13,95 +13,95 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.trendDetect;
 
 import backtype.storm.Config;
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseBasicBolt;
+import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import org.apache.log4j.Logger;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
 /**
-* This abstract bolt provides the basic behavior of bolts that rank objects according to their count.
-* <p/>
-* It uses a template method design pattern for {@link AbstractRankerBolt#execute(Tuple, BasicOutputCollector)} to allow
-* actual bolt implementations to specify how incoming tuples are processed, i.e. how the objects embedded within those
-* tuples are retrieved and counted.
-*/
-public abstract class AbstractRankerBolt extends BaseBasicBolt {
+ * This abstract bolt provides the basic behavior of bolts that rank objects
+ * according to their count.
+ * <p/>
+ * It uses a template method design pattern for
+ * {@link AbstractRankerBolt#execute(Tuple, BasicOutputCollector)} to allow
+ * actual bolt implementations to specify how incoming tuples are processed,
+ * i.e. how the objects embedded within those tuples are retrieved and counted.
+ */
+public abstract class AbstractRankerBolt extends BaseRichBolt {
 
-  private static final long serialVersionUID = 4931640198501530202L;
+    private static final long serialVersionUID = 4931640198501530202L;
 
+    private final int emitFrequencyInSeconds;
+    private final int count;
+    private final Rankings rankings;
+    private OutputCollector collector;
 
-  private final int emitFrequencyInSeconds;
-  private final int count;
-  private final Rankings rankings;
-
-   
- 
     /**
      *
      * @param topN
      * @param emitFrequencyInSeconds
      */
     public AbstractRankerBolt(int topN, int emitFrequencyInSeconds) {
-    if (topN < 1) {
-      throw new IllegalArgumentException("topN must be >= 1 (you requested " + topN + ")");
+        if (topN < 1) {
+            throw new IllegalArgumentException("topN must be >= 1 (you requested " + topN + ")");
+        }
+        if (emitFrequencyInSeconds < 1) {
+            throw new IllegalArgumentException(
+                    "The emit frequency must be >= 1 seconds (you requested " + emitFrequencyInSeconds + " seconds)");
+        }
+        count = topN;
+        this.emitFrequencyInSeconds = emitFrequencyInSeconds;
+        rankings = new Rankings(count);
     }
-    if (emitFrequencyInSeconds < 1) {
-      throw new IllegalArgumentException(
-          "The emit frequency must be >= 1 seconds (you requested " + emitFrequencyInSeconds + " seconds)");
-    }
-    count = topN;
-    this.emitFrequencyInSeconds = emitFrequencyInSeconds;
-    rankings = new Rankings(count);
-  }
 
     /**
      *
      * @return
      */
     protected Rankings getRankings() {
-    return rankings;
-  }
-
-  /**
-* This method functions as a template method (design pattern).
-     * @param tuple
-     * @param collector
-*/
-  @Override
-  public final void execute(Tuple tuple, BasicOutputCollector collector) {
-    if (TupleHelpers.isTickTuple(tuple)) {
-      getLogger().debug("Received tick tuple, triggering emit of current rankings");
-      collector.emit(new Values(rankings.copy()));
+        return rankings;
     }
-    else {
-      updateRankingsWithTuple(tuple);
+
+    @Override
+    public final void execute(Tuple tuple) {
+        if (TupleHelpers.isTickTuple(tuple)) {
+            getLogger().debug("Received tick tuple, triggering emit of current rankings");
+            collector.emit(new Values(rankings.copy()));
+        } else {
+            updateRankingsWithTuple(tuple);
+        }
+        collector.ack(tuple);
     }
-  }
 
-  abstract void updateRankingsWithTuple(Tuple tuple);
+    @Override
+    public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+        this.collector = collector;
+    }
 
-  @Override
-  public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields("rankings"));
-  }
+    abstract void updateRankingsWithTuple(Tuple tuple);
 
-  @Override
-  public Map<String, Object> getComponentConfiguration() {
-    Map<String, Object> conf = new HashMap<>();
-    conf.put(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS, emitFrequencyInSeconds);
-    return conf;
-  }
+    @Override
+    public void declareOutputFields(OutputFieldsDeclarer declarer) {
+        declarer.declare(new Fields("rankings"));
+    }
 
-  abstract Logger getLogger();
+    @Override
+    public Map<String, Object> getComponentConfiguration() {
+        Map<String, Object> conf = new HashMap<>();
+        conf.put(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS, emitFrequencyInSeconds);
+        return conf;
+    }
+
+    abstract Logger getLogger();
 }

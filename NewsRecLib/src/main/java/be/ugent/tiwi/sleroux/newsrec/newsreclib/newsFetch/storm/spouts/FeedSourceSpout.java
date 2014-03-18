@@ -71,8 +71,8 @@ public class FeedSourceSpout extends BaseRichSpout {
 
     @Override
     public void close() {
-        super.close(); 
         timer.cancel();
+        super.close();         
     }
 
     

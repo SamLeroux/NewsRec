@@ -52,6 +52,10 @@ public final class StormRunner {
      */
     public static void stop(String name) {
         cluster.killTopology(name);
+    }
+    
+    public static void shutdown(){
         cluster.shutdown();
+        cluster = null;
     }
 }
