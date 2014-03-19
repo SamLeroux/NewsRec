@@ -31,16 +31,19 @@ import java.util.Map;
  */
 public class JDBCRatingsDao extends AbstractJDBCBaseDao implements IRatingsDao {
 
-    private PreparedStatement insertUpdateRatingStatement;
-    private PreparedStatement selectStatement;
-
     public JDBCRatingsDao() throws DaoException {
     }
 
     @Override
     public Map<String, Double> getRatings(long userid) throws RatingsDaoException {
+        PreparedStatement selectStatement = null;
+        Connection conn = null;
         try {
             logger.debug("get rating for user: " + userid);
+            String statementText = bundle.getString("selectRatingsQuery");
+            conn = getConnection();
+            conn.setAutoCommit(true);
+            selectStatement = conn.prepareStatement(statementText);
             selectStatement.setLong(1, userid);
             Map<String, Double> ratings;
             try (ResultSet results = selectStatement.executeQuery()) {
@@ -53,14 +56,32 @@ public class JDBCRatingsDao extends AbstractJDBCBaseDao implements IRatingsDao {
         } catch (SQLException ex) {
             logger.error("Error fetching ratings", ex);
             throw new RatingsDaoException("Error fetching ratings: " + ex.getMessage(), ex);
+        } finally {
+            try {
+                if (selectStatement != null) {
+                    selectStatement.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                throw new RatingsDaoException(ex);
+            }
         }
 
     }
 
     @Override
     public void giveRating(long userid, String term, double rating) throws RatingsDaoException {
+        PreparedStatement insertUpdateRatingStatement = null;
+        Connection conn = null;
         try {
             logger.debug("set rating for user: " + userid + " and term: " + term + " to: " + rating);
+            String statementText = bundle.getString("insertUpdateRatingsQuery");
+            conn = getConnection();
+
+            insertUpdateRatingStatement = conn.prepareStatement(statementText);
+
             insertUpdateRatingStatement.setLong(1, userid);
             insertUpdateRatingStatement.setString(2, term);
             insertUpdateRatingStatement.setDouble(3, rating);
@@ -71,13 +92,31 @@ public class JDBCRatingsDao extends AbstractJDBCBaseDao implements IRatingsDao {
         } catch (SQLException ex) {
             logger.error("Error updating rating", ex);
             throw new RatingsDaoException("Error updating rating: " + ex.getMessage(), ex);
+        } finally {
+            try {
+                if (insertUpdateRatingStatement != null) {
+                    insertUpdateRatingStatement.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                throw new RatingsDaoException(ex);
+            }
         }
     }
 
     @Override
     public void giveRating(long userid, Map<String, Double> terms) throws RatingsDaoException {
+        PreparedStatement insertUpdateRatingStatement = null;
+        Connection conn = null;
         try {
             logger.debug("updating ratings in batch");
+            String statementText = bundle.getString("insertUpdateRatingsQuery");
+            conn = getConnection();
+
+            insertUpdateRatingStatement = conn.prepareStatement(statementText);
+
             for (String term : terms.keySet()) {
                 double rating = terms.get(term);
                 insertUpdateRatingStatement.setLong(1, userid);
@@ -92,32 +131,17 @@ public class JDBCRatingsDao extends AbstractJDBCBaseDao implements IRatingsDao {
         } catch (SQLException ex) {
             logger.error("Error updating rating", ex);
             throw new RatingsDaoException("Error updating rating: " + ex.getMessage(), ex);
-        }
-    }
-
-    @Override
-    protected void createStatements() throws DaoException {
-        try {
-            logger.debug("creating preparedstatements");
-            String statementText = bundle.getString("selectRatingsQuery");
-            Connection conn = getConnection();
-            conn.setAutoCommit(true);
-            selectStatement = conn.prepareStatement(statementText);
-            statementText = bundle.getString("insertUpdateRatingsQuery");
-            insertUpdateRatingStatement = conn.prepareStatement(statementText);
-            logger.debug("created preparedstatements");
-        } catch (SQLException ex) {
-            throw new RatingsDaoException(ex);
-        }
-    }
-
-    @Override
-    protected void closeStatements() throws DaoException {
-        try {
-            selectStatement.close();
-            insertUpdateRatingStatement.close();
-        } catch (SQLException ex) {
-            throw new RatingsDaoException(ex);
+        } finally {
+            try {
+                if (insertUpdateRatingStatement != null) {
+                    insertUpdateRatingStatement.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                throw new RatingsDaoException(ex);
+            }
         }
     }
 

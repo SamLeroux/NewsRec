@@ -18,6 +18,7 @@ package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ViewsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,17 +31,21 @@ import java.util.List;
  */
 public class JDBCViewsDao extends AbstractJDBCBaseDao implements IViewsDao {
 
-    private PreparedStatement insertViewsStatement;
-    private PreparedStatement selectStatement;
-    private PreparedStatement selectTopNStatement;
-
     public JDBCViewsDao() throws DaoException {
     }
 
     @Override
     public List<Integer> getSeenArticles(long userId) throws ViewsDaoException {
+        Connection conn = null;
+        PreparedStatement selectStatement = null;
+
         try {
+            conn = getConnection();
+            String statementText = bundle.getString("selectViewsQuery");
+            selectStatement = conn.prepareStatement(statementText);
+
             selectStatement.setLong(1, userId);
+
             List<Integer> seen = new ArrayList<>();
             try (ResultSet results = selectStatement.executeQuery()) {
                 while (results.next()) {
@@ -54,29 +59,66 @@ public class JDBCViewsDao extends AbstractJDBCBaseDao implements IViewsDao {
         } catch (SQLException ex) {
             logger.error(ex);
             throw new ViewsDaoException(ex);
+        } finally {
+            try {
+                if (selectStatement != null) {
+                    selectStatement.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                throw new ViewsDaoException(ex);
+            }
         }
 
     }
 
     @Override
     public void see(long userid, int docnr, String itemid) throws ViewsDaoException {
+        Connection conn = null;
+        PreparedStatement insertViewsStatement = null;
         try {
             logger.debug(userid + " has seen " + docnr);
+
+            conn = getConnection();
+            String statementText = bundle.getString("insertUpdateViewsQuery");
+            insertViewsStatement = conn.prepareStatement(statementText);
+
             insertViewsStatement.setLong(1, userid);
             insertViewsStatement.setInt(2, docnr);
             insertViewsStatement.setLong(3, Long.parseLong(itemid));
 
             int result = insertViewsStatement.executeUpdate();
             logger.debug("return value insert/update: " + result);
+
         } catch (SQLException ex) {
             logger.error("Error updating rating", ex);
             throw new ViewsDaoException("Error inserting view: " + ex.getMessage(), ex);
+        } finally {
+            try {
+                if (insertViewsStatement != null) {
+                    insertViewsStatement.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                throw new ViewsDaoException(ex);
+            }
         }
     }
 
     @Override
     public List<Long> getNMostSeenArticles(int start, int stop) throws ViewsDaoException {
+        Connection conn = null;
+        PreparedStatement selectTopNStatement = null;
+
         try {
+            conn = getConnection();
+            String statementText = bundle.getString("selectTopNViewsQuery");
+            selectTopNStatement = conn.prepareStatement(statementText);
+
             selectTopNStatement.setInt(1, start);
             selectTopNStatement.setInt(2, stop);
             List<Long> out = new ArrayList<>();
@@ -93,37 +135,17 @@ public class JDBCViewsDao extends AbstractJDBCBaseDao implements IViewsDao {
         } catch (SQLException ex) {
             logger.error(ex);
             throw new ViewsDaoException(ex);
-        }
-    }
-
-    @Override
-    protected void createStatements() throws DaoException {
-        try {
-            logger.debug("creating preparedstatements");
-            
-            String statementText = bundle.getString("selectViewsQuery");
-            selectStatement = getConnection().prepareStatement(statementText);
-            
-            statementText = bundle.getString("insertUpdateViewsQuery");
-            insertViewsStatement = getConnection().prepareStatement(statementText);
-            
-            statementText = bundle.getString("selectTopNViewsQuery");
-            selectTopNStatement = getConnection().prepareStatement(statementText);
-            
-            logger.debug("created preparedstatements");
-        } catch (SQLException ex) {
-            throw new ViewsDaoException(ex);
-        }
-    }
-
-    @Override
-    protected void closeStatements() throws DaoException {
-        try {
-            selectStatement.close();
-            insertViewsStatement.close();
-            selectTopNStatement.close();
-        } catch (SQLException ex) {
-            throw new ViewsDaoException(ex);
+        } finally {
+            try {
+                if (selectTopNStatement != null) {
+                    selectTopNStatement.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                throw new ViewsDaoException(ex);
+            }
         }
     }
 

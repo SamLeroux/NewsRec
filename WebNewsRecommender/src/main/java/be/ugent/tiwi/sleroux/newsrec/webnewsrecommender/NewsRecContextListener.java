@@ -24,20 +24,14 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCTrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCViewsDao;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.lucene.analyzers.EnAnalyzer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.RecommenderBuildException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.RecommenderBuilder;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.IRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.IScorer;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.StopWordsReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ResourceBundle;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import org.apache.log4j.Logger;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.util.CharArraySet;
 
 /**
  *
@@ -89,7 +83,9 @@ public class NewsRecContextListener implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         try {
-            builder.close();
+            if (builder != null){
+                builder.close();
+            }
         } catch (RecommenderBuildException ex) {
             logger.error(ex);
         }

@@ -25,10 +25,12 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queries.ChainedFilter;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.NumericRangeFilter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.SearcherManager;
@@ -64,10 +66,15 @@ public class TrendingTopicRecommender extends LuceneRecommender implements IReco
 
             TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
 
-            Filter filter = new SeenArticlesFilter(viewsDao, userid);
-            searcher = manager.acquire();
+            //Filter filter = new SeenArticlesFilter(viewsDao, userid);
+            Filter f = NumericRangeFilter.newLongRange("timestamp",
+                                            System.currentTimeMillis()-(1000*60*60*48),
+                                            System.currentTimeMillis(), true, true);
+            
             manager.maybeRefresh();
-            searcher.search(query, filter, collector);
+            searcher = manager.acquire();
+            
+            searcher.search(query, f, collector);
 
             ScoreDoc[] hits = collector.topDocs().scoreDocs;
 

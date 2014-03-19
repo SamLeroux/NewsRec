@@ -36,7 +36,6 @@ public abstract class AbstractJDBCBaseDao {
         if (connectionPool == null) {
             connectionPool = createConnectionPool();
         }
-        createStatements();
     }
 
     private synchronized BasicDataSource createConnectionPool() {
@@ -56,27 +55,19 @@ public abstract class AbstractJDBCBaseDao {
         return source;
     }
 
-    protected abstract void createStatements() throws DaoException;
-
-    protected abstract void closeStatements() throws DaoException;
-
-    protected Connection getConnection() throws DaoException {
-        try {
-            if (connectionPool == null){
-                connectionPool = createConnectionPool();
-            }
-            return connectionPool.getConnection();
-        } catch (SQLException ex) {
-            throw new DaoException(ex);
+    protected Connection getConnection() throws SQLException {
+        if (connectionPool == null) {
+            connectionPool = createConnectionPool();
         }
+        return connectionPool.getConnection();
+
     }
 
     public void close() throws DaoException {
         try {
-            closeStatements();
             connectionPool.close();
             connectionPool = null;
-        } catch (NullPointerException| SQLException ex) {
+        } catch (NullPointerException | SQLException ex) {
             logger.error(ex);
         }
     }

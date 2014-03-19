@@ -12,6 +12,10 @@ $(function() {
 //    $(document).on("click","a", function(){
 //       console.log("click: "); 
 //    });
+
+    $("#btnHide").on("click", function(){
+        btnHideClicked();
+    });
 });
 
 function btnClicked() {
@@ -52,7 +56,14 @@ function displayArticle(url) {
     iframe.attr("src", url);
     iframe.height = iframe.contents().height();
     $("#contentDiv").height($("#resultsDiv").height());
-    $("#contentDiv").show();
+    if(! $("#contentDiv").is(':visible')){
+        $("#resultsDiv").hide();
+        //$("#contentDiv").addClass("fullScreen");
+        $("#contentDiv").show();
+        $("#btnHide").show();
+    }
+    
+    
     iframe.load(function() {
         $.mobile.hidePageLoadingMsg();
     });
@@ -103,4 +114,11 @@ function recommendationsFetched(data) {
 
 function recommendationsFetchError(xhr, errorType, exception) {
     console.log(xhr);
+}
+
+function btnHideClicked(){
+    $("#btnHide").hide();
+    $("#contentDiv").hide();
+    $("#resultsDiv").show();
+    //$("#contentDiv").removeClass("fullScreen");
 }

@@ -17,9 +17,9 @@ package be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItemCluster;
-import com.aliasi.cluster.CompleteLinkClusterer;
 import com.aliasi.cluster.Dendrogram;
 import com.aliasi.cluster.HierarchicalClusterer;
+import com.aliasi.cluster.SingleLinkClusterer;
 import com.aliasi.util.Distance;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -38,11 +38,11 @@ public class LingPipeHierarchicalClustering implements IClusterer {
     @Override
     public List<NewsItemCluster> cluster(List<NewsItem> items) {
 
-        HierarchicalClusterer<NewsItem> clusterer = new CompleteLinkClusterer<>(new NewsItemDistance());
+        HierarchicalClusterer<NewsItem> clusterer = new SingleLinkClusterer<>(new NewsItemDistance());
         Set<NewsItem> itemSet = new HashSet<>(items);
         Dendrogram<NewsItem> dend = clusterer.hierarchicalCluster(itemSet);
-        Set<Set<NewsItem>> clusters = dend.partitionDistance(0.10);
-        
+        Set<Set<NewsItem>> clusters = dend.partitionDistance(0.85);
+
         List<NewsItemCluster> clusterList = new ArrayList<>(clusters.size());
         for (Set<NewsItem> sn : clusters) {
             NewsItemCluster nc = new NewsItemCluster();
@@ -71,7 +71,7 @@ public class LingPipeHierarchicalClustering implements IClusterer {
                 Set<String> different = new HashSet<>(obs1.size() + obs2.size());
                 different.addAll(obs1);
                 different.addAll(obs2);
-                return 1-((double) different.size() / (double) (obs1.size() + obs2.size()));
+                return ((double) different.size() / (double) (obs1.size() + obs2.size()));
             }
         }
 
