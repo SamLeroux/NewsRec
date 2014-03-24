@@ -33,7 +33,7 @@ import java.util.UUID;
 public class NewsItem {
 
     /**
-     *The id is a numeric identification (long) but is stored as a String.
+     * The id is a numeric identification (long) but is stored as a String.
      * There were some problems retrieving documents from the lucene index based
      * on the numeric value.
      */
@@ -57,7 +57,7 @@ public class NewsItem {
         id = Long.toString(Math.abs(UUID.randomUUID().getLeastSignificantBits()));
     }
 
-    public NewsItem(int docNr, String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Double> terms, Locale locale, String source, URL url, URL imageUrl) {
+    public NewsItem(String title, int docNr, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Double> terms, Locale locale, String source, URL url, URL imageUrl) {
         this(Long.toString(Math.abs(UUID.randomUUID().getLeastSignificantBits())), docNr, title, authors, fulltext, description, timestamp, terms, locale, source, url, imageUrl);
     }
 
@@ -139,8 +139,8 @@ public class NewsItem {
     public void setTerms(Map<String, Double> terms) {
         this.terms = terms;
     }
-    
-    public void addTerms(Map<String, Double> terms){
+
+    public void addTerms(Map<String, Double> terms) {
         this.terms.putAll(terms);
     }
 
@@ -172,14 +172,6 @@ public class NewsItem {
         terms.put(term, relevancy);
     }
 
-    public int getDocNr() {
-        return docNr;
-    }
-
-    public void setDocNr(int docNr) {
-        this.docNr = docNr;
-    }
-
     @Override
     public String toString() {
         return "NewsItem{" + "id=" + id + ", title=" + title + ", authors=" + authors + ", fulltext=" + fulltext + ", description=" + description + ", timestamp=" + timestamp + ", terms=" + terms + ", locale=" + locale + ", source=" + source + ", url=" + url + '}';
@@ -202,8 +194,15 @@ public class NewsItem {
         }
         final NewsItem other = (NewsItem) obj;
         return Objects.equals(this.title, other.title);
+
     }
-    
-    
+
+    public int getDocNr() {
+        return docNr;
+    }
+
+    public void setDocNr(int docNr) {
+        this.docNr = docNr;
+    }
 
 }

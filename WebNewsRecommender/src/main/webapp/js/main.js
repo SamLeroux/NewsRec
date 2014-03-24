@@ -16,12 +16,13 @@ $(function() {
     $("#btnHide").on("click", function(){
         btnHideClicked();
     });
+    
+    $("#articleFrame").on("load", function(){
+       articleFrameSourceChanged(); 
+    });
+    
+    
 });
-
-function btnClicked() {
-    fetchRecommendations();
-    window.scrollTo(0, 0);
-}
 
 function getItemDisplayLi(item) {
     var li = $("<li>");
@@ -56,12 +57,13 @@ function displayArticle(url) {
     iframe.attr("src", url);
     iframe.height = iframe.contents().height();
     $("#contentDiv").height($("#resultsDiv").height());
-    if(! $("#contentDiv").is(':visible')){
+    if(!$("#contentDiv").is(":visible")){
         $("#resultsDiv").hide();
-        //$("#contentDiv").addClass("fullScreen");
         $("#contentDiv").show();
-        $("#btnHide").show();
+        
+        $().dpToast("Swipe left to go back");
     }
+    $("#articleFrame").show();
     
     
     iframe.load(function() {
@@ -117,8 +119,10 @@ function recommendationsFetchError(xhr, errorType, exception) {
 }
 
 function btnHideClicked(){
-    $("#btnHide").hide();
     $("#contentDiv").hide();
     $("#resultsDiv").show();
-    //$("#contentDiv").removeClass("fullScreen");
+}
+
+function articleFrameSourceChanged(){
+    console.log($("#articleFrame").attr("src"));
 }

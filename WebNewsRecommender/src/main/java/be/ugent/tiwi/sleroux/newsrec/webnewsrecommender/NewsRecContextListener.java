@@ -21,6 +21,7 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ITrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.cachingProxyImpl.CachingTrendsDaoProxy;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCTrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCViewsDao;
@@ -57,7 +58,7 @@ public class NewsRecContextListener implements ServletContextListener {
             sce.getServletContext().setAttribute("viewsDao", viewsDao);
 
             ratingsDao = new JDBCRatingsDao();
-            trendsDao = new JDBCTrendsDao();
+            trendsDao = new CachingTrendsDaoProxy(new JDBCTrendsDao());
 
             String luceneLocation = bundle.getString("luceneIndexLocation");
 

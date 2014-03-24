@@ -15,13 +15,15 @@
  */
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders;
 
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ITrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.TrendsDaoException;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.RatingsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.filters.UniqueResultsFilter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
@@ -29,7 +31,6 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.NumericRangeFilter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.SearcherManager;
@@ -40,73 +41,61 @@ import org.apache.lucene.search.TopScoreDocCollector;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class TrendingTopicRecommender extends LuceneRecommender implements IRecommender {
+public class PersonalAndTrendingRecommender extends TrendingTopicRecommender {
 
-    private final ITrendsDao trendsDao;
-    private final IViewsDao viewsDao;
-    private static final Logger logger = Logger.getLogger(TrendingTopicRecommender.class);
-
-    public TrendingTopicRecommender(ITrendsDao trendsDao, IViewsDao viewsDao, SearcherManager manager) {
-        super(manager);
-        this.trendsDao = trendsDao;
-        this.viewsDao = viewsDao;
+    private final IRatingsDao ratingsDao;
+    private static final Logger logger = Logger.getLogger(PersonalAndTrendingRecommender.class);
+    
+    public PersonalAndTrendingRecommender(ITrendsDao trendsDao, IViewsDao viewsDao, IRatingsDao ratingsDao, SearcherManager manager) {
+        super(trendsDao, viewsDao, manager);
+        this.ratingsDao = ratingsDao;
     }
-
-    
-    
 
     @Override
     public List<NewsItem> recommend(long userid, int start, int count) throws RecommendationException {
+        List<NewsItem> results = super.recommend(userid, start, count);
+
         IndexSearcher searcher = null;
         try {
-            String[] trends = trendsDao.getTrends();
-            Query query = buildQuery(trends);
+            Map<String, Double> terms = ratingsDao.getRatings(userid);
+            Query query = buildQuery(terms);
             int hitsPerPage = count;
 
             TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
 
-            //Filter filter = new SeenArticlesFilter(viewsDao, userid);
-            Filter f = NumericRangeFilter.newLongRange("timestamp",
-                                            System.currentTimeMillis()-(1000*60*60*24),
-                                            System.currentTimeMillis(), true, true);
-            
-            manager.maybeRefresh();
+            Filter f = new UniqueResultsFilter(results);
             searcher = manager.acquire();
-            
+            manager.maybeRefresh();
             searcher.search(query, f, collector);
 
             ScoreDoc[] hits = collector.topDocs().scoreDocs;
 
             int stop = (start + count < hits.length ? start + count : hits.length);
-            List<NewsItem> results = new ArrayList<>(stop - start);
 
             for (int i = start; i < stop; i++) {
                 int docId = hits[i].doc;
                 Document d = searcher.doc(docId);
                 results.add(toNewsitem(d, docId));
+
             }
-
-            return results;
-
-        } catch (TrendsDaoException | IOException ex) {
+        } catch (RatingsDaoException | IOException ex) {
             logger.error(ex);
             throw new RecommendationException(ex);
-        } finally {
-            try {
-                manager.release(searcher);
-            } catch (IOException ex) {
-                logger.error(ex);
-            }
-            searcher = null;
         }
+        return results;
     }
 
-    protected Query buildQuery(String[] trends) {
+    protected Query buildQuery(Map<String, Double> terms) {
         BooleanQuery q = new BooleanQuery();
-        for (String term : trends) {
+        for (String term : terms.keySet()) {
+            Query query = new TermQuery(new Term("text", term));
+            query.setBoost(terms.get(term).floatValue());
+            q.add(query, BooleanClause.Occur.SHOULD);
             Query query2 = new TermQuery(new Term("title", term));
+            query2.setBoost(terms.get(term).floatValue());
             q.add(query2, BooleanClause.Occur.SHOULD);
         }
+        //return q;
         return new RecencyBoostQuery(q);
     }
 

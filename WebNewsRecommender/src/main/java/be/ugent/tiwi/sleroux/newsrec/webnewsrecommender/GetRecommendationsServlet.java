@@ -23,6 +23,8 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.Recommend
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -67,6 +69,13 @@ public class GetRecommendationsServlet extends HttpServlet {
             IClusterer clusterer = (IClusterer) getServletContext().getAttribute("clusterer");
             List<NewsItemCluster> clusters = clusterer.cluster(items);
 
+            Collections.sort(clusters, new Comparator<NewsItemCluster>() {
+                @Override
+                public int compare(NewsItemCluster o1, NewsItemCluster o2) {
+                    return Integer.compare(o2.getSize(),o1.getSize());
+                }
+            });
+            
             Gson gson = new Gson();
             String json = gson.toJson(clusters.toArray(new NewsItemCluster[clusters.size()]));
             System.out.println(json);

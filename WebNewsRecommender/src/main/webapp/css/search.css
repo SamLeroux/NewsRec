@@ -18,20 +18,22 @@
 
 #header,#page{
     width:100%;
+    height:100%;
     height:2.1em;
 }
 
 #contentDiv{
-    width:67%;
-    height:100%;
+    width: 68%;
     float:left;
-    display:none;
+    
+
 }
 
 #articleFrame{
     width:100%;
     height:100%;
- }
+    display:none;
+}
 
 #resultsDiv{
     width:30%;
@@ -40,7 +42,7 @@
 }
 
 #btnHide{
-    display:none;
+    display: none;
     position: fixed;
 }
 
