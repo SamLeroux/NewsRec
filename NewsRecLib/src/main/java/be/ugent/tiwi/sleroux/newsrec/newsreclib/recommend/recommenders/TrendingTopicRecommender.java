@@ -52,9 +52,6 @@ public class TrendingTopicRecommender extends LuceneRecommender implements IReco
         this.viewsDao = viewsDao;
     }
 
-    
-    
-
     @Override
     public List<NewsItem> recommend(long userid, int start, int count) throws RecommendationException {
         IndexSearcher searcher = null;
@@ -67,12 +64,12 @@ public class TrendingTopicRecommender extends LuceneRecommender implements IReco
 
             //Filter filter = new SeenArticlesFilter(viewsDao, userid);
             Filter f = NumericRangeFilter.newLongRange("timestamp",
-                                            System.currentTimeMillis()-(1000*60*60*24),
-                                            System.currentTimeMillis(), true, true);
-            
+                    System.currentTimeMillis() - (1000 * 60 * 60 * 24),
+                    System.currentTimeMillis(), true, true);
+
             manager.maybeRefresh();
             searcher = manager.acquire();
-            
+
             searcher.search(query, f, collector);
 
             ScoreDoc[] hits = collector.topDocs().scoreDocs;
@@ -93,7 +90,9 @@ public class TrendingTopicRecommender extends LuceneRecommender implements IReco
             throw new RecommendationException(ex);
         } finally {
             try {
-                manager.release(searcher);
+                if (searcher != null) {
+                    manager.release(searcher);
+                }
             } catch (IOException ex) {
                 logger.error(ex);
             }

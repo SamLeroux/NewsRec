@@ -1,39 +1,28 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>News recommendation</title>
-        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.1/jquery.mobile-1.2.1.min.css" />
-        <link rel="stylesheet"  href="css/search.css" />
-
-
-
+        <title>News Recommendation</title>
+        <link href="css/search.css" type="text/css" rel="stylesheet"/>
+        <link href="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.css" type="text/css" rel="stylesheet" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
     </head>
     <body>
-        <div data-role="page" id="page">
-            <div data-role="header" data-theme="b" id="header"> 
-                <input type="text" id="txtSearch" placeholder="..."/>
-                <input type="button" value="Search" id="btnSearch"/>
+        <div data-role="page" data-content-view="c">
+            <div id="headerDiv" data-role="header">
+                <a id="btnBack" data-icon="back">Back</a>
+                <h2>News Recommendation</h2>
             </div>
-            
             <div id="resultsDiv" data-role="content">
-                <ul id="results" data-role="listview" data-inset="false" data-theme="c" data-dividertheme="b">
-                </ul>
+                <ul id="results" data-role="listview"></ul>
             </div>
             
-            <div id="contentDiv">
-                <button id="btnHide">back</button>
-                <iframe id="articleFrame"></iframe>
+            <div id="articleDiv" data-role="content">
+                <iframe id="articleFrame" ></iframe>
             </div>
-        </div> 
-
-
-
-        <script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
-        <script src="http://code.jquery.com/mobile/1.2.1/jquery.mobile-1.2.1.min.js"></script>
-        <script src="lib/jquery.jFrame.min.js"></script>
-        <script src="lib/jquery.dpToast.js"></script>
+            
+        </div>
+        <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+        <script src="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>
         <script src="js/main.js"></script>
     </body>
 </html>

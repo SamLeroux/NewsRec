@@ -1,5 +1,7 @@
-.timestamp{
-    font-size: small;
+#header,#page{
+    width:100%;
+    height:100%;
+    height:2.1em;
 }
 
 #txtSearch{
@@ -16,44 +18,31 @@
     margin:1px 1px 1px 1px;
 }
 
-#header,#page{
-    width:100%;
-    height:100%;
-    height:2.1em;
-}
-
-#contentDiv{
-    width: 68%;
-    float:left;
-    
-
-}
-
-#articleFrame{
-    width:100%;
-    height:100%;
-    display:none;
-}
-
 #resultsDiv{
     width:30%;
     height:100%;
     float:left;
 }
 
-#btnHide{
-    display: none;
-    position: fixed;
+#articleDiv{
+    width: 65%;
+    float:left;
 }
 
+#articleFrame{
+    width:100%;
+    height:100%;
+    display: none;
+}
 
-
-@media screen and (max-width: 600px) {
-    #contentDiv {
-        top: 0px;
-        right:0px;
+#btnBack{
+    display:none;
+}
+@media screen and (max-width: 700px) {
+    #articleDiv {
         width:100%;
         height:100%;
+        float:left;
         display:none;
     }
 

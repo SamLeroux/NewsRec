@@ -6,38 +6,42 @@ $(function() {
         }
     });
 
-    fetchRecommendations();
-    // Volledig naar boven scrollen
-    window.scrollTo(0, 0);
-//    $(document).on("click","a", function(){
-//       console.log("click: "); 
-//    });
 
-    $("#btnHide").on("click", function(){
-        btnHideClicked();
+    $("#articleFrame").on("load", function() {
+        articleFrameSourceChanged();
     });
     
-    $("#articleFrame").on("load", function(){
-       articleFrameSourceChanged(); 
+    $("#btnBack").on("click", function(){
+        btnBackClicked(); 
     });
     
-    
+    $("#results").listview();
+    fetchRecommendations();
+    window.scrollTo(0, 0);
 });
+
+function isPhone() {
+    return window.matchMedia("screen and (max-width: 700px)").matches;
+}
 
 function getItemDisplayLi(item) {
     var li = $("<li>");
+
+
     var a = $("<a>");
-    a.on("click", function() {
+    a.on("click", function(event) {
         displayArticle(item.representative.url);
+        ratingClick(event, item.representative.id, item.representative.docNr);
     });
+
     var h1 = $("<h1>");
     h1.addClass("myHeader");
     h1.text(item.representative.title);
     a.append(h1);
-    
+
     var h3 = $("<h3>");
     h3.addClass("timestamp");
-    h3.text(item.representative.timestamp + "  (" + item.items.length+" members)");
+    h3.text(item.representative.timestamp + "  (" + item.items.length + " members)");
     a.append(h3);
 
     var p = $("<p>");
@@ -53,23 +57,22 @@ function getItemDisplayLi(item) {
 function displayArticle(url) {
     console.log(url);
     $.mobile.showPageLoadingMsg();
+    if (isPhone()) {
+        $("#resultsDiv").hide();
+        $("#articleDiv").show();
+        $("#btnBack").show();
+    }
+
     var iframe = $("#articleFrame");
     iframe.attr("src", url);
-    iframe.height = iframe.contents().height();
-    $("#contentDiv").height($("#resultsDiv").height());
-    if(!$("#contentDiv").is(":visible")){
-        $("#resultsDiv").hide();
-        $("#contentDiv").show();
-        
-        $().dpToast("Swipe left to go back");
-    }
-    $("#articleFrame").show();
-    
-    
+
+    $("#articleDiv").height($("#resultsDiv").height());
+
+    iframe.show();
     iframe.load(function() {
         $.mobile.hidePageLoadingMsg();
     });
-    iframe.error(function(){
+    iframe.error(function() {
         $.mobile.hidePageLoadingMsg();
     });
 }
@@ -104,25 +107,36 @@ function fetchRecommendations() {
 }
 
 function recommendationsFetched(data) {
-    console.log(data);
-    for (var item in data) {
-        var li = getItemDisplayLi(data[item]);
-        $("#results").append(li);
+    for (var i = 0; i < 10; i++) {
+        for (var item in data) {
+            var li = getItemDisplayLi(data[item]);
+            $("#results").append(li);
+        }
     }
-    $("#resultsDiv").show();
     $("#results").listview("refresh");
     $.mobile.hidePageLoadingMsg();
+
 }
 
 function recommendationsFetchError(xhr, errorType, exception) {
     console.log(xhr);
+    $.mobile.hidePageLoadingMsg();
 }
 
-function btnHideClicked(){
-    $("#contentDiv").hide();
-    $("#resultsDiv").show();
-}
 
-function articleFrameSourceChanged(){
+function articleFrameSourceChanged() {
     console.log($("#articleFrame").attr("src"));
+}
+
+
+
+function dispatchEvent(event) {
+    console.log(event.animationName);
+    isPhone = (event.animationName === "phone");
+}
+
+function btnBackClicked() {
+    $("#resultsDiv").show();
+    $("#articleDiv").hide();
+    $("#btnBack").hide();
 }
