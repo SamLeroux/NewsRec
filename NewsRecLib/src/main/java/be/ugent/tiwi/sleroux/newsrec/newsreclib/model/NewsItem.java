@@ -50,6 +50,8 @@ public class NewsItem {
 
     private URL url;
     private URL imageUrl;
+    
+    private String recommendedBy;
 
     public NewsItem() {
         terms = new HashMap<>();
@@ -204,5 +206,19 @@ public class NewsItem {
     public void setDocNr(int docNr) {
         this.docNr = docNr;
     }
+
+    public void setAuthors(List<String> authors) {
+        this.authors = authors;
+    }
+
+    public String getRecommendedBy() {
+        return recommendedBy;
+    }
+
+    public void setRecommendedBy(String recommendedBy) {
+        this.recommendedBy = recommendedBy;
+    }
+    
+    
 
 }

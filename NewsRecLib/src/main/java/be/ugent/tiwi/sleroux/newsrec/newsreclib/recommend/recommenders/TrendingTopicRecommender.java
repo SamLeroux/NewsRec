@@ -19,6 +19,7 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ITrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.TrendsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.filters.RecentFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,9 +64,7 @@ public class TrendingTopicRecommender extends LuceneRecommender implements IReco
             TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
 
             //Filter filter = new SeenArticlesFilter(viewsDao, userid);
-            Filter f = NumericRangeFilter.newLongRange("timestamp",
-                    System.currentTimeMillis() - (1000 * 60 * 60 * 24),
-                    System.currentTimeMillis(), true, true);
+            Filter f = new RecentFilter("timestamp", 1000*60*60*24);
 
             manager.maybeRefresh();
             searcher = manager.acquire();
@@ -80,7 +79,9 @@ public class TrendingTopicRecommender extends LuceneRecommender implements IReco
             for (int i = start; i < stop; i++) {
                 int docId = hits[i].doc;
                 Document d = searcher.doc(docId);
-                results.add(toNewsitem(d, docId));
+                NewsItem item = toNewsitem(d, docId);
+                item.setRecommendedBy("trending");
+                results.add(item);
             }
 
             return results;

@@ -3,6 +3,9 @@
     <listener>
         <listener-class>be.ugent.tiwi.sleroux.newsrec.webnewsrecommender.NewsRecContextListener</listener-class>
     </listener>
+    <listener>
+        <listener-class>be.ugent.tiwi.sleroux.newsrec.webnewsrecommender.NewsRecSessionListener</listener-class>
+    </listener>
     <servlet>
         <servlet-name>GetRecommendationsServlet</servlet-name>
         <servlet-class>be.ugent.tiwi.sleroux.newsrec.webnewsrecommender.GetRecommendationsServlet</servlet-class>
@@ -10,6 +13,10 @@
     <servlet>
         <servlet-name>ScorerServlet</servlet-name>
         <servlet-class>be.ugent.tiwi.sleroux.newsrec.webnewsrecommender.ViewedServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>be.ugent.tiwi.sleroux.newsrec.webnewsrecommender.LoginServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>GetRecommendationsServlet</servlet-name>
@@ -19,9 +26,11 @@
         <servlet-name>ScorerServlet</servlet-name>
         <url-pattern>/view.do</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/login.do</url-pattern>
+    </servlet-mapping>
     <session-config>
-        <session-timeout>
-            30
-        </session-timeout>
+        <session-timeout>100000</session-timeout>
     </session-config>
 </web-app>

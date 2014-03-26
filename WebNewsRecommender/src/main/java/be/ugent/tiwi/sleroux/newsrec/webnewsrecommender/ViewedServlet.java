@@ -48,7 +48,7 @@ public class ViewedServlet extends HttpServlet {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
         try {            
-            long user = 2L;
+            long user = (Long)request.getSession().getAttribute("userId");
             int docNr = Integer.parseInt(request.getParameter("docNr"));
             String itemId = request.getParameter("itemId");
             

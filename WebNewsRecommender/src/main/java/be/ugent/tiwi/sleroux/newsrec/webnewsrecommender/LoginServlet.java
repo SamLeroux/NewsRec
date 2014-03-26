@@ -13,19 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package be.ugent.tiwi.sleroux.newsrec.webnewsrecommender;
 
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering.IClusterer;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItemCluster;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.IRecommender;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.RecommendationException;
-import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -36,8 +28,8 @@ import org.apache.log4j.Logger;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class GetRecommendationsServlet extends HttpServlet {
-
+public class LoginServlet extends HttpServlet {
+    private static final Logger logger = Logger.getLogger(LoginServlet.class);
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -47,40 +39,21 @@ public class GetRecommendationsServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    private static final Logger logger = Logger.getLogger(GetRecommendationsServlet.class);
-
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("application/json");
+        response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         try {
-            long user = (Long)request.getSession().getAttribute("userId");
-            int start = Integer.parseInt(request.getParameter("start"));
-            int count = Integer.parseInt(request.getParameter("count"));
-
-            IRecommender recommender = (IRecommender) getServletContext().getAttribute("recommender");
-            List<NewsItem> items = recommender.recommend(user, start, count);
-            // No need to send the full text over the network.
-            String empty = "";
-            for (NewsItem n : items) {
-                n.setFulltext(empty);
+            String param = request.getParameter("userId");
+            if (param != null){
+                long userId = Long.parseLong(param);
+                request.getSession().setAttribute("userId", userId);
+                logger.info("Set userId="+userId);
+                out.write("{\"response\":\"OK\"}");
+            }else{
+                logger.warn("No userId parameter in request");
+                out.write("{\"response\":\"No userId parameter found\"}");
             }
-            IClusterer clusterer = (IClusterer) getServletContext().getAttribute("clusterer");
-            List<NewsItemCluster> clusters = clusterer.cluster(items);
-
-//            Collections.sort(clusters, new Comparator<NewsItemCluster>() {
-//                @Override
-//                public int compare(NewsItemCluster o1, NewsItemCluster o2) {
-//                    return Integer.compare(o2.getSize(),o1.getSize());
-//                }
-//            });
-            
-            Gson gson = new Gson();
-            String json = gson.toJson(clusters.toArray(new NewsItemCluster[clusters.size()]));
-//            System.out.println(json);
-            out.write(json);
-        } catch (RecommendationException ex) {
-            logger.error(ex);
         } finally {
             out.close();
         }

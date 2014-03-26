@@ -77,7 +77,7 @@ public class DatabaseLuceneScorer implements IScorer {
         score(user, item, 0.75);
     }
 
-    private Map<String, Double> getTopTerms(String item) throws IOException {
+    protected Map<String, Double> getTopTerms(String item) throws IOException {
         manager.maybeRefreshBlocking();
         IndexSearcher searcher = manager.acquire();
         IndexReader reader = searcher.getIndexReader();

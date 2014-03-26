@@ -64,10 +64,10 @@ public class NewsRecContextListener implements ServletContextListener {
 
             builder = new RecommenderBuilder(ratingsDao, trendsDao, viewsDao, luceneLocation);
 
-            recommender = builder.getRecommender();
+            recommender = builder.getRecommender(RecommenderBuilder.Recommenders.TrendingAndPersonal);
             sce.getServletContext().setAttribute("recommender", recommender);
 
-            scorer = builder.getScorer();
+            scorer = builder.getScorer(RecommenderBuilder.Scorers.WithTrendsFilter);
             sce.getServletContext().setAttribute("scorer", scorer);
 
             clusterer = new LingPipeHierarchicalClustering();

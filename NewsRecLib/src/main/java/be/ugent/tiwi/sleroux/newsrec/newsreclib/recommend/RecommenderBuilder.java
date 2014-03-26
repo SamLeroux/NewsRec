@@ -20,8 +20,12 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ITrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.IRecommender;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.LuceneTermRecommender;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.PersonalAndTrendingRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.TrendingTopicRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.DatabaseLuceneScorer;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.DatabaseLuceneScorerWithTrendsFilter;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.DummyScorer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.IScorer;
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +41,7 @@ import org.apache.lucene.store.FSDirectory;
 public class RecommenderBuilder {
 
     private boolean closed = false;
-    
+
     private final IRatingsDao ratingsDao;
     private final ITrendsDao trendsDao;
     private final IViewsDao viewsDao;
@@ -45,6 +49,16 @@ public class RecommenderBuilder {
     private SearcherManager searcherManager;
 
     private static final Logger logger = Logger.getLogger(RecommenderBuilder.class);
+
+    public static enum Recommenders {
+
+        Trending, Personal, TrendingAndPersonal
+    };
+
+    public static enum Scorers {
+
+        WithTrendsFilter, WithoutTrendsFilter, Dummy
+    };
 
     public RecommenderBuilder(IRatingsDao ratingsDao, ITrendsDao trendsDao, IViewsDao viewsDao, String luceneIndexLocation) throws RecommenderBuildException {
         this.ratingsDao = ratingsDao;
@@ -54,18 +68,34 @@ public class RecommenderBuilder {
         build();
     }
 
-    public IRecommender getRecommender() throws RecommenderBuildException {
-        if (closed){
+    public IRecommender getRecommender(Recommenders r) throws RecommenderBuildException {
+        if (closed) {
             throw new RecommenderBuildException("builder is closed");
         }
-        return new TrendingTopicRecommender(trendsDao, viewsDao, searcherManager);
+        if (r == Recommenders.Personal) {
+            return new LuceneTermRecommender(ratingsDao, viewsDao, searcherManager);
+        } else if (r == Recommenders.Trending) {
+            return new TrendingTopicRecommender(trendsDao, viewsDao, searcherManager);
+        } else if (r == Recommenders.TrendingAndPersonal) {
+            return new PersonalAndTrendingRecommender(trendsDao, viewsDao, ratingsDao, searcherManager);
+        } else {
+            throw new RecommenderBuildException("unknown recommender");
+        }
     }
 
-    public IScorer getScorer() throws RecommenderBuildException {
-        if (closed){
+    public IScorer getScorer(Scorers s) throws RecommenderBuildException {
+        if (closed) {
             throw new RecommenderBuildException("builder is closed");
         }
-        return new DatabaseLuceneScorer(searcherManager, ratingsDao);
+        if (s == Scorers.Dummy) {
+            return new DummyScorer();
+        } else if (s == Scorers.WithoutTrendsFilter) {
+            return new DatabaseLuceneScorer(searcherManager, ratingsDao);
+        } else if (s == Scorers.WithTrendsFilter) {
+            return new DatabaseLuceneScorerWithTrendsFilter(searcherManager, ratingsDao, trendsDao);
+        } else {
+            throw new RecommenderBuildException("unknown scorer");
+        }
     }
 
     public void close() throws RecommenderBuildException {
@@ -103,7 +133,7 @@ public class RecommenderBuilder {
             }
         }
         closed = true;
-        if (ex != null){
+        if (ex != null) {
             throw new RecommenderBuildException(ex);
         }
     }

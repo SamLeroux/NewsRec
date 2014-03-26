@@ -20,6 +20,7 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ITrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.RatingsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.filters.RecentFilter;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.filters.UniqueResultsFilter;
 import java.io.IOException;
 import java.util.List;
@@ -27,6 +28,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queries.ChainedFilter;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Filter;
@@ -53,8 +55,10 @@ public class PersonalAndTrendingRecommender extends TrendingTopicRecommender {
 
     @Override
     public List<NewsItem> recommend(long userid, int start, int count) throws RecommendationException {
+        count = count/2;
+        
         List<NewsItem> results = super.recommend(userid, start, count);
-
+        
         IndexSearcher searcher = null;
         try {
             Map<String, Double> terms = ratingsDao.getRatings(userid);
@@ -63,7 +67,10 @@ public class PersonalAndTrendingRecommender extends TrendingTopicRecommender {
 
             TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
 
-            Filter f = new UniqueResultsFilter(results);
+            Filter f1 = new UniqueResultsFilter(results);
+            Filter f2 = new RecentFilter("timestamp", 1000*60*60*24);
+            Filter f = new ChainedFilter(new Filter[]{f1,f2}, ChainedFilter.AND);
+            
             searcher = manager.acquire();
             manager.maybeRefresh();
             searcher.search(query, f, collector);
@@ -75,7 +82,9 @@ public class PersonalAndTrendingRecommender extends TrendingTopicRecommender {
             for (int i = start; i < stop; i++) {
                 int docId = hits[i].doc;
                 Document d = searcher.doc(docId);
-                results.add(toNewsitem(d, docId));
+                NewsItem item = toNewsitem(d, docId);
+                item.setRecommendedBy("personal");
+                results.add(item);
 
             }
         } catch (RatingsDaoException | IOException ex) {

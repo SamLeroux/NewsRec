@@ -24,7 +24,7 @@ import java.util.List;
  */
 public class NewsItemCluster {
 
-    private final List<NewsItem> items;
+    private List<NewsItem> items;
     private NewsItem representative;
 
     public NewsItemCluster() {
@@ -53,6 +53,17 @@ public class NewsItemCluster {
     public NewsItem getRepresentative() {
         return representative;
     }
+
+    public void setRepresentative(NewsItem representative) {
+        this.representative = representative;
+    }
+
+    public void setItems(List<NewsItem> items) {
+        this.items = items;
+    }
+    
+    
+    
     
     
 

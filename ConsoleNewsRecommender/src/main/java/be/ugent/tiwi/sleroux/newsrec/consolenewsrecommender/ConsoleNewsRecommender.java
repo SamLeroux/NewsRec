@@ -66,8 +66,8 @@ public class ConsoleNewsRecommender {
             
             builder = new RecommenderBuilder(ratingsDao, trendsDao, viewsDao, luceneLoc);
      
-            scorer = builder.getScorer();
-            rec = builder.getRecommender();
+            scorer = builder.getScorer(RecommenderBuilder.Scorers.WithTrendsFilter);
+            rec = builder.getRecommender(RecommenderBuilder.Recommenders.TrendingAndPersonal);
         } catch (DaoException | RecommenderBuildException ex) {
             java.util.logging.Logger.getLogger(ConsoleNewsRecommender.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -147,7 +147,7 @@ public class ConsoleNewsRecommender {
                     stopwordsFileLocation);
             
             starter.start();
-            Thread.sleep(1000*60*60);
+            Thread.sleep(1000*60*60*24);
             starter.stop();
         } catch (InterruptedException ex) {
             java.util.logging.Logger.getLogger(ConsoleNewsRecommender.class.getName()).log(Level.SEVERE, null, ex);
