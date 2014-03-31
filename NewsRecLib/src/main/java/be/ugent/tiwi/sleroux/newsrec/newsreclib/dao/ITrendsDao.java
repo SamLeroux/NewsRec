@@ -22,6 +22,7 @@ package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao;
  */
 public interface ITrendsDao {
     public String[] getTrends() throws TrendsDaoException;
+    public String[] getTrends(int n) throws TrendsDaoException;
     public void updateTrends(String[] trends) throws TrendsDaoException;
     public void close() throws DaoException;
 }

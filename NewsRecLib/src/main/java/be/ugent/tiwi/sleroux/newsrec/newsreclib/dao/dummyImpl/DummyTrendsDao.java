@@ -45,5 +45,10 @@ public class DummyTrendsDao implements ITrendsDao{
     @Override
     public void close() throws DaoException {
     }
+
+    @Override
+    public String[] getTrends(int n) throws TrendsDaoException {
+        return trends;
+    }
     
 }

@@ -62,6 +62,11 @@ public class CachingTrendsDaoProxy implements ITrendsDao{
     public void close() throws DaoException {
         inner.close();
     }
+
+    @Override
+    public String[] getTrends(int n) throws TrendsDaoException {
+        return inner.getTrends(n);
+    }
     
 }
     

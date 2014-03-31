@@ -1,4 +1,4 @@
-package be.ugent.tiwi.sleroux.newsrec.newsreclib.lucene.analyzers;
+package be.ugent.tiwi.sleroux.newsrec.recommendationstester;
 
 /*
  * Copyright 2014 Sam Leroux <sam.leroux@ugent.be>.
@@ -129,7 +129,7 @@ public class EnAnalyzer extends Analyzer {
         if (stopwords != null) {
             result = new StopFilter(Config.LUCENE_VERSION, result, stopwords);
         } else {
-            logger.info("No stopwordsfile provided, no stopword removal");
+            logger.warn("No stopwordsfile provided, no stopword removal");
         }
         //result = new LowerCaseFilter(Version.LUCENE_46, result);
         result = new EnglishPossessiveFilter(Config.LUCENE_VERSION, result);

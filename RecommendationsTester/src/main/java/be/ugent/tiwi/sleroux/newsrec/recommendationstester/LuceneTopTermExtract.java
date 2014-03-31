@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ugent.tiwi.sleroux.newsrec.newsreclib.termExtract;
+package be.ugent.tiwi.sleroux.newsrec.recommendationstester;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.TermScorePair;
@@ -138,6 +138,7 @@ public class LuceneTopTermExtract implements Serializable {
 
                 while (stream.incrementToken()) {
                     String term = stream.getAttribute(CharTermAttribute.class).toString();
+                    term = term.trim();
                     if (freqMap.containsKey(term)) {
                         freqMap.put(term, freqMap.get(term) + weight);
                     } else {
@@ -159,8 +160,15 @@ public class LuceneTopTermExtract implements Serializable {
         int numDocs = reader.numDocs();
         PriorityQueue<TermScorePair> pq = new PriorityQueue<>(termFreqMap.size());
 
+        double max = 0;
+        double avg = 0;
+        for (String term: termFreqMap.keySet()){
+            max = (max > termFreqMap.get(term)? max: termFreqMap.get(term));
+            avg += termFreqMap.get(term);
+        }
         for (String term : termFreqMap.keySet()) {
-            double tf = 1+Math.log(termFreqMap.get(term));
+            System.out.println(term);
+            double tf = Math.log(termFreqMap.size()/termFreqMap.get(term));
             int docFreq = docFreqMap.get(term);
             if (docFreq > 0) {
                 double idf = 1 + Math.log((double) numDocs / docFreqMap.get(term));

@@ -6,15 +6,28 @@
 
 package be.ugent.tiwi.sleroux.newsrec.recommendationstester;
 
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.StopWordsReader;
+import java.io.File;
+import java.io.IOException;
+import org.apache.lucene.analysis.util.CharArraySet;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.store.FSDirectory;
+
 /**
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class App {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, InterruptedException {
         //RecommenderAccess ra = new RecommenderAccess("http://wicaweb5.intec.ugent.be:8080/");
-        RecommenderAccess ra = new RecommenderAccess("http://localhost:8080/");
-        TestingAgent ta = new TestingAgent(ra, 5, new String[]{"linux","android","google","microsoft","smartphone"});
-        ta.start();        
+        //RecommenderAccess ra = new RecommenderAccess("http://localhost:8080/");
+        //TestingManager manager = new TestingManager("/home/sam/tester.conf", "/home/sam/tester.csv", ra, 100);
+        //manager.start();
+        IndexReader reader = DirectoryReader.open(FSDirectory.open(new File("/home/sam/Bureaublad/index")));
+        CharArraySet stopw = StopWordsReader.getStopwords("/home/sam/Bureaublad/dev/stopwords_EN.txt");
+        LuceneTopTermExtract termExtract = new LuceneTopTermExtract(new EnAnalyzer(stopw));
+        TopTermTester tester = new TopTermTester(termExtract, reader);
+        tester.test("4887519953487884911");
     }
 }

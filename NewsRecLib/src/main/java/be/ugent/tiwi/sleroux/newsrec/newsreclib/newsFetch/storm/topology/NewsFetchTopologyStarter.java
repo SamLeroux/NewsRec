@@ -124,9 +124,6 @@ public class NewsFetchTopologyStarter {
      *
      */
     public void stop() {
-        System.out.println("");
-        System.out.println("---> Shutting down <-----");
-        System.out.println("");
         StormRunner.stop(name);
         StormRunner.shutdown();
     }

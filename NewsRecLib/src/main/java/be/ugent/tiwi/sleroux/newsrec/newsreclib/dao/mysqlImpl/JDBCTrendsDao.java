@@ -33,12 +33,13 @@ import java.util.List;
  */
 public class JDBCTrendsDao extends AbstractJDBCBaseDao implements ITrendsDao, Serializable {
 
+    public static final int DEFAULT_NUMBER_TRENDS = 100;
     public JDBCTrendsDao() throws DaoException {
     }
 
     
     @Override
-    public String[] getTrends() throws TrendsDaoException {
+    public String[] getTrends(int n) throws TrendsDaoException {
         logger.debug("Get trends");
         
         Connection conn = null;
@@ -50,7 +51,7 @@ public class JDBCTrendsDao extends AbstractJDBCBaseDao implements ITrendsDao, Se
             conn = getConnection();
             selectStatement = conn.prepareStatement(selectText);
             
-            selectStatement.setInt(1, 100);
+            selectStatement.setInt(1, n);
             
             try (ResultSet results = selectStatement.executeQuery()) {
                 List<String> trends = new ArrayList<>(100);
@@ -116,6 +117,11 @@ public class JDBCTrendsDao extends AbstractJDBCBaseDao implements ITrendsDao, Se
                 throw new TrendsDaoException(ex);
             }
         }
+    }
+
+    @Override
+    public String[] getTrends() throws TrendsDaoException {
+        return getTrends(DEFAULT_NUMBER_TRENDS);
     }
 
 }
