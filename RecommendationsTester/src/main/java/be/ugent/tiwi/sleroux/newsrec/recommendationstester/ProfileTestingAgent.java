@@ -12,7 +12,7 @@ import java.util.HashSet;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class ProfileTestingAgent implements ITestingAgent{
+public class ProfileTestingAgent implements ITestingAgent {
 
     protected final RecommenderAccess access;
     protected final long id;
@@ -34,25 +34,27 @@ public class ProfileTestingAgent implements ITestingAgent{
         long start = System.currentTimeMillis();
         NewsItemCluster[] results = access.getRecommendations();
         int time = (int) (System.currentTimeMillis() - start);
-        for (NewsItemCluster cluster : results) {
-            int c = 0;
-            boolean stop = false;
-            while (!stop && c < intrests.length) {
-                stop = cluster.getRepresentative().getTitle().toLowerCase().contains(intrests[c]);
-                stop = stop || cluster.getRepresentative().getDescription().toLowerCase().contains(intrests[c]);
-                c++;
-            }
-            if (stop) {
-                relevant++;
-                if (!seen.contains(cluster.getRepresentative().getId())) {
-                    access.view(cluster.getRepresentative().getId(), cluster.getRepresentative().getDocNr());
-                    seen.add(cluster.getRepresentative().getId());
-                    relevantNotYetSeen++;
+        if (results != null) {
+            for (NewsItemCluster cluster : results) {
+                int c = 0;
+                boolean stop = false;
+                while (!stop && c < intrests.length) {
+                    stop = cluster.getRepresentative().getTitle().toLowerCase().contains(intrests[c]);
+                    stop = stop || cluster.getRepresentative().getDescription().toLowerCase().contains(intrests[c]);
+                    c++;
+                }
+                if (stop) {
+                    relevant++;
+                    if (!seen.contains(cluster.getRepresentative().getId())) {
+                        access.view(cluster.getRepresentative().getId(), cluster.getRepresentative().getDocNr());
+                        seen.add(cluster.getRepresentative().getId());
+                        relevantNotYetSeen++;
+                    }
                 }
             }
         }
-
-        TestResult r = new TestResult(results.length, relevant, relevantNotYetSeen, time);
+        int length = (results == null ? 0 : results.length);
+        TestResult r = new TestResult(length, relevant, relevantNotYetSeen, time);
         return r;
 
     }

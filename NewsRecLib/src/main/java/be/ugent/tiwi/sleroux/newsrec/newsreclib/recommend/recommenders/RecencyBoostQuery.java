@@ -15,6 +15,7 @@
  */
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders;
 
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.ScoreDecay;
 import java.io.IOException;
 import java.util.Date;
 import org.apache.log4j.Logger;
@@ -36,9 +37,7 @@ import org.apache.lucene.search.Query;
  */
 public class RecencyBoostQuery extends CustomScoreQuery {
 
-    private double a = 1.1;
-    private double b = 1.0;
-    private double m = 9e-10;
+    private final ScoreDecay decay;
     private static final Logger logger = Logger.getLogger(RecencyBoostQuery.class);
 
     /**
@@ -47,36 +46,22 @@ public class RecencyBoostQuery extends CustomScoreQuery {
      */
     public RecencyBoostQuery(Query subQuery) {
         super(subQuery);
+        decay = new ScoreDecay();
     }
+
+    public RecencyBoostQuery(Query subQuery,ScoreDecay decay) {
+        super(subQuery);
+        this.decay = decay;
+    }
+    
+    
 
     @Override
     protected CustomScoreProvider getCustomScoreProvider(AtomicReaderContext context) throws IOException {
         return new RecencyBoostScoreProvider(context);
     }
 
-    public double getA() {
-        return a;
-    }
-
-    public void setA(double a) {
-        this.a = a;
-    }
-
-    public double getB() {
-        return b;
-    }
-
-    public void setB(double b) {
-        this.b = b;
-    }
-
-    public double getM() {
-        return m;
-    }
-
-    public void setM(double m) {
-        this.m = m;
-    }
+   
 
     private class RecencyBoostScoreProvider extends CustomScoreProvider {
 
@@ -94,10 +79,10 @@ public class RecencyBoostQuery extends CustomScoreQuery {
             if (f != null) {
                 Number numericValue = f.numericValue();
                 if (numericValue != null) {
-                    float timestamp = numericValue.longValue();
+                    long timestamp = numericValue.longValue();
                     Date now = new Date();
-                    float diff = now.getTime() - timestamp;
-                    score *= (float) (a / (diff * m + b));
+                    long diff = now.getTime() - timestamp;
+                    score *= decay.getBoost(diff);
                 } else {
                     logger.warn("timestamp field for document with docNr="
                             + doc

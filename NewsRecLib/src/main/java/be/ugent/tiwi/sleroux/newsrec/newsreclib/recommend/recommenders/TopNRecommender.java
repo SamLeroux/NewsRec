@@ -19,11 +19,11 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.filters.S
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ViewsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.ScoreDecay;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -43,14 +43,15 @@ import org.apache.lucene.search.TopScoreDocCollector;
 public class TopNRecommender extends LuceneRecommender {
 
     private IViewsDao viewsDao;
+    private final ScoreDecay decay;
     private static final Logger logger = Logger.getLogger(TopNRecommender.class);
 
     public TopNRecommender(IViewsDao viewsDao, SearcherManager manager) {
         super(manager);
         this.viewsDao = viewsDao;
+        decay = new ScoreDecay();
+        decay.setM(9e-9);
     }
-
-    
 
     public IViewsDao getViewsDao() {
         return viewsDao;
@@ -88,7 +89,7 @@ public class TopNRecommender extends LuceneRecommender {
             return results;
 
         } catch (ViewsDaoException | IOException ex) {
-            
+
             throw new RecommendationException(ex);
         } finally {
             if (searcher != null) {
@@ -113,10 +114,7 @@ public class TopNRecommender extends LuceneRecommender {
             q.add(query, BooleanClause.Occur.SHOULD);
         }
 
-        RecencyBoostQuery rbq = new RecencyBoostQuery(q);
-        rbq.setM(9e-9);
-
-        return new RecencyBoostQuery(q);
+        return new RecencyBoostQuery(q, decay);
     }
 
 }

@@ -97,11 +97,11 @@ public class PersonalAndTrendingRecommender extends TrendingTopicRecommender {
     protected Query buildQuery(Map<String, Double> terms) {
         BooleanQuery q = new BooleanQuery();
         for (String term : terms.keySet()) {
-            Query query = new TermQuery(new Term("text", term));
+            Query query = new TermQuery(new Term("description", term));
             query.setBoost(terms.get(term).floatValue());
             q.add(query, BooleanClause.Occur.SHOULD);
             Query query2 = new TermQuery(new Term("title", term));
-            query2.setBoost(terms.get(term).floatValue());
+            query2.setBoost(terms.get(term).floatValue()*2);
             q.add(query2, BooleanClause.Occur.SHOULD);
         }
         //return q;

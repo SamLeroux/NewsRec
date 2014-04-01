@@ -18,10 +18,12 @@ package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.RatingsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.ScoreDecay;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,7 +33,9 @@ import java.util.Map;
  */
 public class JDBCRatingsDao extends AbstractJDBCBaseDao implements IRatingsDao {
 
+    private final ScoreDecay decay;
     public JDBCRatingsDao() throws DaoException {
+        decay = new ScoreDecay();
     }
 
     @Override
@@ -49,7 +53,10 @@ public class JDBCRatingsDao extends AbstractJDBCBaseDao implements IRatingsDao {
             try (ResultSet results = selectStatement.executeQuery()) {
                 ratings = new HashMap<>();
                 while (results.next()) {
-                    ratings.put(results.getString(1), results.getDouble(2));
+                    Date lastChanged = results.getDate(3);
+                    double score = results.getDouble(2);
+                    score *= decay.getBoost(new Date().getTime() - lastChanged.getTime());
+                    ratings.put(results.getString(1), score );
                 }
             }
             return ratings;
