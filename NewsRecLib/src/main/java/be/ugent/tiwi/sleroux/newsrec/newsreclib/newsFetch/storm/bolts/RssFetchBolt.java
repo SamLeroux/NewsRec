@@ -26,6 +26,7 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsSource;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.HashCircularBuffer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.topology.StreamIDs;
+import com.sun.syndication.feed.synd.SyndEnclosure;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.feed.synd.SyndPerson;
@@ -39,9 +40,13 @@ import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jdom.Element;
 
 /**
  * Checks a news source for new articles.
@@ -53,6 +58,7 @@ public class RssFetchBolt extends BaseRichBolt {
     private HashCircularBuffer<String> articlesurlBuffer;
     private transient OutputCollector collector;
     private static final Logger logger = Logger.getLogger(RssFetchBolt.class);
+    private Pattern pattern;
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
@@ -64,11 +70,12 @@ public class RssFetchBolt extends BaseRichBolt {
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.collector = collector;
         articlesurlBuffer = new HashCircularBuffer<>(2500);
+        pattern = Pattern.compile("<img src=\"(.*?)\"");
     }
 
     @Override
     public void execute(Tuple input) {
-        
+
         NewsSource source = (NewsSource) input.getValueByField(StreamIDs.NEWSSOURCEITEM);
         logger.info("checking: " + source.getName());
         try {
@@ -111,9 +118,8 @@ public class RssFetchBolt extends BaseRichBolt {
 
                     collector.emit(StreamIDs.NEWSARTICLENOCONTENTSTREAM, new Values(item, item.getSource()));
 
-                }
-                else{
-                    logger.info("Skipping: article, article with same title has already been added (title="+entry.getTitle()+")");
+                } else {
+                    logger.info("Skipping: article, article with same title has already been added (title=" + entry.getTitle() + ")");
                 }
                 i++;
             }
@@ -125,7 +131,7 @@ public class RssFetchBolt extends BaseRichBolt {
             // Exponential backoff
             // When there were no new articles, increase the interval, otherwise 
             // decrease the interval. Do not go below 30 seconds.
-            logger.info("current fetchinterval: "+source.getFetchinterval());
+            logger.info("current fetchinterval: " + source.getFetchinterval());
             if (count == 0) {
                 source.setFetchinterval(source.getFetchinterval() * 2);
             } else {
@@ -171,11 +177,49 @@ public class RssFetchBolt extends BaseRichBolt {
         }
         item.setUrl(new URL(entry.getLink()));
         item.setSource(source.getName());
-
+        item.setImageUrl(findImage(source, entry));
 //        for (Object o : entry.getCategories()) {
 //            SyndCategory cat = (SyndCategory) o;
 //            item.addTerm(cat.getName(), 0.75F);
 //        }
+        
         return item;
+    }
+
+    private URL findImage(NewsSource source, SyndEntry entry) {
+        String image = null;
+        List<SyndEnclosure> encls = entry.getEnclosures();
+
+        if (!encls.isEmpty()) {
+            SyndEnclosure e = encls.get(0);
+            image = e.getUrl();
+        }
+
+        if (image == null) {
+            List<Element> foreignMarkups = (List<Element>) entry.getForeignMarkup();
+            Element e = foreignMarkups.get(0);
+            image = e.getAttribute("url").getValue();
+        }
+
+        if (image == null) {
+            Matcher m = pattern.matcher(entry.getDescription().getValue());
+            if (m.find()) {
+                image = m.group(1);
+            }
+        }
+
+        if (image != null && image.startsWith("/")){
+            String prefix = source.getRssUrl().getHost();
+            image = prefix+image;
+        }
+        
+        URL result = null;
+        if (image != null){
+            try {
+                result = new URL(image);
+            } catch (MalformedURLException ex) {
+            }
+        }
+        return result;
     }
 }

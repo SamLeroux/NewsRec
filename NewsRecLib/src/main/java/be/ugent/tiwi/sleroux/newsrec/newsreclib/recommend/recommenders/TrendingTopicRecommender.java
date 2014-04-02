@@ -15,6 +15,7 @@
  */
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders;
 
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.queries.RecencyBoostQuery;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ITrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.TrendsDaoException;

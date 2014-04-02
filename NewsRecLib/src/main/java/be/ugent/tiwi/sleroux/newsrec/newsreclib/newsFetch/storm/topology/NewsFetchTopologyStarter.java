@@ -8,15 +8,16 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.INewsSourceDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ITrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.FetchArticleContentBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.LuceneIndexBolt;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.NewsItemToTermsBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.RssFetchBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.UpdateNewsSourceBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.spouts.FeedSourceSpout;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.StormRunner;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.TermFileOutputBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.TrendingTermsToDatabaseBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.trendDetect.IntermediateRankingsBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.trendDetect.RollingCountBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.trendDetect.TotalRankingsBolt;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.spouts.GoogleTrendsSpout;
 
 /*
  * Copyright 2014 Sam Leroux <sam.leroux@ugent.be>.
@@ -69,7 +70,11 @@ public class NewsFetchTopologyStarter {
         TopologyBuilder builder = new TopologyBuilder();
 
         builder.setSpout("feedurlspout", new FeedSourceSpout(newsSourceDao));
-
+        builder.setSpout("trendsspout", new GoogleTrendsSpout());
+        
+        builder.setBolt("fileOutputBolt", new TermFileOutputBolt(), 1)
+             .allGrouping("trendsspout",StreamIDs.TERMSTREAM);
+        
         builder.setBolt("rssfetchbolt", new RssFetchBolt(), 1)
                 .globalGrouping("feedurlspout", StreamIDs.NEWSSOURCESTREAM);
 
@@ -84,7 +89,9 @@ public class NewsFetchTopologyStarter {
 //        builder.setBolt("termextractor", new NewsItemToTermsBolt(luceneIndexLocation), 1)
 //                .globalGrouping("luceneIndexBolt", StreamIDs.INDEXEDITEMSTREAM);
         builder.setBolt("counterBolt", new RollingCountBolt(window, tickFreq), 4)
-                .fieldsGrouping("luceneIndexBolt", StreamIDs.TERMSTREAM, new Fields(StreamIDs.TERM));
+                .fieldsGrouping("luceneIndexBolt", StreamIDs.TERMSTREAM, new Fields(StreamIDs.TERM))
+                .fieldsGrouping("trendsspout", StreamIDs.TERMSTREAM, new Fields(StreamIDs.TERM));
+        
         builder.setBolt("intermediateRankerBolt", new IntermediateRankingsBolt(topN, tickFreq), 4)
                 .fieldsGrouping("counterBolt", new Fields("obj"));
         builder.setBolt("rankerBolt", new TotalRankingsBolt(topN, tickFreq), 1)

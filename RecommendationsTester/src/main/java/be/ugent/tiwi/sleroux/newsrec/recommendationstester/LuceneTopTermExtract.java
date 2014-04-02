@@ -167,13 +167,13 @@ public class LuceneTopTermExtract implements Serializable {
             avg += termFreqMap.get(term);
         }
         for (String term : termFreqMap.keySet()) {
-            System.out.println(term);
             double tf = Math.log(termFreqMap.size()/termFreqMap.get(term));
             int docFreq = docFreqMap.get(term);
             if (docFreq > 0) {
                 double idf = 1 + Math.log((double) numDocs / docFreqMap.get(term));
                 double score = tf * idf;
                 pq.add(new TermScorePair(term, score));
+                System.out.println(term+";"+termFreqMap.get(term)+";"+docFreqMap.get(term));
             }
         }
         return pq;

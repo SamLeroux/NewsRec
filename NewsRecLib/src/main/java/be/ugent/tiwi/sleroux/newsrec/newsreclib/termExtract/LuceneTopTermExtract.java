@@ -139,6 +139,7 @@ public class LuceneTopTermExtract implements Serializable {
                 while (stream.incrementToken()) {
                     String term = stream.getAttribute(CharTermAttribute.class).toString();
                     term = term.trim();
+                    term = term.replaceAll("  ", " ");
                     if (freqMap.containsKey(term)) {
                         freqMap.put(term, freqMap.get(term) + weight);
                     } else {

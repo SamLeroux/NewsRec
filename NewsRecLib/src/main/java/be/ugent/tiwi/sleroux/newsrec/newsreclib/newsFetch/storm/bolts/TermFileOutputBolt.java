@@ -19,19 +19,17 @@ import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.trendDetect.Rankable;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.trendDetect.RankableObjectWithFields;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.trendDetect.Rankings;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
 
 /**
- * Writes all incoming terms to a text file. 
+ * Writes all incoming terms to a text file.
+ *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class TermFileOutputBolt extends BaseRichBolt {
@@ -67,13 +65,12 @@ public class TermFileOutputBolt extends BaseRichBolt {
 
     @Override
     public void execute(Tuple input) {
-        Rankings rankings = (Rankings) input.getValueByField("rankings");
-        List<Rankable> rl = rankings.getRankings();
-        for (Rankable r : rl) {
-            RankableObjectWithFields rowf = (RankableObjectWithFields) r;
+        Fields fields = input.getFields();
+        for (String field : fields) {
             try {
-                writer.write(rowf.getObject().toString());
+                writer.write(input.getValueByField(field).toString());
                 writer.newLine();
+                writer.write("-------------------------------------------------------");
             } catch (IOException ex) {
                 logger.error(ex);
             }

@@ -65,9 +65,11 @@ public abstract class AbstractJDBCBaseDao {
 
     public void close() throws DaoException {
         try {
-            connectionPool.close();
-            connectionPool = null;
-        } catch (NullPointerException | SQLException ex) {
+            if (connectionPool != null) {
+                connectionPool.close();
+                connectionPool = null;
+            }
+        } catch (SQLException ex) {
             logger.error(ex);
         }
     }

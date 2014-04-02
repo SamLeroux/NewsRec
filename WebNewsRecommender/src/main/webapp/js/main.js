@@ -14,8 +14,8 @@ $(function() {
     $("#btnBack").on("click", function() {
         btnBackClicked();
     });
-    
-    $("#btnRefresh").on("click", function(){
+
+    $("#btnRefresh").on("click", function() {
         fetchRecommendations();
     });
 
@@ -38,9 +38,18 @@ function getItemDisplayLi(item) {
         ratingClick(event, item.representative.id, item.representative.docNr);
     });
 
-    var h1 = $("<h1>");
-    h1.addClass("myHeader");
-    h1.text(item.representative.title);
+    if (item.representative.imageUrl){
+        var img = $("<img>");
+        img.attr("src", item.representative.imageUrl);
+        a.append(img);
+    }
+    var h1 = $("<h2>");
+    h1.addClass("title");
+    var title = item.representative.title;
+    h1.html(title);
+
+   
+
     if (item.representative.recommendedBy === "personal") {
         h1.css("color", "red");
     }
@@ -49,17 +58,20 @@ function getItemDisplayLi(item) {
     }
     a.append(h1);
 
-    var h3 = $("<h3>");
+    var h3 = $("<p>");
     h3.addClass("timestamp");
-    h3.text(item.representative.timestamp + "  (" + item.items.length + " members)");
+    var d = new Date(item.representative.timestamp);
+    h3.text(toDateString(d));
     a.append(h3);
 
     var p = $("<p>");
-    p.addClass("myParagraph");
+
     p.text(item.representative.description);
     a.append(p);
 
     li.append(a);
+
+    console.log(item.representative.title + " : " + item.items.length + " members");
     return li;
 
 }
@@ -150,4 +162,35 @@ function btnBackClicked() {
     $("#resultsDiv").show();
     $("#articleDiv").hide();
     $("#btnBack").hide();
+}
+
+function toDateString(date) {
+    var day = date.getDate();
+    var month = date.getMonth();
+    var year = date.getYear();
+
+    var today = new Date();
+
+    if (today.getDate() === day && today.getMonth() === month && today.getYear() === year) {
+        var age = today.getHours() - date.getHours();
+        var suffix = " hours ago";
+
+        if (age === 0) {
+            age = today.getMinutes() - date.getMinutes();
+            suffix = " minutes ago";
+        }
+        else if (age === 1) {
+            suffix = " hour ago";
+        }
+        return age + suffix;
+    }
+    else if (today.getDate() === day + 1 && today.getMonth() === month && today.getYear() === year) {
+        return "Yesterday"
+    }
+    else if (today.getDate() <= day + 7 && today.getMonth() === month && today.getYear() === year) {
+        return today.getDate() - day + " days ago";
+    }
+    else {
+        return date.toLocaleString();
+    }
 }

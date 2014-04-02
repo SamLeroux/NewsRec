@@ -15,7 +15,6 @@ package be.ugent.tiwi.sleroux.newsrec.recommendationstester;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.config.Config;
 import java.io.Reader;
 import org.apache.log4j.Logger;
@@ -120,7 +119,7 @@ public class EnAnalyzer extends Analyzer {
         //reader = new HTMLStripCharFilter(reader);
         Tokenizer t = new StandardTokenizer(Config.LUCENE_VERSION, reader);
         TokenStream result = t;
-        
+
         //result = new SynonymFilter(result, synonyms, true);
         result = new StandardFilter(Config.LUCENE_VERSION, result);
         result = new LowerCaseFilter(Config.LUCENE_VERSION, result);
@@ -137,9 +136,8 @@ public class EnAnalyzer extends Analyzer {
         result = new SnowballFilter(result, new EnglishStemmer());
         ShingleFilter sf = new ShingleFilter(result, 2, 3);
         sf.setFillerToken(null);
-        result = sf;
-        TokenStreamComponents comp = new TokenStreamComponents(t, result);
-        return comp;
+        return new TokenStreamComponents(t, sf);
+
     }
 
 }

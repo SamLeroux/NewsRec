@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders;
+package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.queries;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.ScoreDecay;
 import java.io.IOException;

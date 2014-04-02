@@ -38,6 +38,13 @@
 #btnBack{
     display:none;
 }
+
+.timestamp{
+    font-size: x-small;
+    font-style: italic;
+}
+
+
 @media screen and (max-width: 700px) {
     #articleDiv {
         width:100%;

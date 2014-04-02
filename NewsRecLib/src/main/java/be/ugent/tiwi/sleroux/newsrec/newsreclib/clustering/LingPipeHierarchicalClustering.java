@@ -41,7 +41,7 @@ public class LingPipeHierarchicalClustering implements IClusterer {
         HierarchicalClusterer<NewsItem> clusterer = new SingleLinkClusterer<>(new NewsItemDistance());
         Set<NewsItem> itemSet = new HashSet<>(items);
         Dendrogram<NewsItem> dend = clusterer.hierarchicalCluster(itemSet);
-        Set<Set<NewsItem>> clusters = dend.partitionDistance(0.85);
+        Set<Set<NewsItem>> clusters = dend.partitionDistance(0.95);
 
         List<NewsItemCluster> clusterList = new ArrayList<>(clusters.size());
         for (Set<NewsItem> sn : clusters) {

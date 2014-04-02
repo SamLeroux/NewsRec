@@ -23,6 +23,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
@@ -39,6 +41,7 @@ import org.apache.lucene.index.IndexableField;
  * @see Document
  */
 public class NewsItemLuceneDocConverter {
+
     private static Gson gson = new Gson();
 
     public static Document NewsItemToDocument(NewsItem item) {
@@ -75,11 +78,11 @@ public class NewsItemLuceneDocConverter {
         for (String author : item.getAuthors()) {
             doc.add(new StringField("author", author, Field.Store.YES));
         }
-        
+
         Map<String, Double> terms = item.getTerms();
         String termsJson = gson.toJson(terms);
         doc.add(new StoredField("terms", termsJson));
-        
+
         return doc;
     }
 
@@ -115,6 +118,7 @@ public class NewsItemLuceneDocConverter {
             item.setId("");
         }
 
+       
         field = d.getField("imageUrl");
         if (field != null) {
             try {
@@ -157,7 +161,7 @@ public class NewsItemLuceneDocConverter {
         }
 
         field = d.getField("terms");
-        if (field != null){
+        if (field != null) {
             Map<String, Double> terms = gson.fromJson(field.stringValue(), HashMap.class);
             item.addTerms(terms);
         }
