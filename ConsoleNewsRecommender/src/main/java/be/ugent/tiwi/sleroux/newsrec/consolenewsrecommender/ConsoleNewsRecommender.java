@@ -28,6 +28,7 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCTrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItemCluster;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.StormException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.IRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.RecommendationException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.IScorer;
@@ -78,7 +79,8 @@ public class ConsoleNewsRecommender {
         try {     
             //startAddArticles();
             //startRectest();
-            startFetchTest();
+            //startLocalFetchTest();
+            startClusterFetchTest();
             //testClustering();
             builder.close();
         } catch (RecommenderBuildException ex) {
@@ -134,7 +136,7 @@ public class ConsoleNewsRecommender {
         viewsDao.see(userid, docNr, itemid);
     }
 
-    private void startFetchTest() {
+    private void startLocalFetchTest() {
         try {
             INewsSourceDao newsSourceDao = new MysqlNewsSourceDao();
             
@@ -146,12 +148,29 @@ public class ConsoleNewsRecommender {
                     luceneLoc,
                     stopwordsFileLocation);
             
-            starter.start();
+            starter.startLocal();
             Thread.sleep(1000*60*60*24);
-            starter.stop();
-        } catch (InterruptedException ex) {
+            starter.stopLocal();
+        } catch (StormException| InterruptedException ex) {
             java.util.logging.Logger.getLogger(ConsoleNewsRecommender.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
+    private void startClusterFetchTest(){
+        try {
+            INewsSourceDao newsSourceDao = new MysqlNewsSourceDao();
+            
+            
+            NewsFetchTopologyStarter starter = new NewsFetchTopologyStarter(
+                    newsSourceDao,
+                    trendsDao,
+                    "newsfetch",
+                    luceneLoc,
+                    stopwordsFileLocation);
+            
+            starter.startOnCLuster();
+        } catch (StormException ex) {
+            java.util.logging.Logger.getLogger(ConsoleNewsRecommender.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }

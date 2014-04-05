@@ -17,6 +17,9 @@ package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm;
 
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
+import backtype.storm.StormSubmitter;
+import backtype.storm.generated.AlreadyAliveException;
+import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.generated.StormTopology;
 
 /**
@@ -35,17 +38,26 @@ public final class StormRunner {
      * @param topology The topology to run
      * @param topologyName The name of the new topology
      * @param conf The configuration for the new topology.
-     * @throws InterruptedException
+     * @throws be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.StormException
      * @see Config
      */
     public static void runTopologyLocally(StormTopology topology, String topologyName, Config conf)
-            throws InterruptedException {
+            throws StormException {
         if (cluster == null){
-        cluster = new LocalCluster();
+            cluster = new LocalCluster();
         }
         cluster.submitTopology(topologyName, conf, topology);
     }
 
+    
+    public static void runTopologyOnCLuster(StormTopology topology, String topologyName, Config conf) throws StormException{
+        try {
+            StormSubmitter.submitTopology(topologyName, conf, topology);
+        } catch (AlreadyAliveException | InvalidTopologyException ex) {
+            throw new StormException(ex);
+        }
+        
+    }
     /**
      * Stops a running cluster.
      * @param name the name of the cluster to stop.

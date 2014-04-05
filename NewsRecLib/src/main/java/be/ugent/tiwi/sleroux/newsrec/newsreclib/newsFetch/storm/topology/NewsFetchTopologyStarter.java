@@ -6,6 +6,7 @@ import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.INewsSourceDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ITrendsDao;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.StormException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.FetchArticleContentBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.LuceneIndexBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.RssFetchBolt;
@@ -118,20 +119,22 @@ public class NewsFetchTopologyStarter {
         return conf;
     }
 
-    /**
-     *
-     * @throws InterruptedException
-     */
-    public void start() throws InterruptedException {
+
+    public void startLocal() throws StormException {
         Config config = createTopologyConfiguration();
         StormTopology topology = buildTopology();
         StormRunner.runTopologyLocally(topology, name, config);
     }
-
+    
+    public void startOnCLuster() throws StormException{
+        Config config = createTopologyConfiguration();
+        StormTopology topology = buildTopology();
+        StormRunner.runTopologyOnCLuster(topology, name, config);
+    }
     /**
      *
      */
-    public void stop() {
+    public void stopLocal() {
         StormRunner.stop(name);
         StormRunner.shutdown();
     }
