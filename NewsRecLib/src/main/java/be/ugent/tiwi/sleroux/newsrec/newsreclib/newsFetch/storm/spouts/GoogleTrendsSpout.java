@@ -72,10 +72,11 @@ public class GoogleTrendsSpout extends BaseRichSpout {
 
     @Override
     public void nextTuple() {
-        if (rnd.nextInt(50) == 0) {
+        if (rnd.nextInt(480) == 0) {
             String term = termsQueue.poll();
             if (term != null) {
                 collector.emit(StreamIDs.TERMSTREAM, new Values(term));
+                termsQueue.add(term);
             } else {
                 try {
                     Thread.sleep(500);
@@ -105,13 +106,11 @@ public class GoogleTrendsSpout extends BaseRichSpout {
                 urlConnection.disconnect();
 
                 String html = new String(content);
-
+                termsQueue.clear();
                 Matcher m = Pattern.compile(REGEX).matcher(html);
                 while (m.find()) {
                     String term = m.group(1);
-                    for (int i = 0; i < 100; i++) {
-                        termsQueue.add(term);
-                    }
+                    termsQueue.add(term);
                 }
 
             } catch (MalformedURLException ex) {

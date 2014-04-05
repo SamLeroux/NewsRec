@@ -16,15 +16,11 @@
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.termExtract.LuceneTopTermExtract;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.NewsItemLuceneDocConverter;
 import java.io.IOException;
-import java.util.Map;
 import org.apache.log4j.Logger;
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.SearcherManager;
 
 /**

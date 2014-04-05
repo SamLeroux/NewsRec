@@ -1,38 +1,43 @@
 #header,#page{
     width:100%;
     height:100%;
-    height:2.1em;
-}
-
-#txtSearch{
-    float:left;
-    width:40%;
-    height:2em;
-    margin:1px 1px 1px 1px;
-}
-
-#btnSearch{
-    float:left;
-    width:10%;
-    height:2em;
-    margin:1px 1px 1px 1px;
 }
 
 #resultsDiv{
     width:30%;
     height:100%;
     float:left;
+    margin:0;
+    padding:0;
+    top:0;
+    left:0;
+    
 }
 
+#results{
+    padding:0;
+    margin:0;width:100%;
+    height:100%;
+    
+}
 #articleDiv{
-    width: 65%;
+    width: 70%;
     float:left;
+    margin:0;
+    padding:0;
 }
 
 #articleFrame{
     width:100%;
     height:100%;
     display: none;
+    margin:0;
+    padding:0;
+}
+
+.ui-listview{
+    padding:0;
+    margin:0;
 }
 
 #btnBack{
@@ -44,6 +49,24 @@
     font-style: italic;
 }
 
+.iconWrapper{
+    float: left; 
+    width: 25%; height: auto;
+    max-height: 80px;
+    text-align: center; 
+    vertical-align: central; 
+    margin:2%;
+}
+
+img{
+    width:100%;
+    height:auto;
+}
+
+.ui-li-heading{
+    overflow: hidden;
+    white-space: normal;
+}
 
 @media screen and (max-width: 700px) {
     #articleDiv {

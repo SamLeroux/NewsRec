@@ -32,6 +32,7 @@ import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.IndexableField;
+import org.apache.tika.mime.MediaType;
 
 /**
  * Converts NewsItems to Lucene documents and back.
@@ -42,7 +43,7 @@ import org.apache.lucene.index.IndexableField;
  */
 public class NewsItemLuceneDocConverter {
 
-    private static Gson gson = new Gson();
+    private static final Gson gson = new Gson();
 
     public static Document NewsItemToDocument(NewsItem item) {
         Document doc = new Document();
@@ -64,6 +65,7 @@ public class NewsItemLuceneDocConverter {
             doc.add(new StringField("url", item.getUrl().toString(), Field.Store.YES));
         }
         if (item.getImageUrl() != null) {
+            System.out.println("image : "+item.getImageUrl());
             doc.add(new StringField("imageUrl", item.getImageUrl().toString(), Field.Store.YES));
         }
         if (item.getLocale() != null) {

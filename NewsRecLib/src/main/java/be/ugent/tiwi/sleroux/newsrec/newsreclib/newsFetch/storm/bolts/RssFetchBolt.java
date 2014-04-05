@@ -40,10 +40,9 @@ import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
+import org.jdom.Attribute;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jdom.Element;
@@ -182,7 +181,7 @@ public class RssFetchBolt extends BaseRichBolt {
 //            SyndCategory cat = (SyndCategory) o;
 //            item.addTerm(cat.getName(), 0.75F);
 //        }
-        
+
         return item;
     }
 
@@ -197,24 +196,29 @@ public class RssFetchBolt extends BaseRichBolt {
 
         if (image == null) {
             List<Element> foreignMarkups = (List<Element>) entry.getForeignMarkup();
-            Element e = foreignMarkups.get(0);
-            image = e.getAttribute("url").getValue();
-        }
-
-        if (image == null) {
-            Matcher m = pattern.matcher(entry.getDescription().getValue());
-            if (m.find()) {
-                image = m.group(1);
+            if (!foreignMarkups.isEmpty()) {
+                Element e = foreignMarkups.get(0);
+                Attribute a = e.getAttribute("url");
+                if (a != null) {
+                    image = a.getValue();
+                }
             }
         }
 
-        if (image != null && image.startsWith("/")){
+//        if (image == null && entry.getDescription() != null) {
+//            Matcher m = pattern.matcher(entry.getDescription().getValue());
+//            if (m.find()) {
+//                image = m.group(1);
+//            }
+//        }
+
+        if (image != null && image.startsWith("/")) {
             String prefix = source.getRssUrl().getHost();
-            image = prefix+image;
+            image = prefix + image;
         }
-        
+
         URL result = null;
-        if (image != null){
+        if (image != null) {
             try {
                 result = new URL(image);
             } catch (MalformedURLException ex) {

@@ -1,4 +1,4 @@
-$(function() {
+$(document).ready(function() {
     // Zorg ervoor dat de gebruiker kan zoeken door op enter te drukken in het zoekveld
     $('#queryinput').keypress(function(e) {
         if (e.which === 10 || e.which === 13) {
@@ -20,6 +20,14 @@ $(function() {
     });
 
     $("#results").listview();
+    
+    if (isPhone()){
+        $("#btnRefresh").addClass("ui-btn-icon-notext");
+        $("#btnRefresh").addClass("ui-corner-all");
+        $("#btnRefresh").removeClass("ui-btn-icon-left");
+        $("#btnRefresh").removeClass("ui-shadow");
+    }
+    
     fetchRecommendations();
     window.scrollTo(0, 0);
 });
@@ -38,17 +46,20 @@ function getItemDisplayLi(item) {
         ratingClick(event, item.representative.id, item.representative.docNr);
     });
 
-    if (item.representative.imageUrl){
+    var p = $("<p>");
+    p.addClass("iconWrapper");
+    if (item.representative.imageUrl) {
         var img = $("<img>");
         img.attr("src", item.representative.imageUrl);
-        a.append(img);
+        p.append(img);
+        a.append(p);
     }
     var h1 = $("<h2>");
     h1.addClass("title");
     var title = item.representative.title;
-    h1.html(title);
+    h1.html(shorten(title,100));
 
-   
+
 
     if (item.representative.recommendedBy === "personal") {
         h1.css("color", "red");
@@ -64,10 +75,10 @@ function getItemDisplayLi(item) {
     h3.text(toDateString(d));
     a.append(h3);
 
-    var p = $("<p>");
+    //var p = $("<p>");
 
-    p.text(item.representative.description);
-    a.append(p);
+    //p.text(item.representative.description);
+    //a.append(p);
 
     li.append(a);
 
@@ -185,7 +196,7 @@ function toDateString(date) {
         return age + suffix;
     }
     else if (today.getDate() === day + 1 && today.getMonth() === month && today.getYear() === year) {
-        return "Yesterday"
+        return "Yesterday";
     }
     else if (today.getDate() <= day + 7 && today.getMonth() === month && today.getYear() === year) {
         return today.getDate() - day + " days ago";
@@ -193,4 +204,20 @@ function toDateString(date) {
     else {
         return date.toLocaleString();
     }
+}
+
+function shorten(text, n){
+    var result = text;
+    if (text.length > n){
+        var pos = text.substring(0,n - 3).lastIndexOf(" ");
+        console.log(pos);
+        if (pos > 0){
+            result =  text.substring(0,pos)+" ...";
+        }
+        else{
+            result = text.substring(0,n-1)+" ...";
+        }
+    }
+    return result;
+    
 }
