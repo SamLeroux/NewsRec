@@ -22,6 +22,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
@@ -35,21 +37,36 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopScoreDocCollector;
 
 /**
- *
+ * Extracts important terms from a document.
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class LuceneTopTermExtract implements Serializable {
 
     private static final Logger logger = Logger.getLogger(LuceneTopTermExtract.class);
     private static final int DEFAULT_NUMBER_TERMS = 10;
+    private static final Pattern PATTERN = Pattern.compile("([A-Z][a-z]+( [A-Z][a-z]+)+)");
     private final Analyzer analyzer;
 
+    /**
+     * 
+     * @param analyzer 
+     */
     public LuceneTopTermExtract(Analyzer analyzer) {
         this.analyzer = analyzer;
     }
 
+    /**
+     * 
+     * @param id
+     * @param reader
+     * @return 
+     */
     public Map<String, Double> getTopTerms(String id, IndexReader reader) {
         return getTopTerms(id, reader, DEFAULT_NUMBER_TERMS);
+    }
+
+    public Map<String, Double> getTopTerms(int docNr, IndexReader reader) {
+        return getTopTerms(docNr, reader, DEFAULT_NUMBER_TERMS);
     }
 
     public Map<String, Double> getTopTerms(String id, IndexReader reader, int numberOfTerms) {
@@ -70,10 +87,6 @@ public class LuceneTopTermExtract implements Serializable {
         return new HashMap<>(0);
     }
 
-    public Map<String, Double> getTopTerms(int docNr, IndexReader reader) {
-        return getTopTerms(docNr, reader, DEFAULT_NUMBER_TERMS);
-    }
-
     public Map<String, Double> getTopTerms(int docNr, IndexReader reader, int numberOfTerms) {
         try {
             Map<String, Double> termFreq = new HashMap<>(200);
@@ -81,9 +94,13 @@ public class LuceneTopTermExtract implements Serializable {
 
             Document doc = reader.document(docNr);
 
-            updateFrequenciesMaps(termFreq, docFreqs, "title", doc.get("title"), reader, 2);
-            updateFrequenciesMaps(termFreq, docFreqs, "description", doc.get("description"), reader, 1.5);
-            updateFrequenciesMaps(termFreq, docFreqs, "text", doc.get("text"), reader, 1);
+            updateFrequenciesMapsForReader(termFreq, docFreqs, "title", doc.get("title"), reader, 2);
+            updateFrequenciesMapsForReader(termFreq, docFreqs, "description", doc.get("description"), reader, 1.5);
+            updateFrequenciesMapsForReader(termFreq, docFreqs, "text", doc.get("text"), reader, 1);
+            
+            updateFrequenciesMapsForRegex(termFreq, docFreqs, "title", doc.get("title"), reader, 2);
+            updateFrequenciesMapsForRegex(termFreq, docFreqs, "description", doc.get("description"), reader, 1.5);
+            updateFrequenciesMapsForRegex(termFreq, docFreqs, "text", doc.get("text"), reader, 1);
 
             PriorityQueue<TermScorePair> pq = getTermScores(termFreq, docFreqs, reader);
 
@@ -108,30 +125,13 @@ public class LuceneTopTermExtract implements Serializable {
     }
 
     public void addTopTerms(NewsItem item, int numberOfTerms, IndexReader reader) {
-        try {
-            Map<String, Double> termFreq = new HashMap<>(200);
-            Map<String, Integer> docFreqs = new HashMap<>(200);
-
-            updateFrequenciesMaps(termFreq, docFreqs, "title", item.getTitle(), reader, 2);
-            updateFrequenciesMaps(termFreq, docFreqs, "description", item.getDescription(), reader, 1.5);
-            updateFrequenciesMaps(termFreq, docFreqs, "text", item.getFulltext(), reader, 1);
-
-            PriorityQueue<TermScorePair> pq = getTermScores(termFreq, docFreqs, reader);
-
-            int n = (pq.size() < numberOfTerms ? pq.size() : numberOfTerms);
-            int i = 0;
-            TermScorePair tsp = pq.poll();
-            while (i < n && tsp != null) {
-                item.addTerm(tsp.getTerm(), tsp.getScore());
-                tsp = pq.poll();
-                i++;
-            }
-        } catch (IOException ex) {
-            logger.error(ex);
+        Map<String, Double> topterms = getTopTerms(item.getId(), reader, numberOfTerms);
+        for (String term : topterms.keySet()) {
+            item.addTerm(term, topterms.get(term));
         }
     }
 
-    private void updateFrequenciesMaps(Map<String, Double> freqMap, Map<String, Integer> docFreqMap, String field, String content, IndexReader reader, double weight) throws IOException {
+    private void updateFrequenciesMapsForReader(Map<String, Double> freqMap, Map<String, Integer> docFreqMap, String field, String content, IndexReader reader, double weight) throws IOException {
         if (content != null && !"".equals(content)) {
             try (TokenStream stream = analyzer.tokenStream(field, content)) {
                 stream.reset();
@@ -140,21 +140,33 @@ public class LuceneTopTermExtract implements Serializable {
                     String term = stream.getAttribute(CharTermAttribute.class).toString();
                     term = term.trim();
                     term = term.replaceAll("  ", " ");
-                    if (freqMap.containsKey(term)) {
-                        freqMap.put(term, freqMap.get(term) + weight);
-                    } else {
-                        freqMap.put(term, weight);
-                    }
-
-                    int docFreq = reader.docFreq(new Term(field, term));
-                    if (docFreqMap.containsKey(content)) {
-                        docFreqMap.put(term, docFreqMap.get(content) + docFreq);
-                    } else {
-                        docFreqMap.put(term, docFreq);
-                    }
+                    updateFrequenciesMapsForTerm(freqMap, docFreqMap, field,term, reader, weight);
                 }
             }
         }
+    }
+
+    private void updateFrequenciesMapsForTerm(Map<String, Double> freqMap, Map<String, Integer> docFreqMap, String field, String term, IndexReader reader, double weight) throws IOException {
+        if (freqMap.containsKey(term)) {
+            freqMap.put(term, freqMap.get(term) + weight);
+        } else {
+            freqMap.put(term, weight);
+        }
+
+        int docFreq = reader.docFreq(new Term(field, term));
+        if (docFreqMap.containsKey(term)) {
+            docFreqMap.put(term, docFreqMap.get(term) + docFreq);
+        } else {
+            docFreqMap.put(term, docFreq);
+        }
+    }
+
+    private void updateFrequenciesMapsForRegex(Map<String, Double> freqMap, Map<String, Integer> docFreqMap, String field, String content, IndexReader reader, double weight) throws IOException {
+        Matcher m = PATTERN.matcher(content);
+        while (m.find()){
+            updateFrequenciesMapsForTerm(freqMap, docFreqMap, field, m.group(1).toLowerCase(), reader, weight*2);
+        }
+        
     }
 
     private PriorityQueue<TermScorePair> getTermScores(Map<String, Double> termFreqMap, Map<String, Integer> docFreqMap, IndexReader reader) {
@@ -162,7 +174,7 @@ public class LuceneTopTermExtract implements Serializable {
         PriorityQueue<TermScorePair> pq = new PriorityQueue<>(termFreqMap.size());
 
         for (String term : termFreqMap.keySet()) {
-            double tf = 1+Math.log(termFreqMap.get(term));
+            double tf = 1 + Math.log(termFreqMap.get(term));
             int docFreq = docFreqMap.get(term);
             if (docFreq > 0) {
                 double idf = 1 + Math.log((double) numDocs / docFreqMap.get(term));

@@ -135,9 +135,9 @@ public class EnAnalyzer extends Analyzer {
         result = new EnglishPossessiveFilter(Config.LUCENE_VERSION, result);
         //result = new PorterStemFilter(result);
         result = new SnowballFilter(result, new EnglishStemmer());
-        ShingleFilter sf = new ShingleFilter(result, 2, 3);
-        sf.setFillerToken(null);
-        result = sf;
+//        ShingleFilter sf = new ShingleFilter(result, 2, 3);
+//        sf.setFillerToken(null);
+//        result = sf;
         TokenStreamComponents comp = new TokenStreamComponents(t, result);
         return comp;
     }

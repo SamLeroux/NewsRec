@@ -32,8 +32,10 @@ public class NewsItemCluster {
     }
 
     public void addItem(NewsItem item) {
-        if (representative == null || representative.getTimestamp().before(item.getTimestamp())) {
-            if (representative != null){
+        if (representative == null
+                || representative.getTimestamp().before(item.getTimestamp())
+                || (representative.getImageUrl() == null && item.getImageUrl() != null)) {
+            if (representative != null) {
                 items.add(representative);
             }
             representative = item;
@@ -41,8 +43,8 @@ public class NewsItemCluster {
             items.add(item);
         }
     }
-    
-    public int getSize(){
+
+    public int getSize() {
         return items.size();
     }
 
@@ -61,10 +63,5 @@ public class NewsItemCluster {
     public void setItems(List<NewsItem> items) {
         this.items = items;
     }
-    
-    
-    
-    
-    
 
 }
