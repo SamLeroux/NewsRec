@@ -15,7 +15,6 @@
  */
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.filters;
 
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ViewsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import java.io.IOException;
 import java.util.List;
@@ -55,8 +54,6 @@ public class UniqueResultsFilter extends Filter {
         for (NewsItem item : items) {
             int relative = item.getDocNr() - docBase; // relative id in this context
             if (relative >= 0 && relative < maxId) {
-                logger.debug("cleared " + item.getDocNr() + ", should not show up in results");
-                // Remove this document from the results.
                 bits.fastClear(item.getDocNr() - docBase);
             }
         }

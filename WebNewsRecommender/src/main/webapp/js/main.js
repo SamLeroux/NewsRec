@@ -20,19 +20,19 @@ $(document).ready(function() {
     });
 
     $("#results").listview();
-    
-    if (isPhone()){
+
+    if (isPhone()) {
         $("#btnRefresh").addClass("ui-btn-icon-notext");
         $("#btnRefresh").addClass("ui-corner-all");
         $("#btnRefresh").removeClass("ui-btn-icon-left");
         $("#btnRefresh").removeClass("ui-shadow");
-        
+
         $("#btnBack").addClass("ui-btn-icon-notext");
         $("#btnBack").addClass("ui-corner-all");
         $("#btnBack").removeClass("ui-btn-icon-left");
         $("#btnBack").removeClass("ui-shadow");
     }
-    
+
     fetchRecommendations();
     window.scrollTo(0, 0);
 });
@@ -62,7 +62,7 @@ function getItemDisplayLi(item) {
     var h1 = $("<h2>");
     h1.addClass("title");
     var title = item.representative.title;
-    h1.html(shorten(title,100));
+    h1.html(shorten(title, 100));
 
 
 
@@ -76,16 +76,26 @@ function getItemDisplayLi(item) {
 
     var h3 = $("<p>");
     h3.addClass("timestamp");
+    h3.addClass("ui-li-aside");
     var d = new Date(item.representative.timestamp);
     h3.text(toDateString(d));
-    a.append(h3);
+    h1.append(h3);
 
     //var p = $("<p>");
 
     //p.text(item.representative.description);
     //a.append(p);
 
+    var span = $("<span>");
+    span.addClass("ui-li-count");
+    span.html(item.items.length + 1);
+    a.append(span);
+    
     li.append(a);
+
+
+    
+
 
     console.log(item.representative.title + " : " + item.items.length + " members");
     return li;
@@ -110,6 +120,7 @@ function displayArticle(url) {
     iframe.load(function() {
         $.mobile.hidePageLoadingMsg();
         window.scrollTo(0, 0);
+        autoHeight(iframe);
     });
     iframe.error(function() {
         $.mobile.hidePageLoadingMsg();
@@ -211,18 +222,20 @@ function toDateString(date) {
     }
 }
 
-function shorten(text, n){
+function shorten(text, n) {
     var result = text;
-    if (text.length > n){
-        var pos = text.substring(0,n - 3).lastIndexOf(" ");
+    if (text.length > n) {
+        var pos = text.substring(0, n - 3).lastIndexOf(" ");
         console.log(pos);
-        if (pos > 0){
-            result =  text.substring(0,pos)+" ...";
+        if (pos > 0) {
+            result = text.substring(0, pos) + " ...";
         }
-        else{
-            result = text.substring(0,n-1)+" ...";
+        else {
+            result = text.substring(0, n - 1) + " ...";
         }
     }
     return result;
-    
+
 }
+
+
