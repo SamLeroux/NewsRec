@@ -15,11 +15,8 @@ package be.ugent.tiwi.sleroux.newsrec.newsreclib.lucene.analyzers;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.config.Config;
 import java.io.Reader;
-import org.apache.log4j.Logger;
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.core.LowerCaseFilter;
@@ -30,83 +27,13 @@ import org.apache.lucene.analysis.miscellaneous.TrimFilter;
 import org.apache.lucene.analysis.snowball.SnowballFilter;
 import org.apache.lucene.analysis.standard.StandardFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
-import org.apache.lucene.analysis.synonym.SynonymMap;
-import org.apache.lucene.analysis.util.CharArraySet;
 import org.tartarus.snowball.ext.EnglishStemmer;
 
 /**
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class EnAnalyzer extends Analyzer {
-
-    private static final Logger logger = Logger.getLogger(EnAnalyzer.class);
-    private CharArraySet stopwords = null;
-    private SynonymMap synonyms = null;
-
-    /**
-     *
-     */
-    public EnAnalyzer() {
-    }
-
-    /**
-     *
-     * @param stopwords
-     */
-    public EnAnalyzer(CharArraySet stopwords) {
-        this.stopwords = stopwords;
-    }
-
-    /**
-     *
-     * @param synonyms
-     */
-    public EnAnalyzer(SynonymMap synonyms) {
-        this.synonyms = synonyms;
-    }
-
-    /**
-     *
-     * @param stopwords
-     * @param synonyms
-     */
-    public EnAnalyzer(CharArraySet stopwords, SynonymMap synonyms) {
-        this.stopwords = stopwords;
-        this.synonyms = synonyms;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public CharArraySet getStopwords() {
-        return stopwords;
-    }
-
-    /**
-     *
-     * @param stopwords
-     */
-    public void setStopwords(CharArraySet stopwords) {
-        this.stopwords = stopwords;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public SynonymMap getSynonyms() {
-        return synonyms;
-    }
-
-    /**
-     *
-     * @param synonyms
-     */
-    public void setSynonyms(SynonymMap synonyms) {
-        this.synonyms = synonyms;
-    }
+public class EnAnalyzer extends NewsRecLuceneAnalyzer {
 
     /**
      *
@@ -119,7 +46,7 @@ public class EnAnalyzer extends Analyzer {
         //reader = new HTMLStripCharFilter(reader);
         Tokenizer t = new StandardTokenizer(Config.LUCENE_VERSION, reader);
         TokenStream result = t;
-        
+
         //result = new SynonymFilter(result, synonyms, true);
         result = new StandardFilter(Config.LUCENE_VERSION, result);
         result = new LowerCaseFilter(Config.LUCENE_VERSION, result);

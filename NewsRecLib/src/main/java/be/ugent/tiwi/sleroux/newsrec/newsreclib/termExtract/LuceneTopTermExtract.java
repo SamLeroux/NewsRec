@@ -15,6 +15,7 @@
  */
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.termExtract;
 
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.lucene.analyzers.NewsRecLuceneAnalyzer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.TermScorePair;
 import java.io.IOException;
@@ -28,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
@@ -46,18 +48,20 @@ public class LuceneTopTermExtract implements Serializable {
     private static final Logger logger = Logger.getLogger(LuceneTopTermExtract.class);
     private static final int DEFAULT_NUMBER_TERMS = 10;
     private static final Pattern PATTERN = Pattern.compile("([A-Z][a-z]+( [A-Z][a-z]+)+)");
-    private final Analyzer analyzer;
+    private final NewsRecLuceneAnalyzer analyzer;
 
     /**
      *
      * @param analyzer
      */
-    public LuceneTopTermExtract(Analyzer analyzer) {
+    public LuceneTopTermExtract(NewsRecLuceneAnalyzer analyzer) {
         this.analyzer = analyzer;
     }
 
     /**
-     * Returns the 10 most important terms in the document with the specified id.
+     * Returns the 10 most important terms in the document with the specified
+     * id.
+     *
      * @param id
      * @param reader
      * @return A Map containing the terms and the scores.
@@ -67,9 +71,10 @@ public class LuceneTopTermExtract implements Serializable {
     }
 
     /**
-     * Returns the 10 most important terms in the document with the specified docNr.
-     * WARNING: document numbers may change, only use this when you are sure you
-     * are using the correct document number.
+     * Returns the 10 most important terms in the document with the specified
+     * docNr. WARNING: document numbers may change, only use this when you are
+     * sure you are using the correct document number.
+     *
      * @param id
      * @param reader
      * @return A Map containing the terms and the scores.
@@ -79,11 +84,13 @@ public class LuceneTopTermExtract implements Serializable {
     }
 
     /**
-     * Returns the 10 most important terms in the document with the specified id.
+     * Returns the 10 most important terms in the document with the specified
+     * id.
+     *
      * @param id
      * @param reader
      * @param numberOfTerms
-     * @return 
+     * @return
      */
     public Map<String, Double> getTopTerms(String id, IndexReader reader, int numberOfTerms) {
         try {
@@ -104,11 +111,13 @@ public class LuceneTopTermExtract implements Serializable {
     }
 
     /**
-     * Returns the 10 most important terms in the document with the specified id.
+     * Returns the 10 most important terms in the document with the specified
+     * id.
+     *
      * @param id
      * @param reader
      * @param numberOfTerms
-     * @return 
+     * @return
      */
     public Map<String, Double> getTopTerms(int docNr, IndexReader reader, int numberOfTerms) {
         try {
@@ -144,20 +153,22 @@ public class LuceneTopTermExtract implements Serializable {
     }
 
     /**
-     * Adds the 10 most important terms to the document. The document does not need 
-     * to be stored in the index.
+     * Adds the 10 most important terms to the document. The document does not
+     * need to be stored in the index.
+     *
      * @param item
-     * @param reader 
+     * @param reader
      */
     public void addTopTerms(NewsItem item, IndexReader reader) {
         addTopTerms(item, DEFAULT_NUMBER_TERMS, reader);
     }
 
     /**
-     * Adds the most important terms to the document. The document does not need 
+     * Adds the most important terms to the document. The document does not need
      * to be stored in the index.
+     *
      * @param item
-     * @param reader 
+     * @param reader
      */
     public void addTopTerms(NewsItem item, int numberOfTerms, IndexReader reader) {
         try {
@@ -220,8 +231,12 @@ public class LuceneTopTermExtract implements Serializable {
 
     private void updateFrequenciesMapsForRegex(Map<String, Double> freqMap, Map<String, Integer> docFreqMap, String field, String content, IndexReader reader, double weight) throws IOException {
         Matcher m = PATTERN.matcher(content);
+        CharArraySet stopwords = analyzer.getStopwords();
         while (m.find()) {
-            updateFrequenciesMapsForTerm(freqMap, docFreqMap, field, m.group(1).toLowerCase(), reader, weight * 2);
+            String term = m.group(1).toLowerCase();
+            if (!stopwords.contains(term)) {
+                updateFrequenciesMapsForTerm(freqMap, docFreqMap, field, term, reader, weight * 2);
+            }
         }
     }
 

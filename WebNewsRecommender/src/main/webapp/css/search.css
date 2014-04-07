@@ -11,14 +11,14 @@
     padding:0;
     top:0;
     left:0;
-    
+
 }
 
 #results{
     padding:0;
-    margin:0;width:100%;
+    margin:0;
+    width:100%;
     height:100%;
-    
 }
 #articleDiv{
     width: 70%;
@@ -54,21 +54,23 @@
 
 .iconWrapper{
     float: left; 
-    width: 25%; height: auto;
-    max-height: 80px;
-    text-align: center; 
-    vertical-align: central; 
+    height: auto;
+    max-height: 100%;
     margin:2%;
+    width:25%;
 }
 
-img{
+.iconWrapper img{
     width:100%;
     height:auto;
+    margin: auto;
 }
 
 .ui-li-heading{
     overflow: hidden;
     white-space: normal;
+    margin: auto;
+    font-weight: 500;
 }
 
 @media screen and (max-width: 700px) {
