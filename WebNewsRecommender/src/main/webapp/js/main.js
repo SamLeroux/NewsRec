@@ -26,6 +26,11 @@ $(document).ready(function() {
         $("#btnRefresh").addClass("ui-corner-all");
         $("#btnRefresh").removeClass("ui-btn-icon-left");
         $("#btnRefresh").removeClass("ui-shadow");
+        
+        $("#btnBack").addClass("ui-btn-icon-notext");
+        $("#btnBack").addClass("ui-corner-all");
+        $("#btnBack").removeClass("ui-btn-icon-left");
+        $("#btnBack").removeClass("ui-shadow");
     }
     
     fetchRecommendations();

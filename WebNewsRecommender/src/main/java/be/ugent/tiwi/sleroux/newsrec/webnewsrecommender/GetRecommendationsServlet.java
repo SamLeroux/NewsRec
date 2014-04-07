@@ -23,8 +23,6 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.Recommend
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -61,10 +59,11 @@ public class GetRecommendationsServlet extends HttpServlet {
 
             IRecommender recommender = (IRecommender) getServletContext().getAttribute("recommender");
             List<NewsItem> items = recommender.recommend(user, start, count);
-            // No need to send the full text over the network.
+            // No need to send the full text  and the description over the network.
             String empty = "";
             for (NewsItem n : items) {
                 n.setFulltext(empty);
+                n.setDescription(empty);
             }
             IClusterer clusterer = (IClusterer) getServletContext().getAttribute("clusterer");
             List<NewsItemCluster> clusters = clusterer.cluster(items);
