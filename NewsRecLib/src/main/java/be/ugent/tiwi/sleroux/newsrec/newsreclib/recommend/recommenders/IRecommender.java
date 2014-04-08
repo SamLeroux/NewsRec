@@ -25,7 +25,7 @@ import java.util.List;
  */
 public interface IRecommender {
     /**
-     * Recommend "count" item for the user with userid "userid", return only the
+     * Recommend "count" items for the user with userid "userid", return only the
      * items after "start".
      * @param userid
      * @param start

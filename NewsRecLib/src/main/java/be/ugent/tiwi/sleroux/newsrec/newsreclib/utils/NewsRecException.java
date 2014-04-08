@@ -17,7 +17,7 @@
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.utils;
 
 /**
- *
+ * Base class for all custom exceptions.
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class NewsRecException extends Exception{

@@ -59,7 +59,7 @@ public class TrendingTopicRecommender extends LuceneRecommender implements IReco
     public List<NewsItem> recommend(long userid, int start, int count) throws RecommendationException {
         IndexSearcher searcher = null;
         try {
-            String[] trends = trendsDao.getTrends();
+            String[] trends = trendsDao.getTrends(250);
             Query query = buildQuery(trends);
             int hitsPerPage = count;
 

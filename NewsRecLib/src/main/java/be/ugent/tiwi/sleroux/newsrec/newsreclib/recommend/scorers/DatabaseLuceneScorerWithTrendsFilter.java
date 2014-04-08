@@ -30,7 +30,7 @@ import org.apache.lucene.search.SearcherManager;
 public class DatabaseLuceneScorerWithTrendsFilter extends DatabaseLuceneScorer {
 
     private final ITrendsDao trendsDao;
-    private HashSet<String> trends;
+    private final HashSet<String> trends;
     private int cnt = 0;
     private static final Logger logger = Logger.getLogger(DatabaseLuceneScorerWithTrendsFilter.class);
 

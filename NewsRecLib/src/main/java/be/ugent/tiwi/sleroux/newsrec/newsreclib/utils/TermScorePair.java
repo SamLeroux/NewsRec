@@ -16,6 +16,8 @@
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.utils;
 
 /**
+ * Wrapper around a term (string) and a score (double). Instances are comparable
+ * based on the score.
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */

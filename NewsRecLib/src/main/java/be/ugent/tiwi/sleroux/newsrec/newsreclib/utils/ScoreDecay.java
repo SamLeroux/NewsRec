@@ -16,7 +16,7 @@
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.utils;
 
 /**
- *
+ * 
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class ScoreDecay {

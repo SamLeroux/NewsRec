@@ -6,13 +6,7 @@
 
 package be.ugent.tiwi.sleroux.newsrec.recommendationstester;
 
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.StopWordsReader;
-import java.io.File;
 import java.io.IOException;
-import org.apache.lucene.analysis.util.CharArraySet;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.store.FSDirectory;
 
 /**
  *

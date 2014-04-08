@@ -75,7 +75,7 @@ public class LuceneTopTermExtract implements Serializable {
      * docNr. WARNING: document numbers may change, only use this when you are
      * sure you are using the correct document number.
      *
-     * @param id
+     * @param docNr
      * @param reader
      * @return A Map containing the terms and the scores.
      */
@@ -114,7 +114,7 @@ public class LuceneTopTermExtract implements Serializable {
      * Returns the 10 most important terms in the document with the specified
      * id.
      *
-     * @param id
+     * @param docNr
      * @param reader
      * @param numberOfTerms
      * @return
@@ -234,8 +234,15 @@ public class LuceneTopTermExtract implements Serializable {
         CharArraySet stopwords = analyzer.getStopwords();
         while (m.find()) {
             String term = m.group(1).toLowerCase();
-            if (!stopwords.contains(term)) {
-                updateFrequenciesMapsForTerm(freqMap, docFreqMap, field, term, reader, weight * 2);
+            boolean stop = false;
+            int i = 0;
+            String[] comp = term.split(" ");
+            while (i < comp.length && !stop){
+                stop = stopwords.contains(comp[i]);
+                i++;
+            }
+            if (!stopwords.contains(term) && !stop) {
+                updateFrequenciesMapsForTerm(freqMap, docFreqMap, field, term, reader, weight);
             }
         }
     }

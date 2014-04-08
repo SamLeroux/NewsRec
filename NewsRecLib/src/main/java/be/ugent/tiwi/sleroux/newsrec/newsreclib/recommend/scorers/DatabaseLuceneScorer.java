@@ -48,7 +48,6 @@ public class DatabaseLuceneScorer implements IScorer {
      *
      * @param manager
      * @param dao
-     * @param analyzer
      */
     public DatabaseLuceneScorer(SearcherManager manager, IRatingsDao dao) {
         ratingsDao = dao;
@@ -80,19 +79,19 @@ public class DatabaseLuceneScorer implements IScorer {
     protected Map<String, Double> getTopTerms(String item) throws IOException {
         manager.maybeRefreshBlocking();
         IndexSearcher searcher = manager.acquire();
-        IndexReader reader = searcher.getIndexReader();
-        TopScoreDocCollector collector = TopScoreDocCollector.create(1, true);
-        Query q = new TermQuery(new Term("id",item));
-        searcher.search(q,collector);
-        if (collector.getTotalHits() > 0){
-            int docNr = collector.topDocs().scoreDocs[0].doc;
-            Document doc = reader.document(docNr);
-            NewsItem nitem = NewsItemLuceneDocConverter.DocumentToNewsItem(doc);
-            return nitem.getTerms();
-        }else{
-            logger.warn("Could not find document with id="+item);
+        try (IndexReader reader = searcher.getIndexReader()) {
+            TopScoreDocCollector collector = TopScoreDocCollector.create(1, true);
+            Query q = new TermQuery(new Term("id",item));
+            searcher.search(q,collector);
+            if (collector.getTotalHits() > 0){
+                int docNr = collector.topDocs().scoreDocs[0].doc;
+                Document doc = reader.document(docNr);
+                NewsItem nitem = NewsItemLuceneDocConverter.documentToNewsItem(doc);
+                return nitem.getTerms();
+            }else{
+                logger.warn("Could not find document with id="+item);
+            }
         }
-        reader.close();
         manager.release(searcher);
         return new HashMap<>();
     }

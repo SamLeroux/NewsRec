@@ -44,7 +44,7 @@ public abstract class LuceneRecommender implements IRecommender {
 
     protected NewsItem toNewsitem(Document d, int docId) throws IOException {
         logger.debug("Converting document to newsitem");
-        NewsItem item = NewsItemLuceneDocConverter.DocumentToNewsItem(d);
+        NewsItem item = NewsItemLuceneDocConverter.documentToNewsItem(d);
         item.setDocNr(docId);
         return item;
     }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.utils;
 
 import java.util.HashSet;
@@ -22,49 +21,48 @@ import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 
 /**
+ * Fixed size FIFO buffer with linear add() and contains() functionality.
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  * @param <T>
  */
 public class HashCircularBuffer<T> {
+
     private final Queue<T> queue;
     private final Set<T> set;
     private final int capacity;
-    
+
     public HashCircularBuffer(int capacity) {
         this.capacity = capacity;
         queue = new ArrayBlockingQueue<>(capacity);
         set = new HashSet<>(capacity);
     }
-    
-    public synchronized void put(T t){
-        if (!set.contains(t)){
+
+    public synchronized void put(T t) {
+        if (!set.contains(t)) {
             putNoCheck(t);
         }
     }
-    
-    public synchronized void putNoCheck(T t){
-        if (queue.size() == capacity){
+
+    public synchronized void putNoCheck(T t) {
+        if (queue.size() == capacity) {
             T delete = queue.remove();
             set.remove(delete);
         }
         set.add(t);
         queue.offer(t);
     }
-    
-    public boolean contains(T t){
+
+    public boolean contains(T t) {
         return set.contains(t);
     }
-    
-    public int size(){
+
+    public int size() {
         return queue.size();
     }
-    
-    public int capacity(){
+
+    public int capacity() {
         return this.capacity;
     }
-    
-    
-    
-    
+
 }

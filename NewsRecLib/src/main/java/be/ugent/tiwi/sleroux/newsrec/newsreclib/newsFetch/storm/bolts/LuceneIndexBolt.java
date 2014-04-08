@@ -108,7 +108,7 @@ public class LuceneIndexBolt extends BaseRichBolt {
             }
             
             // Convert to lucene document and add to index
-            Document doc = NewsItemLuceneDocConverter.NewsItemToDocument(item);
+            Document doc = NewsItemLuceneDocConverter.newsItemToDocument(item);
             writer.addDocument(doc);
             writer.commit();
             

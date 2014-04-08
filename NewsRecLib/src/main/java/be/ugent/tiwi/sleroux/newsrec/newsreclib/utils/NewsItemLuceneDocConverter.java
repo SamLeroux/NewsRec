@@ -23,8 +23,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
@@ -32,7 +30,6 @@ import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.IndexableField;
-import org.apache.tika.mime.MediaType;
 
 /**
  * Converts NewsItems to Lucene documents and back.
@@ -45,7 +42,12 @@ public class NewsItemLuceneDocConverter {
 
     private static final Gson gson = new Gson();
 
-    public static Document NewsItemToDocument(NewsItem item) {
+    /**
+     * Converts a NewsItem to a Lucene Document.
+     * @param item
+     * @return 
+     */
+    public static Document newsItemToDocument(NewsItem item) {
         Document doc = new Document();
         FieldType ftype = getTextType();
 
@@ -88,7 +90,12 @@ public class NewsItemLuceneDocConverter {
         return doc;
     }
 
-    public static NewsItem DocumentToNewsItem(Document d) {
+    /**
+     * Converts a Lucene Document to a NewsItem
+     * @param d
+     * @return 
+     */
+    public static NewsItem documentToNewsItem(Document d) {
         NewsItem item = new NewsItem();
         IndexableField field;
 

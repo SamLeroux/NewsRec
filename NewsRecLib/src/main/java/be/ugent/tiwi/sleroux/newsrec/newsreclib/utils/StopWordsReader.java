@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.utils;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.config.Config;
@@ -25,11 +24,13 @@ import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.util.CharArraySet;
 
 /**
- *
+ * Provides an easy wey to read a stopwords file.
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class StopWordsReader {
+
     private static final Logger logger = Logger.getLogger(StopWordsReader.class);
+
     public static CharArraySet getStopwords(String stopwordsLocation) throws FileNotFoundException, IOException {
         logger.info("reading stopwords file: " + stopwordsLocation);
         CharArraySet stopw;

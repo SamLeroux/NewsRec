@@ -29,33 +29,33 @@ public class CachingTrendsDaoProxy implements ITrendsDao{
 
     private final ITrendsDao inner;
     private String[] trends = null;
-    private int cnt = 0;
+    private long lastFetched;
     private static final Logger logger = Logger.getLogger(CachingTrendsDaoProxy.class);
     
 
     public CachingTrendsDaoProxy(ITrendsDao inner) {
         this.inner = inner;
+        lastFetched = 0;
     }
     
     
     @Override
     public String[] getTrends() throws TrendsDaoException {
-        if (cnt == 0 || trends == null){
+        long diff = System.currentTimeMillis() - lastFetched;
+        if (trends == null || diff >= 5*60*1000){
             logger.info("requesting trends from inner dao");
             trends = inner.getTrends();
         }
         else{
             logger.info("returning cached trends");
         }
-        cnt++;
-        cnt = cnt % 10;
         return trends;
     }
 
     @Override
     public void updateTrends(String[] trends) throws TrendsDaoException {
         inner.updateTrends(trends);
-        cnt = 0;
+        lastFetched = 0;
     }
 
     @Override
@@ -65,7 +65,15 @@ public class CachingTrendsDaoProxy implements ITrendsDao{
 
     @Override
     public String[] getTrends(int n) throws TrendsDaoException {
-        return inner.getTrends(n);
+        long diff = System.currentTimeMillis() - lastFetched;
+        if (trends == null || diff >= 5*60*1000){
+            logger.info("requesting trends from inner dao");
+            trends = inner.getTrends(n);
+        }
+        else{
+            logger.info("returning cached trends");
+        }
+        return trends;
     }
     
 }

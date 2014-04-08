@@ -73,8 +73,8 @@ public class NewsFetchTopologyStarter {
         builder.setSpout("feedurlspout", new FeedSourceSpout(newsSourceDao));
         builder.setSpout("trendsspout", new GoogleTrendsSpout());
         
-        builder.setBolt("fileOutputBolt", new TermFileOutputBolt(), 1)
-             .allGrouping("trendsspout",StreamIDs.TERMSTREAM);
+//        builder.setBolt("fileOutputBolt", new TermFileOutputBolt(), 1)
+//             .allGrouping("trendsspout",StreamIDs.TERMSTREAM);
         
         builder.setBolt("rssfetchbolt", new RssFetchBolt(), 1)
                 .globalGrouping("feedurlspout", StreamIDs.NEWSSOURCESTREAM);

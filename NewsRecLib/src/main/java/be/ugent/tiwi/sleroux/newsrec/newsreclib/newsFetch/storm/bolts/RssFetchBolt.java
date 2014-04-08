@@ -57,7 +57,6 @@ public class RssFetchBolt extends BaseRichBolt {
     private HashCircularBuffer<String> articlesurlBuffer;
     private transient OutputCollector collector;
     private static final Logger logger = Logger.getLogger(RssFetchBolt.class);
-    private Pattern pattern;
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
@@ -69,7 +68,6 @@ public class RssFetchBolt extends BaseRichBolt {
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         this.collector = collector;
         articlesurlBuffer = new HashCircularBuffer<>(2500);
-        pattern = Pattern.compile("<img src=\"(.*?)\"");
     }
 
     @Override
@@ -204,13 +202,6 @@ public class RssFetchBolt extends BaseRichBolt {
                 }
             }
         }
-
-//        if (image == null && entry.getDescription() != null) {
-//            Matcher m = pattern.matcher(entry.getDescription().getValue());
-//            if (m.find()) {
-//                image = m.group(1);
-//            }
-//        }
 
         if (image != null && image.startsWith("/")) {
             String prefix = source.getRssUrl().getHost();

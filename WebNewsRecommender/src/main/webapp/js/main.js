@@ -1,3 +1,7 @@
+var start = 0;
+var count = 500;
+var canFetch = true;
+
 $(document).ready(function() {
     // Zorg ervoor dat de gebruiker kan zoeken door op enter te drukken in het zoekveld
     $('#queryinput').keypress(function(e) {
@@ -34,6 +38,15 @@ $(document).ready(function() {
     }
 
     fetchRecommendations();
+
+    $(window).scroll(function() {
+        if ($(window).scrollTop() + $(window).height() === $(document).height()) {
+            if (canFetch) {
+                count += 250;
+                fetchRecommendations();
+            }
+        }
+    });
     window.scrollTo(0, 0);
 });
 
@@ -90,11 +103,11 @@ function getItemDisplayLi(item) {
     span.addClass("ui-li-count");
     span.html(item.items.length + 1);
     a.append(span);
-    
+
     li.append(a);
 
 
-    
+
 
 
     console.log(item.representative.title + " : " + item.items.length + " members");
@@ -104,11 +117,13 @@ function getItemDisplayLi(item) {
 
 function displayArticle(url) {
     console.log(url);
+    
     $.mobile.showPageLoadingMsg();
     if (isPhone()) {
         $("#resultsDiv").hide();
         $("#articleDiv").show();
         $("#btnBack").show();
+        canFetch = false;
     }
 
     var iframe = $("#articleFrame");
@@ -125,6 +140,7 @@ function displayArticle(url) {
     iframe.error(function() {
         $.mobile.hidePageLoadingMsg();
     });
+    
 }
 
 
@@ -146,9 +162,9 @@ function ratingClick(event, id, docNr) {
 
 function fetchRecommendations() {
     $.mobile.showPageLoadingMsg();
-
+    canFetch = false;
     $.ajax({
-        url: "GetRecommendations.do?count=250&start=0",
+        url: "GetRecommendations.do?count=" + count + "&start=" + start,
         dataType: "json",
         success: recommendationsFetched,
         error: recommendationsFetchError
@@ -163,19 +179,16 @@ function recommendationsFetched(data) {
         $("#results").append(li);
     }
     $("#results").listview("refresh");
-    window.scrollTo(0, 0);
+    //window.scrollTo(0, 0);
     $.mobile.hidePageLoadingMsg();
+    canFetch = true;
 
 }
 
 function recommendationsFetchError(xhr, errorType, exception) {
     console.log(xhr);
     $.mobile.hidePageLoadingMsg();
-}
-
-
-function articleFrameSourceChanged() {
-    console.log($("#articleFrame").attr("src"));
+    canFetch = true;
 }
 
 
@@ -189,6 +202,7 @@ function btnBackClicked() {
     $("#resultsDiv").show();
     $("#articleDiv").hide();
     $("#btnBack").hide();
+    canFetch = true;
 }
 
 function toDateString(date) {

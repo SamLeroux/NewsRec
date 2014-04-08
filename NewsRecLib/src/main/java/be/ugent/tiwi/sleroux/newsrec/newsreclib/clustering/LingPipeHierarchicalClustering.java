@@ -42,7 +42,7 @@ public class LingPipeHierarchicalClustering implements IClusterer {
         HierarchicalClusterer<NewsItem> clusterer = new SingleLinkClusterer<>(new NewsItemDistance());
         Set<NewsItem> itemSet = new HashSet<>(items);
         Dendrogram<NewsItem> dend = clusterer.hierarchicalCluster(itemSet);
-        Set<Set<NewsItem>> clusters = dend.partitionDistance(0.95);
+        Set<Set<NewsItem>> clusters = dend.partitionDistance(0.85);
 
         List<NewsItemCluster> clusterList = new ArrayList<>(clusters.size());
         for (Set<NewsItem> sn : clusters) {
@@ -65,6 +65,9 @@ public class LingPipeHierarchicalClustering implements IClusterer {
             Set<String> obs1 = enrichTerms(n1.getTerms().keySet());
             Set<String> obs2 = enrichTerms(n2.getTerms().keySet());
 
+            obs1.addAll(Arrays.asList(n1.getTitle().split(" ")));
+            obs2.addAll(Arrays.asList(n2.getTitle().split(" ")));
+
             if (obs1.isEmpty() || obs2.isEmpty()) {
                 logger.warn("distance between " + n1.getId() + " and " + n2.getId() + " not defined, termset is empty");
                 return Double.POSITIVE_INFINITY;
@@ -75,7 +78,7 @@ public class LingPipeHierarchicalClustering implements IClusterer {
                 return ((double) different.size() / (double) (obs1.size() + obs2.size()));
             }
         }
-        
+
         private Set<String> enrichTerms(Set<String> terms) {
             Set<String> result = new HashSet<>();
             for (String term : terms) {

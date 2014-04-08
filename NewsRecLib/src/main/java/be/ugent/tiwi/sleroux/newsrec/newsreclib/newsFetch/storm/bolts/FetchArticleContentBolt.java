@@ -51,6 +51,7 @@ import org.xml.sax.SAXException;
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class FetchArticleContentBolt extends BaseRichBolt {
+
     private static final Logger logger = Logger.getLogger(FetchArticleContentBolt.class);
     private static final ResourceBundle bundle = PropertyResourceBundle.getBundle("newsRec");
 
@@ -68,7 +69,7 @@ public class FetchArticleContentBolt extends BaseRichBolt {
 
     @Override
     public void execute(Tuple input) {
-        
+
         InputStream in = null;
         try {
             NewsItem item = (NewsItem) input.getValueByField(StreamIDs.NEWSARTICLENOCONTENT);
