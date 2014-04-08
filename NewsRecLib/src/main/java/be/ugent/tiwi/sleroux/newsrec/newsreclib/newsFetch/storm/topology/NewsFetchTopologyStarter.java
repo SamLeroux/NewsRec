@@ -112,7 +112,7 @@ public class NewsFetchTopologyStarter {
         conf.put(Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS, 10000);
         conf.put(Config.NIMBUS_SUPERVISOR_TIMEOUT_SECS,10000);
         conf.put(Config.SUPERVISOR_WORKER_TIMEOUT_SECS,10000);
-        conf.put(Config.STORM_CLUSTER_MODE, "local");
+        conf.put(Config.STORM_CLUSTER_MODE,"distributed");
         conf.put(Config.STORM_ZOOKEEPER_CONNECTION_TIMEOUT, 10000);
         conf.put(Config.STORM_ZOOKEEPER_SESSION_TIMEOUT, 10000);
         conf.put(Config.TOPOLOGY_SLEEP_SPOUT_WAIT_STRATEGY_TIME_MS,1000);

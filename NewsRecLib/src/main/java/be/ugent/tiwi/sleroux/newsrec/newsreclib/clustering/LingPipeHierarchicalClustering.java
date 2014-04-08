@@ -22,6 +22,7 @@ import com.aliasi.cluster.HierarchicalClusterer;
 import com.aliasi.cluster.SingleLinkClusterer;
 import com.aliasi.util.Distance;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -61,8 +62,8 @@ public class LingPipeHierarchicalClustering implements IClusterer {
             NewsItem n1 = (NewsItem) e;
             NewsItem n2 = (NewsItem) e1;
 
-            Set<String> obs1 = n1.getTerms().keySet();
-            Set<String> obs2 = n2.getTerms().keySet();
+            Set<String> obs1 = enrichTerms(n1.getTerms().keySet());
+            Set<String> obs2 = enrichTerms(n2.getTerms().keySet());
 
             if (obs1.isEmpty() || obs2.isEmpty()) {
                 logger.warn("distance between " + n1.getId() + " and " + n2.getId() + " not defined, termset is empty");
@@ -73,6 +74,15 @@ public class LingPipeHierarchicalClustering implements IClusterer {
                 different.addAll(obs2);
                 return ((double) different.size() / (double) (obs1.size() + obs2.size()));
             }
+        }
+        
+        private Set<String> enrichTerms(Set<String> terms) {
+            Set<String> result = new HashSet<>();
+            for (String term : terms) {
+                term = term.toLowerCase();
+                result.addAll(Arrays.asList(term.split(" ")));
+            }
+            return result;
         }
 
     }
