@@ -22,7 +22,6 @@ import com.aliasi.cluster.HierarchicalClusterer;
 import com.aliasi.cluster.SingleLinkClusterer;
 import com.aliasi.util.Distance;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,7 +38,7 @@ public class LingPipeHierarchicalClustering implements IClusterer {
     @Override
     public List<NewsItemCluster> cluster(List<NewsItem> items) {
 
-        HierarchicalClusterer<NewsItem> clusterer = new SingleLinkClusterer<>(new NewsItemDistance());
+        HierarchicalClusterer<NewsItem> clusterer = new SingleLinkClusterer<>(new NewsItemDistance(items));
         Set<NewsItem> itemSet = new HashSet<>(items);
         Dendrogram<NewsItem> dend = clusterer.hierarchicalCluster(itemSet);
         Set<Set<NewsItem>> clusters = dend.partitionDistance(0.85);
@@ -57,35 +56,39 @@ public class LingPipeHierarchicalClustering implements IClusterer {
 
     private class NewsItemDistance implements Distance {
 
+        List<HashSet<String>> cache;
+
+        public NewsItemDistance(List<NewsItem> items) {
+            cache = new ArrayList<>(items.size());
+            for (NewsItem item : items) {
+                cache.add(new HashSet<>(item.getTerms().keySet()));
+            }
+
+        }
+
         @Override
         public double distance(Object e, Object e1) {
             NewsItem n1 = (NewsItem) e;
             NewsItem n2 = (NewsItem) e1;
 
-            Set<String> obs1 = enrichTerms(n1.getTerms().keySet());
-            Set<String> obs2 = enrichTerms(n2.getTerms().keySet());
-
-            obs1.addAll(Arrays.asList(n1.getTitle().split(" ")));
-            obs2.addAll(Arrays.asList(n2.getTitle().split(" ")));
+            Set<String> obs1 = cache.get(n1.getDocNr());
+            Set<String> obs2 = cache.get(n2.getDocNr());
 
             if (obs1.isEmpty() || obs2.isEmpty()) {
                 logger.warn("distance between " + n1.getId() + " and " + n2.getId() + " not defined, termset is empty");
                 return Double.POSITIVE_INFINITY;
             } else {
-                Set<String> different = new HashSet<>(obs1.size() + obs2.size());
-                different.addAll(obs1);
-                different.addAll(obs2);
-                return ((double) different.size() / (double) (obs1.size() + obs2.size()));
-            }
-        }
+                int c = 0;
+                for (String s : obs1) {
+                    if (obs2.contains(s)) {
+                        c++;
+                    }
+                }
+                double d = (double) (obs1.size() + obs2.size() - c - c) / (double) (obs1.size() + obs2.size());
 
-        private Set<String> enrichTerms(Set<String> terms) {
-            Set<String> result = new HashSet<>();
-            for (String term : terms) {
-                term = term.toLowerCase();
-                result.addAll(Arrays.asList(term.split(" ")));
+                return d;
             }
-            return result;
+
         }
 
     }

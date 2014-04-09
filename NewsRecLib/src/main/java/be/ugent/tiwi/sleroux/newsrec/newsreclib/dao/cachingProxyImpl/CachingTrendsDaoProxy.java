@@ -45,6 +45,7 @@ public class CachingTrendsDaoProxy implements ITrendsDao{
         if (trends == null || diff >= 5*60*1000){
             logger.info("requesting trends from inner dao");
             trends = inner.getTrends();
+            lastFetched = System.currentTimeMillis();
         }
         else{
             logger.info("returning cached trends");
@@ -69,6 +70,7 @@ public class CachingTrendsDaoProxy implements ITrendsDao{
         if (trends == null || diff >= 5*60*1000){
             logger.info("requesting trends from inner dao");
             trends = inner.getTrends(n);
+            lastFetched = System.currentTimeMillis();
         }
         else{
             logger.info("returning cached trends");
