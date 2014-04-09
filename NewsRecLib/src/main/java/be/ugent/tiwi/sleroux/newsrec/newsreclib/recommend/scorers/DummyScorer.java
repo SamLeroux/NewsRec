@@ -29,5 +29,9 @@ public class DummyScorer implements IScorer{
     @Override
     public void view(long user, String item) {
     }
+
+    @Override
+    public void viewUrl(long user, String url) {
+    }
     
 }

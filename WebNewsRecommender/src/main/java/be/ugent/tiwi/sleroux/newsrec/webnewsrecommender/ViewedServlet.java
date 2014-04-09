@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.webnewsrecommender;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
@@ -21,6 +20,7 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ViewsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.IScorer;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -43,25 +43,42 @@ public class ViewedServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     private static final Logger logger = Logger.getLogger(ViewedServlet.class);
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
-        try {            
-            long user = (Long)request.getSession().getAttribute("userId");
-            int docNr = Integer.parseInt(request.getParameter("docNr"));
-            String itemId = request.getParameter("itemId");
-            
-            IScorer scorer = (IScorer)getServletContext().getAttribute("scorer");
-            scorer.view(user, itemId);
-            
-            IViewsDao viewsdao = (IViewsDao)getServletContext().getAttribute(("viewsDao"));
-            viewsdao.see(user, docNr, itemId);
+        try {
+            Map<String, String> params = request.getParameterMap();
+
+            long user = (Long) request.getSession().getAttribute("userId");
+            System.out.println(user);
+            if (params.containsKey("itemId")) {
+                String itemId = request.getParameterValues("itemId")[0];
+                IScorer scorer = (IScorer) getServletContext().getAttribute("scorer");
+                scorer.view(user, itemId);
+                System.out.println(itemId);
+                if (params.containsKey("docNr")) {
+                    int docNr = Integer.parseInt(request.getParameter("docNr"));
+                    IViewsDao viewsdao = (IViewsDao) getServletContext().getAttribute(("viewsDao"));
+                    viewsdao.see(user, docNr, itemId);
+                }
+            } else if (params.containsKey("url")) {
+                String url = request.getParameterValues("url")[0];
+                IScorer scorer = (IScorer) getServletContext().getAttribute("scorer");
+                scorer.viewUrl(user, url);
+                System.out.println(url);
+            }
+
             out.write("{\"response\":\"OK\"}");
             logger.debug("recorded view");
+
+        } catch (NumberFormatException ex) {
+            logger.error(ex);
+            out.write("{\"exception\":\"" + ex.getMessage() + "\"}");
         } catch (ViewsDaoException ex) {
             logger.error(ex);
-            out.write("{\"exception\":\""+ex.getMessage()+"\"}");
+            out.write("{\"exception\":\"" + ex.getMessage() + "\"}");
         } finally {
             out.close();
         }

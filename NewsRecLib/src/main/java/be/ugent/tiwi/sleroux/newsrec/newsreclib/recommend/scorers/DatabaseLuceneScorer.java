@@ -57,7 +57,7 @@ public class DatabaseLuceneScorer implements IScorer {
     @Override
     public void score(long user, String item, double rating) {
         try {
-            Map<String, Double> termsToStore = getTopTerms(item);
+            Map<String, Double> termsToStore = getTopTerms("id",item);
             if (!termsToStore.isEmpty()) {
                 for (String term : termsToStore.keySet()) {
                     termsToStore.put(term, rating * termsToStore.get(term));
@@ -76,12 +76,30 @@ public class DatabaseLuceneScorer implements IScorer {
         score(user, item, 0.75);
     }
 
-    protected Map<String, Double> getTopTerms(String item) throws IOException {
+    
+
+    @Override
+    public void viewUrl(long user, String url) {
+        try {
+            Map<String, Double> termsToStore = getTopTerms("url",url);
+            if (!termsToStore.isEmpty()) {
+                for (String term : termsToStore.keySet()) {
+                    termsToStore.put(term, 0.75 * termsToStore.get(term));
+                }
+                ratingsDao.giveRating(user, termsToStore);
+                logger.info("Success giving score to item: " + url + " for user: " + user);
+            }
+        } catch (RatingsDaoException | IOException ex) {
+            logger.error(ex.getMessage(), ex);
+        }
+    }
+    
+    protected Map<String, Double> getTopTerms(String field, String value) throws IOException {
         manager.maybeRefreshBlocking();
         IndexSearcher searcher = manager.acquire();
         try (IndexReader reader = searcher.getIndexReader()) {
             TopScoreDocCollector collector = TopScoreDocCollector.create(1, true);
-            Query q = new TermQuery(new Term("id",item));
+            Query q = new TermQuery(new Term(field, value));
             searcher.search(q,collector);
             if (collector.getTotalHits() > 0){
                 int docNr = collector.topDocs().scoreDocs[0].doc;
@@ -89,7 +107,7 @@ public class DatabaseLuceneScorer implements IScorer {
                 NewsItem nitem = NewsItemLuceneDocConverter.documentToNewsItem(doc);
                 return nitem.getTerms();
             }else{
-                logger.warn("Could not find document with id="+item);
+                logger.warn("Could not find document with "+field+"="+value);
             }
         }
         manager.release(searcher);

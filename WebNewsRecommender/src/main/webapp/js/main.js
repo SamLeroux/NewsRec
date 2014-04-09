@@ -1,6 +1,7 @@
 var start = 0;
 var count = 500;
 var canFetch = true;
+var clickInArticle = true;
 
 $(document).ready(function() {
     // Zorg ervoor dat de gebruiker kan zoeken door op enter te drukken in het zoekveld
@@ -39,14 +40,14 @@ $(document).ready(function() {
 
     fetchRecommendations();
 
-    $(window).scroll(function() {
-        if ($(window).scrollTop() + $(window).height() === $(document).height()) {
-            if (canFetch) {
-                count += 250;
-                fetchRecommendations();
-            }
-        }
-    });
+//    $(window).scroll(function() {
+//        if ($(window).scrollTop() + $(window).height() === $(document).height()) {
+//            if (canFetch) {
+//                count += 250;
+//                fetchRecommendations();
+//            }
+//        }
+//    });
     window.scrollTo(0, 0);
 });
 
@@ -60,6 +61,7 @@ function getItemDisplayLi(item) {
 
     var a = $("<a>");
     a.on("click", function(event) {
+        clickInArticle = false;
         displayArticle(item.representative.url);
         ratingClick(event, item.representative.id, item.representative.docNr);
     });
@@ -106,10 +108,6 @@ function getItemDisplayLi(item) {
 
     li.append(a);
 
-
-
-
-
     console.log(item.representative.title + " : " + item.items.length + " members");
     return li;
 
@@ -117,7 +115,7 @@ function getItemDisplayLi(item) {
 
 function displayArticle(url) {
     console.log(url);
-    
+
     $.mobile.showPageLoadingMsg();
     if (isPhone()) {
         $("#resultsDiv").hide();
@@ -135,12 +133,11 @@ function displayArticle(url) {
     iframe.load(function() {
         $.mobile.hidePageLoadingMsg();
         window.scrollTo(0, 0);
-        autoHeight(iframe);
     });
     iframe.error(function() {
         $.mobile.hidePageLoadingMsg();
     });
-    
+
 }
 
 
@@ -149,6 +146,21 @@ function ratingClick(event, id, docNr) {
     $.ajax({
         type: 'POST',
         url: "view.do?itemId=" + id + "&docNr=" + docNr,
+        dataType: "json",
+        success: function() {
+            console.log("recorded view");
+        },
+        error: function() {
+            console.log("error recording view");
+        }
+    });
+
+}
+
+function urlViewed(url) {
+    $.ajax({
+        type: 'POST',
+        url: "view.do?url=" + url,
         dataType: "json",
         success: function() {
             console.log("recorded view");
@@ -192,11 +204,6 @@ function recommendationsFetchError(xhr, errorType, exception) {
 }
 
 
-
-function dispatchEvent(event) {
-    console.log(event.animationName);
-    isPhone = (event.animationName === "phone");
-}
 
 function btnBackClicked() {
     $("#resultsDiv").show();
@@ -252,4 +259,12 @@ function shorten(text, n) {
 
 }
 
-
+function articleFrameSourceChanged(event){
+    if (clickInArticle){
+        var frame = $("#articleFrame");
+        urlViewed(frame.attr("src"));
+    }
+    else{
+        clickInArticle = true;
+    }
+}

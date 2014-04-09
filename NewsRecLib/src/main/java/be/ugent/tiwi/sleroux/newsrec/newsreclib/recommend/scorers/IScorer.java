@@ -23,4 +23,5 @@ package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers;
 public interface IScorer {
     public void score(long user, String item, double rating);
     public void view(long user, String item);
+    public void viewUrl(long user, String url);
 }
