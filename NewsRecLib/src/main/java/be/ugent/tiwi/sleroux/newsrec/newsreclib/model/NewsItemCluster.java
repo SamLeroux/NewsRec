@@ -33,8 +33,7 @@ public class NewsItemCluster {
 
     public void addItem(NewsItem item) {
         if (representative == null
-                || representative.getTimestamp().before(item.getTimestamp())
-                || (representative.getImageUrl() == null && item.getImageUrl() != null)) {
+                || representative.getTimestamp().before(item.getTimestamp())) {
             if (representative != null) {
                 items.add(representative);
             }
