@@ -17,6 +17,7 @@ package be.ugent.tiwi.sleroux.newsrec.webnewsrecommender;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering.IClusterer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering.LingPipeHierarchicalClustering;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering.ThresholdClusterer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ITrendsDao;
@@ -70,7 +71,7 @@ public class NewsRecContextListener implements ServletContextListener {
             scorer = builder.getScorer(RecommenderBuilder.Scorers.WithTrendsFilter);
             sce.getServletContext().setAttribute("scorer", scorer);
 
-            clusterer = new LingPipeHierarchicalClustering();
+            clusterer = new ThresholdClusterer();
             sce.getServletContext().setAttribute("clusterer", clusterer);
 
         } catch (DaoException ex) {

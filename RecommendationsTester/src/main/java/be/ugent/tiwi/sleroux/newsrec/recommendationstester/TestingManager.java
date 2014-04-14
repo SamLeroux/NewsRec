@@ -52,6 +52,7 @@ public class TestingManager {
     }
 
     public void start() throws IOException, InterruptedException {
+        writer.write(Long.toString(System.currentTimeMillis()));
         while (!stop) {
             double results = 0;
             double relevantResults = 0;
@@ -71,7 +72,7 @@ public class TestingManager {
             relevantResultsNotYetSeen /= agents.size();
             neededTime /= agents.size();
             
-            writer.write(results +";"+relevantResults+";"+relevantResultsNotYetSeen+";"+neededTime+"\n");
+            writer.write(System.currentTimeMillis()+";"+results +";"+relevantResults+";"+relevantResultsNotYetSeen+";"+neededTime+"\n");
             writer.flush();
             Thread.sleep(60000);
         }

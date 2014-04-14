@@ -15,7 +15,7 @@ import java.io.IOException;
 public class App {
     public static void main(String[] args) throws IOException, InterruptedException {
         //RecommenderAccess ra = new RecommenderAccess("http://wicaweb5.intec.ugent.be:8080/");
-        RecommenderAccess ra = new RecommenderAccess("http://localhost:8080/");
+        RecommenderAccess ra = new RecommenderAccess("http://localhost:8080/WebNewsRecommender/");
         TestingManager manager = new TestingManager("/home/sam/tester.conf", "/home/sam/tester.csv", ra, 100);
         manager.start();
 //        IndexReader reader = DirectoryReader.open(FSDirectory.open(new File("/home/sam/Bureaublad/index")));
