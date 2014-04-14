@@ -7,19 +7,21 @@
 #resultsDiv{
     float:left;
     margin:0;
-    padding:1%;
     left:0;
     overflow-y: auto;
     overflow-x: hidden;
     width:30%;
-    height:100%;
+    height:90%;
     position:fixed;
 }
 
-#results{
+#results, #relatedResults{
     padding:0; 
     bottom:0;
+}
 
+#relatedResults{
+    display: none;
 }
 
 #articleDiv{
@@ -90,4 +92,12 @@
         width:100%;
         height:100%;
     }
+
+    #results, #relatedResults{
+        padding:0; 
+        bottom:0;
+        width:100%;
+        height:100%
+    }
+
 }
