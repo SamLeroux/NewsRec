@@ -15,8 +15,6 @@
  */
 package be.ugent.tiwi.sleroux.newsrec.webnewsrecommender;
 
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ViewsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.IScorer;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -58,11 +56,6 @@ public class ViewedServlet extends HttpServlet {
                 IScorer scorer = (IScorer) getServletContext().getAttribute("scorer");
                 scorer.view(user, itemId);
                 System.out.println(itemId);
-                if (params.containsKey("docNr")) {
-                    int docNr = Integer.parseInt(request.getParameter("docNr"));
-                    IViewsDao viewsdao = (IViewsDao) getServletContext().getAttribute(("viewsDao"));
-                    viewsdao.see(user, docNr, itemId);
-                }
             } else if (params.containsKey("url")) {
                 String url = request.getParameterValues("url")[0];
                 IScorer scorer = (IScorer) getServletContext().getAttribute("scorer");
@@ -74,9 +67,6 @@ public class ViewedServlet extends HttpServlet {
             logger.debug("recorded view");
 
         } catch (NumberFormatException ex) {
-            logger.error(ex);
-            out.write("{\"exception\":\"" + ex.getMessage() + "\"}");
-        } catch (ViewsDaoException ex) {
             logger.error(ex);
             out.write("{\"exception\":\"" + ex.getMessage() + "\"}");
         } finally {

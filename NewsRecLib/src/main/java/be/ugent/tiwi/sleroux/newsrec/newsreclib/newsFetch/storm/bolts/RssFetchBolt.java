@@ -40,7 +40,6 @@ import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.jdom.Attribute;
 import org.jsoup.Jsoup;

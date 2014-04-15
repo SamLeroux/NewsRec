@@ -15,13 +15,35 @@ public class TestResult {
     private int relevantResults;
     private int relevantResultsNotYetSeen;
     private int neededTime;
+    private double trendingResults;
+    private double personalResults;
 
-    public TestResult(int results, int relevantResults, int relevantResultsNotYetSeen, int neededTime) {
+    public TestResult(int results, int relevantResults, int relevantResultsNotYetSeen, int neededTime, double trendingResults, double personalResults) {
         this.results = results;
         this.relevantResults = relevantResults;
         this.relevantResultsNotYetSeen = relevantResultsNotYetSeen;
         this.neededTime = neededTime;
+        this.trendingResults = trendingResults;
+        this.personalResults = personalResults;
     }
+
+    public double getTrendingResults() {
+        return trendingResults;
+    }
+
+    public void setTrendingResults(double trendingResults) {
+        this.trendingResults = trendingResults;
+    }
+
+    public double getPersonalResults() {
+        return personalResults;
+    }
+
+    public void setPersonalResults(double personalResults) {
+        this.personalResults = personalResults;
+    }
+
+    
 
     public int getResults() {
         return results;

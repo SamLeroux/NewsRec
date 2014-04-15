@@ -101,7 +101,6 @@ public class JDBCTrendsDao extends AbstractJDBCBaseDao implements ITrendsDao, Se
             }
             
             int[] result = insertStatement.executeBatch();
-            logger.debug("return value insert/update: " + result);
         } catch (SQLException | NullPointerException ex) {
             logger.error("Error updating rating", ex);
             throw new TrendsDaoException(ex);

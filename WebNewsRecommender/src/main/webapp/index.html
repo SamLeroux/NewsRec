@@ -10,10 +10,14 @@
     <body>
         <div data-role="page" data-content-view="c">
             <div id="headerDiv" data-role="header">
-                <a id="btnBack" data-icon="back">Back</a>
-                <a id="btnRefresh" data-icon="refresh">Refresh</a>
+                <a id="btnBack" data-icon="back" data-role="button">Back</a>
+                <div class="ui-btn-right">
+                    <a id="btnLogin" data-icon="gear" data-role="button" data-rel="popup">Login</a>
+                    <a id="btnRefresh" data-icon="refresh" data-role="button">Refresh</a>
+                </div>
                 <h2>News Recommendation</h2>
             </div>
+
             <div id="resultsDiv" data-role="content">
                 <ul id="results" data-role="listview">
                 </ul>
@@ -24,8 +28,10 @@
             <div id="articleDiv" data-role="content">
                 <iframe id="articleFrame" ></iframe>
             </div>
-
         </div>
+
+
+
         <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
         <script src="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>
         <script src="js/main.js"></script>

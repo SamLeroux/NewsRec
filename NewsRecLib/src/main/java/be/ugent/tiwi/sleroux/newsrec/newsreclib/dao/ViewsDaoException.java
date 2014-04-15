@@ -16,8 +16,6 @@
 
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao;
 
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
-
 /**
  *
  * @author Sam Leroux <sam.leroux@ugent.be>

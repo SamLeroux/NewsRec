@@ -16,7 +16,6 @@
 package be.ugent.tiwi.sleroux.newsrec.webnewsrecommender;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering.IClusterer;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering.LingPipeHierarchicalClustering;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering.ThresholdClusterer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
@@ -25,7 +24,6 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.cachingProxyImpl.CachingTrendsDaoProxy;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCTrendsDao;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.RecommenderBuildException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.RecommenderBuilder;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.IRecommender;
@@ -54,10 +52,6 @@ public class NewsRecContextListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         try {
-
-            viewsDao = new JDBCViewsDao();
-            sce.getServletContext().setAttribute("viewsDao", viewsDao);
-
             ratingsDao = new JDBCRatingsDao();
             trendsDao = new CachingTrendsDaoProxy(new JDBCTrendsDao());
 

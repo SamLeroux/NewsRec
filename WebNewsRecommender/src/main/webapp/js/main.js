@@ -21,6 +21,10 @@ $(document).ready(function() {
         fetchRecommendations();
     });
 
+    $("#btnLogin").on("click", function() {
+        btnLoginClicked();
+    });
+
     $("#results").listview();
 
     if (isPhone()) {
@@ -62,7 +66,7 @@ function getClusterDisplayLi(cluster) {
     a.on("click", function(event) {
         clickInArticle = false;
         displayArticle(cluster.representative.url);
-        ratingClick(event, cluster.representative.id, cluster.representative.docNr);
+        ratingClick(event, cluster.representative.id);
     });
 
     var p = $("<p>");
@@ -109,6 +113,7 @@ function getClusterDisplayLi(cluster) {
             canFetch = false;
 
             $("#relatedResults").empty();
+            $("#btnRefresh").hide();
             for (var i in cluster.items) {
                 var li = getItemDisplayLi(cluster.items[i]);
                 $("#relatedResults").append(li);
@@ -139,7 +144,7 @@ function getItemDisplayLi(item) {
         lastResults = "RelatedResults";
         clickInArticle = false;
         displayArticle(item.url);
-        ratingClick(event, item.id, item.docNr);
+        ratingClick(event, item.id);
     });
 
     var p = $("<p>");
@@ -206,11 +211,11 @@ function displayArticle(url) {
 }
 
 
-function ratingClick(event, id, docNr) {
+function ratingClick(event, id) {
     event.stopPropagation();
     $.ajax({
         type: 'POST',
-        url: "view.do?itemId=" + id + "&docNr=" + docNr,
+        url: "view.do?itemId=" + id,
         dataType: "json",
         success: function() {
             console.log("recorded view");
@@ -270,9 +275,11 @@ function recommendationsFetchError(xhr, errorType, exception) {
 
 
 function btnBackClicked() {
+    $.mobile.hidePageLoadingMsg();
     if (lastResults === "AllResults") {
         $("#resultsDiv").show();
         $("#btnBack").hide();
+        $("#btnRefresh").show();
         $("#results").show();
         $("#relatedResults").hide();
         canFetch = true;
@@ -348,4 +355,9 @@ function articleFrameSourceChanged(event) {
     else {
         clickInArticle = true;
     }
+}
+
+function btnLoginClicked() {
+    console.log("loginclicked");
+    $.mobile.changePage( "#myDialog", { role: "dialog" } );
 }

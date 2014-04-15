@@ -5,6 +5,7 @@
  */
 package be.ugent.tiwi.sleroux.newsrec.recommendationstester;
 
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItemCluster;
 import java.util.HashSet;
 
@@ -29,8 +30,12 @@ public class ProfileTestingAgent implements ITestingAgent {
     @Override
     public TestResult test() {
         access.logIn(id);
+        
         int relevant = 0;
         int relevantNotYetSeen = 0;
+        double trendingResults = 0;
+        double personalResults = 0;
+        int n = 0;
         long start = System.currentTimeMillis();
         NewsItemCluster[] results = access.getRecommendations();
         int time = (int) (System.currentTimeMillis() - start);
@@ -38,6 +43,24 @@ public class ProfileTestingAgent implements ITestingAgent {
             for (NewsItemCluster cluster : results) {
                 int c = 0;
                 boolean stop = false;
+                
+                for (NewsItem item: cluster.getItems()){
+                    if (item.getRecommendedBy().equals("personal")){
+                        personalResults++;
+                    }
+                    else{
+                        trendingResults++;
+                    }
+                    n++;
+                }
+                n++;
+                if (cluster.getRepresentative().getRecommendedBy().equals("personal")){
+                    personalResults++;
+                }
+                else{
+                    trendingResults++;
+                }
+                
                 while (!stop && c < intrests.length) {
                     stop = cluster.getRepresentative().getTitle().toLowerCase().contains(intrests[c]);
                     stop = stop || cluster.getRepresentative().getDescription().toLowerCase().contains(intrests[c]);
@@ -54,7 +77,9 @@ public class ProfileTestingAgent implements ITestingAgent {
             }
         }
         int length = (results == null ? 0 : results.length);
-        TestResult r = new TestResult(length, relevant, relevantNotYetSeen, time);
+        personalResults /= n;
+        trendingResults /= n;
+        TestResult r = new TestResult(length, relevant, relevantNotYetSeen, time, trendingResults, personalResults);
         return r;
 
     }

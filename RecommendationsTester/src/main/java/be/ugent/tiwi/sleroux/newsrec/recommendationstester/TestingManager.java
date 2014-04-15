@@ -58,21 +58,27 @@ public class TestingManager {
             double relevantResults = 0;
             double relevantResultsNotYetSeen = 0;
             double neededTime = 0;
-
+            double personalResults = 0;
+            double trendingResults = 0;
+            
             for (ProfileTestingAgent agent : agents) {
                 TestResult r = agent.test();
                 results += r.getResults();
                 relevantResults += r.getRelevantResults();
                 relevantResultsNotYetSeen += r.getRelevantResultsNotYetSeen();
                 neededTime += r.getNeededTime();
+                personalResults += r.getPersonalResults();
+                trendingResults += r.getTrendingResults();
             }
             
             results /= agents.size();
             relevantResults /= agents.size();
             relevantResultsNotYetSeen /= agents.size();
             neededTime /= agents.size();
+            personalResults /= agents.size();
+            trendingResults /= agents.size();
             
-            writer.write(System.currentTimeMillis()+";"+results +";"+relevantResults+";"+relevantResultsNotYetSeen+";"+neededTime+"\n");
+            writer.write(System.currentTimeMillis()+";"+results +";"+relevantResults+";"+relevantResultsNotYetSeen+";"+neededTime+";"+personalResults+";"+trendingResults+"\n");
             writer.flush();
             Thread.sleep(60000);
         }
