@@ -20,7 +20,7 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ITrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.RatingsDaoException;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.filters.RecentFilter;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.filters.UniqueResultsFilter;
 import java.io.IOException;
@@ -55,10 +55,10 @@ public class PersonalAndTrendingRecommender extends TrendingTopicRecommender {
     }
 
     @Override
-    public List<NewsItem> recommend(long userid, int start, int count) throws RecommendationException {
+    public List<RecommendedNewsItem> recommend(long userid, int start, int count) throws RecommendationException {
         count = count/2;
         
-        List<NewsItem> results = super.recommend(userid, start, count);
+        List<RecommendedNewsItem> results = super.recommend(userid, start, count);
         
         IndexSearcher searcher = null;
         try {
@@ -83,10 +83,8 @@ public class PersonalAndTrendingRecommender extends TrendingTopicRecommender {
             for (int i = start; i < stop; i++) {
                 int docId = hits[i].doc;
                 Document d = searcher.doc(docId);
-                NewsItem item = toNewsitem(d, docId);
-                item.setRecommendedBy("personal");
+                RecommendedNewsItem item = toNewsitem(d, docId, hits[i].score,"personal");
                 results.add(item);
-
             }
         } catch (RatingsDaoException | IOException ex) {
             logger.error(ex);

@@ -20,7 +20,7 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.filters.S
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.RatingsDaoException;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +57,7 @@ public class LuceneTermRecommender extends LuceneRecommender {
     
 
     @Override
-    public List<NewsItem> recommend(long userid, int start, int count) throws RecommendationException {
+    public List<RecommendedNewsItem> recommend(long userid, int start, int count) throws RecommendationException {
         IndexSearcher searcher = null;
         try {
             Map<String, Double> terms = ratingsDao.getRatings(userid);
@@ -74,12 +74,12 @@ public class LuceneTermRecommender extends LuceneRecommender {
             ScoreDoc[] hits = collector.topDocs().scoreDocs;
 
             int stop = (start + count < hits.length ? start + count : hits.length);
-            List<NewsItem> results = new ArrayList<>(stop - start);
+            List<RecommendedNewsItem> results = new ArrayList<>(stop - start);
 
             for (int i = start; i < stop; i++) {
                 int docId = hits[i].doc;
                 Document d = searcher.doc(docId);
-                results.add(toNewsitem(d, docId));
+                results.add(toNewsitem(d, docId, hits[i].score,"termRecommender"));
                 //System.out.println(docId);
                 //System.out.println(searcher.explain(query, docId).toString());
             }

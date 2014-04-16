@@ -17,8 +17,8 @@ package be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering.distance.DistanceAdapter;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering.distance.JaccardDistance;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItemCluster;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
 import com.aliasi.cluster.Dendrogram;
 import com.aliasi.cluster.HierarchicalClusterer;
 import com.aliasi.cluster.SingleLinkClusterer;
@@ -34,17 +34,17 @@ import java.util.Set;
 public class LingPipeHierarchicalClustering implements IClusterer {
 
     @Override
-    public List<NewsItemCluster> cluster(List<NewsItem> items) {
+    public List<NewsItemCluster> cluster(List<RecommendedNewsItem> items) {
 
-        HierarchicalClusterer<NewsItem> clusterer = new SingleLinkClusterer<>(new DistanceAdapter(new JaccardDistance(items)));
-        Set<NewsItem> itemSet = new HashSet<>(items);
-        Dendrogram<NewsItem> dend = clusterer.hierarchicalCluster(itemSet);
-        Set<Set<NewsItem>> clusters = dend.partitionDistance(0.85);
+        HierarchicalClusterer<RecommendedNewsItem> clusterer = new SingleLinkClusterer<>(new DistanceAdapter(new JaccardDistance(items)));
+        Set<RecommendedNewsItem> itemSet = new HashSet<>(items);
+        Dendrogram<RecommendedNewsItem> dend = clusterer.hierarchicalCluster(itemSet);
+        Set<Set<RecommendedNewsItem>> clusters = dend.partitionDistance(0.85);
 
         List<NewsItemCluster> clusterList = new ArrayList<>(clusters.size());
-        for (Set<NewsItem> sn : clusters) {
+        for (Set<RecommendedNewsItem> sn : clusters) {
             NewsItemCluster nc = new NewsItemCluster();
-            for (NewsItem ni : sn) {
+            for (RecommendedNewsItem ni : sn) {
                 nc.addItem(ni);
             }
             clusterList.add(nc);

@@ -20,6 +20,7 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.filters.S
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ViewsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.ScoreDecay;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -63,7 +64,7 @@ public class TopNRecommender extends LuceneRecommender {
     }
 
     @Override
-    public List<NewsItem> recommend(long userid, int start, int count) throws RecommendationException {
+    public List<RecommendedNewsItem> recommend(long userid, int start, int count) throws RecommendationException {
         IndexSearcher searcher = null;
         try {
             List<Long> ids = viewsDao.getNMostSeenArticles(start, start + count);
@@ -79,12 +80,12 @@ public class TopNRecommender extends LuceneRecommender {
             ScoreDoc[] hits = collector.topDocs().scoreDocs;
 
             int stop = (start + count < hits.length ? start + count : hits.length);
-            List<NewsItem> results = new ArrayList<>(stop - start);
+            List<RecommendedNewsItem> results = new ArrayList<>(stop - start);
 
             for (int i = start; i < stop; i++) {
                 int docId = hits[i].doc;
                 Document d = searcher.doc(docId);
-                results.add(toNewsitem(d, docId));
+                results.add(toNewsitem(d, docId, hits[i].score, "topN"));
             }
 
             return results;

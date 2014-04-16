@@ -16,6 +16,7 @@
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.utils;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
 import com.google.gson.Gson;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -95,8 +96,8 @@ public class NewsItemLuceneDocConverter {
      * @param d
      * @return 
      */
-    public static NewsItem documentToNewsItem(Document d) {
-        NewsItem item = new NewsItem();
+    public static RecommendedNewsItem documentToNewsItem(Document d) {
+        RecommendedNewsItem item = new RecommendedNewsItem();
         IndexableField field;
 
         field = d.getField("description");

@@ -38,7 +38,6 @@ public class NewsItem {
      * on the numeric value.
      */
     private String id;
-    private int docNr;
     private String title;
     private List<String> authors;
     private String fulltext;
@@ -51,7 +50,6 @@ public class NewsItem {
     private URL url;
     private URL imageUrl;
     
-    private String recommendedBy;
 
     public NewsItem() {
         terms = new HashMap<>();
@@ -59,13 +57,12 @@ public class NewsItem {
         id = Long.toString(Math.abs(UUID.randomUUID().getLeastSignificantBits()));
     }
 
-    public NewsItem(String title, int docNr, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Double> terms, Locale locale, String source, URL url, URL imageUrl) {
-        this(Long.toString(Math.abs(UUID.randomUUID().getLeastSignificantBits())), docNr, title, authors, fulltext, description, timestamp, terms, locale, source, url, imageUrl);
+    public NewsItem(String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Double> terms, Locale locale, String source, URL url, URL imageUrl) {
+        this(Long.toString(Math.abs(UUID.randomUUID().getLeastSignificantBits())), title, authors, fulltext, description, timestamp, terms, locale, source, url, imageUrl);
     }
 
-    public NewsItem(String id, int docNr, String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Double> terms, Locale locale, String source, URL url, URL imageUrl) {
+    public NewsItem(String id, String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Double> terms, Locale locale, String source, URL url, URL imageUrl) {
         this.id = id;
-        this.docNr = docNr;
         this.title = title;
         this.authors = authors;
         this.fulltext = fulltext;
@@ -199,25 +196,13 @@ public class NewsItem {
 
     }
 
-    public int getDocNr() {
-        return docNr;
-    }
-
-    public void setDocNr(int docNr) {
-        this.docNr = docNr;
-    }
+   
 
     public void setAuthors(List<String> authors) {
         this.authors = authors;
     }
 
-    public String getRecommendedBy() {
-        return recommendedBy;
-    }
-
-    public void setRecommendedBy(String recommendedBy) {
-        this.recommendedBy = recommendedBy;
-    }
+   
     
     
 

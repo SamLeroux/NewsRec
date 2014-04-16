@@ -7,6 +7,7 @@ package be.ugent.tiwi.sleroux.newsrec.recommendationstester;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItemCluster;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -24,9 +25,9 @@ public class CustomDeserializer implements JsonDeserializer<NewsItemCluster> {
     @Override
     public NewsItemCluster deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject jo = json.getAsJsonObject();
-        NewsItem[] items = context.deserialize(jo.get("items"), NewsItem[].class);
+        RecommendedNewsItem[] items = context.deserialize(jo.get("items"), RecommendedNewsItem[].class);
 
-        NewsItem rep = context.deserialize(jo.get("representative"), NewsItem.class);
+        RecommendedNewsItem rep = context.deserialize(jo.get("representative"), RecommendedNewsItem.class);
         NewsItemCluster cluster = new NewsItemCluster();
         cluster.setItems(Arrays.asList(items));
         cluster.setRepresentative(rep);

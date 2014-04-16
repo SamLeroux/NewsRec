@@ -16,6 +16,7 @@
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.NewsItemLuceneDocConverter;
 import java.io.IOException;
 import org.apache.log4j.Logger;
@@ -42,9 +43,11 @@ public abstract class LuceneRecommender implements IRecommender {
         this.manager = manager;
     }
 
-    protected NewsItem toNewsitem(Document d, int docId) throws IOException {
-        NewsItem item = NewsItemLuceneDocConverter.documentToNewsItem(d);
+    protected RecommendedNewsItem toNewsitem(Document d, int docId, float score, String recommendedBy) throws IOException {
+        RecommendedNewsItem item = NewsItemLuceneDocConverter.documentToNewsItem(d);
         item.setDocNr(docId);
+        item.setScore(score);
+        item.setRecommendedBy(recommendedBy);
         return item;
     }
 

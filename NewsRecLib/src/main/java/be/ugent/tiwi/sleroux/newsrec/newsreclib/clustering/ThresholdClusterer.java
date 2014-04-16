@@ -18,8 +18,8 @@ package be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering.distance.IDistance;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering.distance.JaccardDistance;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItemCluster;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,12 +34,12 @@ public class ThresholdClusterer implements IClusterer {
     private List<List<Integer>> clusterToItems;
 
     @Override
-    public List<NewsItemCluster> cluster(List<NewsItem> items) {
+    public List<NewsItemCluster> cluster(List<RecommendedNewsItem> items) {
         itemToCLuster = new int[items.size()];
         clusterToItems = new ArrayList<>(items.size());
         
         for (int i = 0; i < items.size(); i++) {
-            items.get(i).setDocNr(i);
+            items.get(i).setRecommendationId(i);
             itemToCLuster[i] = i;
             List<Integer> l = new LinkedList<>();
             l.add(i);

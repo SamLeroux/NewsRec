@@ -24,14 +24,14 @@ import java.util.List;
  */
 public class NewsItemCluster {
 
-    private List<NewsItem> items;
-    private NewsItem representative;
+    private List<RecommendedNewsItem> items;
+    private RecommendedNewsItem representative;
 
     public NewsItemCluster() {
         items = new ArrayList<>();
     }
 
-    public void addItem(NewsItem item) {
+    public void addItem(RecommendedNewsItem item) {
         if (representative == null
                 || representative.getTimestamp().before(item.getTimestamp())) {
             if (representative != null) {
@@ -47,19 +47,19 @@ public class NewsItemCluster {
         return items.size();
     }
 
-    public List<NewsItem> getItems() {
+    public List<RecommendedNewsItem> getItems() {
         return items;
     }
 
-    public NewsItem getRepresentative() {
+    public RecommendedNewsItem getRepresentative() {
         return representative;
     }
 
-    public void setRepresentative(NewsItem representative) {
+    public void setRepresentative(RecommendedNewsItem representative) {
         this.representative = representative;
     }
 
-    public void setItems(List<NewsItem> items) {
+    public void setItems(List<RecommendedNewsItem> items) {
         this.items = items;
     }
 

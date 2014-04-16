@@ -16,6 +16,7 @@
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering.distance;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -25,7 +26,7 @@ public class JaccardDistance implements IDistance {
 
     private final List<HashSet<String>> cache;
 
-    public JaccardDistance(List<NewsItem> items) {
+    public JaccardDistance(List<RecommendedNewsItem> items) {
         cache = new ArrayList<>(items.size());
         for (NewsItem item : items) {
             cache.add(new HashSet<>(item.getTerms().keySet()));
@@ -34,10 +35,10 @@ public class JaccardDistance implements IDistance {
     }
 
     @Override
-    public double distance(NewsItem n1, NewsItem n2) {
+    public double distance(RecommendedNewsItem n1, RecommendedNewsItem n2) {
 
-        Set<String> obs1 = cache.get(n1.getDocNr());
-        Set<String> obs2 = cache.get(n2.getDocNr());
+        Set<String> obs1 = cache.get(n1.getRecommendationId());
+        Set<String> obs2 = cache.get(n2.getRecommendationId());
 
         if (obs1.isEmpty() || obs2.isEmpty()) {
             return Double.POSITIVE_INFINITY;

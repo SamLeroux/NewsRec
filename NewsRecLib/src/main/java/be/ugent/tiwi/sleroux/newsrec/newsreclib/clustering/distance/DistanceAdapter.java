@@ -16,7 +16,7 @@
 
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering.distance;
 
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
 import com.aliasi.util.Distance;
 
 /**
@@ -34,8 +34,8 @@ public class DistanceAdapter implements Distance{
     
     @Override
     public double distance(Object e, Object e1) {
-        NewsItem n1 = (NewsItem)e;
-        NewsItem n2 = (NewsItem)e1;
+        RecommendedNewsItem n1 = (RecommendedNewsItem)e;
+        RecommendedNewsItem n2 = (RecommendedNewsItem)e1;
         
         return distance.distance(n1, n2);
     }

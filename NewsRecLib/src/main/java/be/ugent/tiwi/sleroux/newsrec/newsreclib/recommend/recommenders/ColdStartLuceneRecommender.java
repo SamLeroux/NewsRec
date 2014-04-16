@@ -19,6 +19,7 @@ package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
 import java.io.IOException;
 import java.util.List;
 import org.apache.lucene.search.SearcherManager;
@@ -38,10 +39,10 @@ public class ColdStartLuceneRecommender implements IRecommender{
 
     
     @Override
-    public List<NewsItem> recommend(long userid, int start, int count) throws RecommendationException {
-        List<NewsItem> results = r1.recommend(userid, start, count);
+    public List<RecommendedNewsItem> recommend(long userid, int start, int count) throws RecommendationException {
+        List<RecommendedNewsItem> results = r1.recommend(userid, start, count);
         if (results.size() < count){
-            List<NewsItem> results2 = r2.recommend(userid, start, count);
+            List<RecommendedNewsItem> results2 = r2.recommend(userid, start, count);
             int i = 0;
             while (results.size() < count && i < results2.size()){
                 results.add(results2.get(i));

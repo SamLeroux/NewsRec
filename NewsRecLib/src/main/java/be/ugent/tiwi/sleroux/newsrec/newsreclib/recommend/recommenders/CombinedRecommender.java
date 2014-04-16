@@ -16,7 +16,7 @@
 
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders;
 
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,9 +39,9 @@ public class CombinedRecommender implements IRecommender{
     
 
     @Override
-    public List<NewsItem> recommend(long userid, int start, int count) throws RecommendationException {
+    public List<RecommendedNewsItem> recommend(long userid, int start, int count) throws RecommendationException {
         if (!recommenders.isEmpty()){
-            List<NewsItem> results = recommenders.get(0).recommend(userid, start, count);
+            List<RecommendedNewsItem> results = recommenders.get(0).recommend(userid, start, count);
             for (int i = 1; i < recommenders.size();i++){
                 results.addAll(recommenders.get(i).recommend(userid, start, count));
             }

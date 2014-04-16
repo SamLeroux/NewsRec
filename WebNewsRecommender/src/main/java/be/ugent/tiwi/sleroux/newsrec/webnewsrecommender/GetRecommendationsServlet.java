@@ -18,6 +18,7 @@ package be.ugent.tiwi.sleroux.newsrec.webnewsrecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering.IClusterer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItemCluster;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.IRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.RecommendationException;
 import com.google.gson.Gson;
@@ -58,7 +59,7 @@ public class GetRecommendationsServlet extends HttpServlet {
             int count = Integer.parseInt(request.getParameter("count"));
 
             IRecommender recommender = (IRecommender) getServletContext().getAttribute("recommender");
-            List<NewsItem> items = recommender.recommend(user, start, count);
+            List<RecommendedNewsItem> items = recommender.recommend(user, start, count);
             // No need to send the full text  and the description over the network.
             String empty = "";
             for (NewsItem n : items) {

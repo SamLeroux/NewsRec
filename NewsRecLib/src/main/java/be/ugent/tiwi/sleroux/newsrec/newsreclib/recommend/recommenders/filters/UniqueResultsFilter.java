@@ -15,10 +15,9 @@
  */
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.filters;
 
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
 import java.io.IOException;
 import java.util.List;
-import org.apache.log4j.Logger;
 import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.search.DocIdSet;
@@ -32,10 +31,8 @@ import org.apache.lucene.util.OpenBitSet;
  */
 public class UniqueResultsFilter extends Filter {
 
-    private final List<NewsItem> items;
-    private static final Logger logger = Logger.getLogger(UniqueResultsFilter.class);
-
-    public UniqueResultsFilter(List<NewsItem> items) {
+    private final List<RecommendedNewsItem> items;
+    public UniqueResultsFilter(List<RecommendedNewsItem> items) {
         this.items = items;
     }
 
@@ -51,7 +48,7 @@ public class UniqueResultsFilter extends Filter {
         // Mark all documents as active
         bits.set(0, maxId);
 
-        for (NewsItem item : items) {
+        for (RecommendedNewsItem item : items) {
             int relative = item.getDocNr() - docBase; // relative id in this context
             if (relative >= 0 && relative < maxId) {
                 bits.fastClear(item.getDocNr() - docBase);

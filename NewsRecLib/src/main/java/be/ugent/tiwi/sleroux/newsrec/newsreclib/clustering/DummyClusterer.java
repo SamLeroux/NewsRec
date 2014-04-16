@@ -16,8 +16,8 @@
 
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering;
 
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItemCluster;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,9 +28,9 @@ import java.util.List;
 public class DummyClusterer implements IClusterer{
 
     @Override
-    public List<NewsItemCluster> cluster(List<NewsItem> items) {
+    public List<NewsItemCluster> cluster(List<RecommendedNewsItem> items) {
         List<NewsItemCluster> clusters = new ArrayList<>(items.size());
-        for (NewsItem item: items){
+        for (RecommendedNewsItem item: items){
             NewsItemCluster c = new NewsItemCluster();
             c.setRepresentative(item);
             clusters.add(c);

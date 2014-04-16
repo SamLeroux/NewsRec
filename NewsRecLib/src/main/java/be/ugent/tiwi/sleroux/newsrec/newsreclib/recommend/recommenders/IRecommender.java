@@ -16,7 +16,7 @@
 
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders;
 
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
 import java.util.List;
 
 /**
@@ -33,5 +33,5 @@ public interface IRecommender {
      * @return 
      * @throws be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.RecommendationException 
      */
-    public List<NewsItem> recommend(long userid, int start, int count) throws RecommendationException;
+    public List<RecommendedNewsItem> recommend(long userid, int start, int count) throws RecommendationException;
 }

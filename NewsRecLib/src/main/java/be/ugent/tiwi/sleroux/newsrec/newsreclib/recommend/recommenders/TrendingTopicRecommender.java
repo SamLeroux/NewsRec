@@ -20,6 +20,7 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ITrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.TrendsDaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.filters.RecentFilter;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.ScoreDecay;
 import java.io.IOException;
@@ -56,7 +57,7 @@ public class TrendingTopicRecommender extends LuceneRecommender implements IReco
     }
 
     @Override
-    public List<NewsItem> recommend(long userid, int start, int count) throws RecommendationException {
+    public List<RecommendedNewsItem> recommend(long userid, int start, int count) throws RecommendationException {
         IndexSearcher searcher = null;
         try {
             String[] trends = trendsDao.getTrends(250);
@@ -76,13 +77,12 @@ public class TrendingTopicRecommender extends LuceneRecommender implements IReco
             ScoreDoc[] hits = collector.topDocs().scoreDocs;
 
             int stop = (start + count < hits.length ? start + count : hits.length);
-            List<NewsItem> results = new ArrayList<>(stop - start);
+            List<RecommendedNewsItem> results = new ArrayList<>(stop - start);
 
             for (int i = start; i < stop; i++) {
                 int docId = hits[i].doc;
                 Document d = searcher.doc(docId);
-                NewsItem item = toNewsitem(d, docId);
-                item.setRecommendedBy("trending");
+                RecommendedNewsItem item = toNewsitem(d, docId, hits[i].score, "trending");
                 results.add(item);
             }
 

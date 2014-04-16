@@ -28,6 +28,7 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCTrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItemCluster;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.StormException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.IRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.RecommendationException;
@@ -106,7 +107,7 @@ public class ConsoleNewsRecommender {
     }
 
     public void testClustering() throws RecommendationException{
-        List<NewsItem> results = rec.recommend(userid, 0, 250);
+        List<RecommendedNewsItem> results = rec.recommend(userid, 0, 250);
         long start = System.currentTimeMillis();
         IClusterer clusterer = new LingPipeHierarchicalClustering();
         List<NewsItemCluster> clusters = clusterer.cluster(results);
@@ -123,7 +124,7 @@ public class ConsoleNewsRecommender {
    
 
     public void testrecommendation() throws RecommendationException {
-        List<NewsItem> results = rec.recommend(userid, 0, 20);
+        List<RecommendedNewsItem> results = rec.recommend(userid, 0, 20);
         for (NewsItem item : results) {
             System.out.print(item.getTitle());
             System.out.print(" : ");

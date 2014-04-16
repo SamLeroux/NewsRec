@@ -16,12 +16,12 @@
 
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering.distance;
 
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
 
 /**
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public interface IDistance {
-    public double distance(NewsItem n1, NewsItem n2);
+    public double distance(RecommendedNewsItem n1, RecommendedNewsItem n2);
 }

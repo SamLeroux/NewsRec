@@ -7,6 +7,7 @@ package be.ugent.tiwi.sleroux.newsrec.recommendationstester;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItemCluster;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
 import java.util.HashSet;
 
 /**
@@ -44,7 +45,7 @@ public class ProfileTestingAgent implements ITestingAgent {
                 int c = 0;
                 boolean stop = false;
                 
-                for (NewsItem item: cluster.getItems()){
+                for (RecommendedNewsItem item: cluster.getItems()){
                     if (item.getRecommendedBy().equals("personal")){
                         personalResults++;
                     }
