@@ -167,6 +167,7 @@ public class LuceneTopTermExtract implements Serializable {
      * to be stored in the index.
      *
      * @param item
+     * @param numberOfTerms
      * @param reader
      */
     public void addTopTerms(NewsItem item, int numberOfTerms, IndexReader reader) {

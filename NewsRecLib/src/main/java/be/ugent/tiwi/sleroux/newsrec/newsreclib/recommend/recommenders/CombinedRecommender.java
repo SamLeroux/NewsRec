@@ -24,6 +24,7 @@ import java.util.List;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
+@Deprecated
 public class CombinedRecommender implements IRecommender{
     
     private final List<IRecommender> recommenders;

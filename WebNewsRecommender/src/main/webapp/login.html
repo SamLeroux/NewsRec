@@ -1,0 +1,35 @@
+<!DOCTYPE html> 
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1"> 
+
+
+        <title>Login</title> 
+    </head> 
+    <body> 
+        <div id="loginDialog" data-role="popup">
+            <div data-role="header" data-theme="d">
+                <h1>Login</h1>
+            </div>
+
+            <div data-role="content" data-theme="c">
+                <div data-role="fieldcontain">
+                    <label for="name">Username:</label>
+                    <input type="text" name="name" id="name" value="" />
+                </div>
+                <div data-role="fieldcontain">
+                    <label for="name">Password:</label>
+                    <input type="password" name="name" id="pass1" value="" />
+                </div>
+                <div data-role="fieldcontain" id="confirmPass">
+                    <label for="name">Confirm password:</label>
+                    <input type="password" name="name" id="pass2" value="" />
+                </div>
+                <input type="button" data-theme="b" name="submit" id="submit" value="Submit">
+                <a id="btnRegister" href="">Register</a> or <a href="facebook.html" data-rel="dialog" data-transition="flip" id="facebook">Login with facebook</a>
+            </div>
+        </div>
+        <script src="js/userUtils.js"></script>
+    </body>
+</html>

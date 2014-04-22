@@ -44,7 +44,7 @@ public class NewsItemCluster {
     }
 
     public int getSize() {
-        return items.size();
+        return items.size()+1;
     }
 
     public List<RecommendedNewsItem> getItems() {

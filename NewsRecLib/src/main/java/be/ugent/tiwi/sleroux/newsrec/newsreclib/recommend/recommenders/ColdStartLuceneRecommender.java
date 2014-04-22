@@ -18,7 +18,6 @@ package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
 import java.io.IOException;
 import java.util.List;
@@ -28,6 +27,7 @@ import org.apache.lucene.search.SearcherManager;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
+@Deprecated
 public class ColdStartLuceneRecommender implements IRecommender{
     private final LuceneTermRecommender r1;
     private final TopNRecommender r2;

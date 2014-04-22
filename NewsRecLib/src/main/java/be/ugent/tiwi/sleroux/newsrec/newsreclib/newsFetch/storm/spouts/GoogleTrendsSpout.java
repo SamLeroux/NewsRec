@@ -40,7 +40,8 @@ import org.apache.log4j.Logger;
 import org.apache.tika.io.IOUtils;
 
 /**
- *
+ * A spout to fetch the latest google search trends. These keywords can be used to 
+ * recommend articles about trending topics.
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class GoogleTrendsSpout extends BaseRichSpout {

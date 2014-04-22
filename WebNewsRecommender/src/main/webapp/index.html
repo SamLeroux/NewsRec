@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <title>News Recommendation</title>
-        <link href="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.css" type="text/css" rel="stylesheet" />
+        <link href="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.css" type="text/css" rel="stylesheet" />
         <link href="css/search.css" type="text/css" rel="stylesheet"/>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
     </head>
@@ -12,7 +12,7 @@
             <div id="headerDiv" data-role="header">
                 <a id="btnBack" data-icon="back" data-role="button">Back</a>
                 <div class="ui-btn-right">
-                    <a id="btnLogin" data-icon="gear" data-role="button" data-rel="popup">Login</a>
+                    <a id="btnLogin" data-icon="gear" href="#loginDialog" data-role="button" data-rel="popup" >Login</a>
                     <a id="btnRefresh" data-icon="refresh" data-role="button">Refresh</a>
                 </div>
                 <h2>News Recommendation</h2>
@@ -21,19 +21,45 @@
             <div id="resultsDiv" data-role="content">
                 <ul id="results" data-role="listview">
                 </ul>
+            </div>
+            <div id="relatedResultsDiv" data-role="content">
                 <ul id="relatedResults" data-role="listview">
                 </ul>
             </div>
 
+
             <div id="articleDiv" data-role="content">
                 <iframe id="articleFrame" ></iframe>
             </div>
+
+            <div id="loginDialog" data-role="popup">
+                <div data-role="header" data-theme="d">
+                    <h1>Login</h1>
+                </div>
+
+                <div data-role="content" data-theme="c">
+                    <div data-role="fieldcontain">
+                        <label for="name">Username:</label>
+                        <input type="text" name="name" id="name" value="" />
+                    </div>
+                    <div data-role="fieldcontain">
+                        <label for="name">Password:</label>
+                        <input type="password" name="name" id="pass1" value="" />
+                    </div>
+                    <div data-role="fieldcontain" id="confirmPass">
+                        <label for="name">Confirm password:</label>
+                        <input type="password" name="name" id="pass2" value="" />
+                    </div>
+                    <input type="button" data-theme="b" name="submit" id="submit" value="Submit">
+                    <a id="btnRegister" href="">Register</a> or <a href="facebook.html" data-rel="dialog" data-transition="flip" id="facebook">Login with facebook</a>
+                </div>
+            </div>
+
         </div>
 
-
-
         <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-        <script src="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>
+        <script src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
         <script src="js/main.js"></script>
+        <script src="js/userUtils.js"></script>
     </body>
 </html>

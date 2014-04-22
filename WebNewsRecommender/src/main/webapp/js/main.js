@@ -1,5 +1,21 @@
+/* 
+ * Copyright 2014 Sam Leroux <sam.leroux@ugent.be>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 var start = 0;
-var count = 500;
+var count = 250;
 
 var canFetch = true;
 var clickInArticle = true;
@@ -37,6 +53,11 @@ $(document).ready(function() {
         $("#btnBack").addClass("ui-corner-all");
         $("#btnBack").removeClass("ui-btn-icon-left");
         $("#btnBack").removeClass("ui-shadow");
+        
+        $("#btnLogin").addClass("ui-btn-icon-notext");
+        $("#btnLogin").addClass("ui-corner-all");
+        $("#btnLogin").removeClass("ui-btn-icon-left");
+        $("#btnLogin").removeClass("ui-shadow");
     }
 
     fetchRecommendations();
@@ -84,12 +105,12 @@ function getClusterDisplayLi(cluster) {
 
 
 
-    if (cluster.representative.recommendedBy === "personal") {
-        h1.css("color", "red");
-    }
-    else if (cluster.representative.recommendedBy === "trending") {
-        h1.css("color", "green");
-    }
+//    if (cluster.representative.recommendedBy === "personal") {
+//        h1.css("color", "red");
+//    }
+//    else if (cluster.representative.recommendedBy === "trending") {
+//        h1.css("color", "green");
+//    }
     a.append(h1);
 
     var h3 = $("<p>");
@@ -120,12 +141,14 @@ function getClusterDisplayLi(cluster) {
             }
 
             $("#relatedResults").listview("refresh");
-            $("#results").hide();
-            $("#relatedResults").show();
+            $("#resultsDiv").hide();
+            $("#relatedResultsDiv").show();
             $("#btnBack").show();
         });
         span.html(cluster.items.length);
         a.append(span);
+
+    
     }
 
     li.append(a);
@@ -133,13 +156,17 @@ function getClusterDisplayLi(cluster) {
     console.log(cluster.representative.title + " : " + cluster.items.length + " members");
     return li;
 
+
 }
 
+                                
 function getItemDisplayLi(item) {
     var li = $("<li>");
 
 
     var a = $("<a>");
+    
+
     a.on("click", function(event) {
         lastResults = "RelatedResults";
         clickInArticle = false;
@@ -162,12 +189,12 @@ function getItemDisplayLi(item) {
 
 
 
-    if (item.recommendedBy === "personal") {
-        h1.css("color", "red");
-    }
-    else if (item.recommendedBy === "trending") {
-        h1.css("color", "green");
-    }
+//    if (item.recommendedBy === "personal") {
+//        h1.css("color", "red");
+//    }
+//    else if (item.recommendedBy === "trending") {
+//        h1.css("color", "green");
+//    }
     a.append(h1);
 
     var h3 = $("<p>");
@@ -188,7 +215,7 @@ function getItemDisplayLi(item) {
 
 }
 function displayArticle(url) {
-    $.mobile.showPageLoadingMsg();
+    $.mobile.loading('show');
     if (isPhone()) {
         $("#resultsDiv").hide();
         $("#articleDiv").show();
@@ -201,11 +228,12 @@ function displayArticle(url) {
     iframe.show();
 
     iframe.load(function() {
-        $.mobile.hidePageLoadingMsg();
+        console.log("iframe source changed 2: "+iframe.attr("src"));
+        $.mobile.loading('hide');
         window.scrollTo(0, 0);
     });
     iframe.error(function() {
-        $.mobile.hidePageLoadingMsg();
+        $.mobile.loading('hide');
     });
 
 }
@@ -243,7 +271,7 @@ function urlViewed(url) {
 }
 
 function fetchRecommendations() {
-    $.mobile.showPageLoadingMsg();
+    $.mobile.loading('show');
     canFetch = false;
     $.ajax({
         url: "GetRecommendations.do?count=" + count + "&start=" + start,
@@ -261,36 +289,34 @@ function recommendationsFetched(data) {
         $("#results").append(li);
     }
     $("#results").listview("refresh");
-    $.mobile.hidePageLoadingMsg();
+    $.mobile.loading('hide');
     canFetch = true;
 
 }
 
 function recommendationsFetchError(xhr, errorType, exception) {
     console.log(xhr);
-    $.mobile.hidePageLoadingMsg();
+    $.mobile.loading('hide');
     canFetch = true;
 }
 
 
 
 function btnBackClicked() {
-    $.mobile.hidePageLoadingMsg();
+    $.mobile.loading('hide');
     if (lastResults === "AllResults") {
         $("#resultsDiv").show();
         $("#btnBack").hide();
         $("#btnRefresh").show();
-        $("#results").show();
-        $("#relatedResults").hide();
+        $("#relatedResultsDiv").hide();
         canFetch = true;
         if (isPhone()) {
             $("#articleDiv").hide();
         }
     }
     else if (lastResults === "RelatedResults") {
-        $("#resultsDiv").show();
-        $("#results").hide();
-        $("#relatedResults").show();
+        $("#resultsDiv").hide();
+        $("#relatedResultsDiv").show();
         lastResults = "AllResults";
         canFetch = false;
         if (isPhone()) {
@@ -348,6 +374,7 @@ function shorten(text, n) {
 }
 
 function articleFrameSourceChanged(event) {
+    console.log("iframe source changed: "+$("#articleFrame").attr("src"));
     if (clickInArticle) {
         var frame = $("#articleFrame");
         urlViewed(frame.attr("src"));
@@ -359,5 +386,5 @@ function articleFrameSourceChanged(event) {
 
 function btnLoginClicked() {
     console.log("loginclicked");
-    $.mobile.changePage( "#myDialog", { role: "dialog" } );
+    $('#loginDialog').popup('open');
 }

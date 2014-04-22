@@ -55,6 +55,7 @@ public class NewsItem {
         terms = new HashMap<>();
         authors = new ArrayList<>();
         id = Long.toString(Math.abs(UUID.randomUUID().getLeastSignificantBits()));
+        timestamp = new Date();
     }
 
     public NewsItem(String title, List<String> authors, String fulltext, String description, Date timestamp, Map<String, Double> terms, Locale locale, String source, URL url, URL imageUrl) {

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.model;
 
 import java.net.URL;
@@ -26,7 +25,8 @@ import java.util.Map;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class RecommendedNewsItem extends NewsItem implements Comparable<RecommendedNewsItem>{
+public class RecommendedNewsItem extends NewsItem implements Comparable<RecommendedNewsItem> {
+
     private String recommendedBy;
     private int docNr;
     private float score;
@@ -36,7 +36,6 @@ public class RecommendedNewsItem extends NewsItem implements Comparable<Recommen
         super();
     }
 
-    
     public RecommendedNewsItem(String recommendedBy, int docNr, float score) {
         this.recommendedBy = recommendedBy;
         this.docNr = docNr;
@@ -83,6 +82,14 @@ public class RecommendedNewsItem extends NewsItem implements Comparable<Recommen
 
     @Override
     public int compareTo(RecommendedNewsItem o) {
+        if (getRecommendedBy() != null && o.getRecommendedBy() != null && !getRecommendedBy().equals(o.getRecommendedBy())) {
+            if (o.getRecommendedBy().equals("trending")) {
+                return Float.compare(score, o.getScore()*2);
+            }else{
+                return Float.compare(2*score, o.getScore());
+            }
+        }
+
         return Float.compare(score, o.getScore());
     }
 
@@ -93,9 +100,5 @@ public class RecommendedNewsItem extends NewsItem implements Comparable<Recommen
     public void setRecommendationId(int recommendationId) {
         this.recommendationId = recommendationId;
     }
-    
-    
-    
-    
-    
+
 }

@@ -42,6 +42,7 @@ import org.apache.lucene.search.TopScoreDocCollector;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
+@Deprecated
 public class TopNRecommender extends LuceneRecommender {
 
     private IViewsDao viewsDao;

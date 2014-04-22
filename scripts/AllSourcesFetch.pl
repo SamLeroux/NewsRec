@@ -87,3 +87,6 @@ sub uniq {
 #add(("http://feeds.gawker.com/gizmodo/full","http://gigaom.com/feed/","http://feeds.feedburner.com/techdirt/feed","http://feeds.betanews.com/bn"));
 #add(uniq(fetch("http://www.newscientist.com/feed/feeds","<a href=\"(http://feeds.newscientist.com/.*?)\">")));
 #add(("http://www.newscientist.com/feed/magazine","http://www.newscientist.com/blogs/shortsharpscience/atom.xml","http://www.newscientist.com/feed/view?id=1&type=channel","http://www.newscientist.com/feed/view?id=2&type=channel","http://www.newscientist.com/feed/view?id=3&type=channel","http://www.newscientist.com/feed/view?id=4&type=channel","http://www.newscientist.com/feed/view?id=5&type=channel","http://www.newscientist.com/feed/view?id=6&type=channel","http://www.newscientist.com/feed/view?id=7&type=channel","http://www.newscientist.com/feed/features"));
+#add(("http://news.yahoo.com/rss/"));
+add(("http://feeds.fool.com/usmf/foolwatch"));
+

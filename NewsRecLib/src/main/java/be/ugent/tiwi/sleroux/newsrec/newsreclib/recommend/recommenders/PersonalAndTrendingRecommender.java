@@ -24,6 +24,7 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.filters.RecentFilter;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.filters.UniqueResultsFilter;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
@@ -48,7 +49,7 @@ public class PersonalAndTrendingRecommender extends TrendingTopicRecommender {
 
     private final IRatingsDao ratingsDao;
     private static final Logger logger = Logger.getLogger(PersonalAndTrendingRecommender.class);
-    
+
     public PersonalAndTrendingRecommender(ITrendsDao trendsDao, IViewsDao viewsDao, IRatingsDao ratingsDao, SearcherManager manager) {
         super(trendsDao, viewsDao, manager);
         this.ratingsDao = ratingsDao;
@@ -56,10 +57,10 @@ public class PersonalAndTrendingRecommender extends TrendingTopicRecommender {
 
     @Override
     public List<RecommendedNewsItem> recommend(long userid, int start, int count) throws RecommendationException {
-        count = count/2;
-        
+        count = count / 2;
+
         List<RecommendedNewsItem> results = super.recommend(userid, start, count);
-        
+
         IndexSearcher searcher = null;
         try {
             Map<String, Double> terms = ratingsDao.getRatings(userid);
@@ -69,9 +70,9 @@ public class PersonalAndTrendingRecommender extends TrendingTopicRecommender {
             TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
 
             Filter f1 = new UniqueResultsFilter(results);
-            Filter f2 = new RecentFilter("timestamp", 1000*60*60*24);
-            Filter f = new ChainedFilter(new Filter[]{f1,f2}, ChainedFilter.AND);
-            
+            Filter f2 = new RecentFilter("timestamp", 1000 * 60 * 60 * 24);
+            Filter f = new ChainedFilter(new Filter[]{f1, f2}, ChainedFilter.AND);
+
             searcher = manager.acquire();
             manager.maybeRefresh();
             searcher.search(query, f, collector);
@@ -83,9 +84,10 @@ public class PersonalAndTrendingRecommender extends TrendingTopicRecommender {
             for (int i = start; i < stop; i++) {
                 int docId = hits[i].doc;
                 Document d = searcher.doc(docId);
-                RecommendedNewsItem item = toNewsitem(d, docId, hits[i].score,"personal");
+                RecommendedNewsItem item = toNewsitem(d, docId, hits[i].score, "personal");
                 results.add(item);
             }
+            //Collections.sort(results);
         } catch (RatingsDaoException | IOException ex) {
             logger.error(ex);
             throw new RecommendationException(ex);
@@ -100,7 +102,7 @@ public class PersonalAndTrendingRecommender extends TrendingTopicRecommender {
             query.setBoost(terms.get(term).floatValue());
             q.add(query, BooleanClause.Occur.SHOULD);
             Query query2 = new TermQuery(new Term("title", term));
-            query2.setBoost(terms.get(term).floatValue()*2);
+            query2.setBoost(terms.get(term).floatValue() * 2);
             q.add(query2, BooleanClause.Occur.SHOULD);
         }
         //return q;
