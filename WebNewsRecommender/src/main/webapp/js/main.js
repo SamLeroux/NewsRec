@@ -24,11 +24,6 @@ var lastResults = "AllResults"; // "AllResults" or "RelatedResults"
 
 $(document).ready(function() {
 
-    // Detect changes in the iframe
-    $("#articleFrame").on("load", function() {
-        articleFrameSourceChanged();
-    });
-
     $("#btnBack").on("click", function() {
         btnBackClicked();
     });
@@ -53,7 +48,7 @@ $(document).ready(function() {
         $("#btnBack").addClass("ui-corner-all");
         $("#btnBack").removeClass("ui-btn-icon-left");
         $("#btnBack").removeClass("ui-shadow");
-        
+
         $("#btnLogin").addClass("ui-btn-icon-notext");
         $("#btnLogin").addClass("ui-corner-all");
         $("#btnLogin").removeClass("ui-btn-icon-left");
@@ -142,13 +137,14 @@ function getClusterDisplayLi(cluster) {
 
             $("#relatedResults").listview("refresh");
             $("#resultsDiv").hide();
+            $("#relatedResultsDiv").scrollTop(0);
             $("#relatedResultsDiv").show();
             $("#btnBack").show();
         });
         span.html(cluster.items.length);
         a.append(span);
 
-    
+
     }
 
     li.append(a);
@@ -159,13 +155,13 @@ function getClusterDisplayLi(cluster) {
 
 }
 
-                                
+
 function getItemDisplayLi(item) {
     var li = $("<li>");
 
 
     var a = $("<a>");
-    
+
 
     a.on("click", function(event) {
         lastResults = "RelatedResults";
@@ -228,7 +224,7 @@ function displayArticle(url) {
     iframe.show();
 
     iframe.load(function() {
-        console.log("iframe source changed 2: "+iframe.attr("src"));
+        console.log("iframe source changed 2: " + iframe.attr("src"));
         $.mobile.loading('hide');
         window.scrollTo(0, 0);
     });
@@ -373,16 +369,6 @@ function shorten(text, n) {
 
 }
 
-function articleFrameSourceChanged(event) {
-    console.log("iframe source changed: "+$("#articleFrame").attr("src"));
-    if (clickInArticle) {
-        var frame = $("#articleFrame");
-        urlViewed(frame.attr("src"));
-    }
-    else {
-        clickInArticle = true;
-    }
-}
 
 function btnLoginClicked() {
     console.log("loginclicked");
