@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.webnewsrecommender;
 
 import java.io.IOException;
@@ -29,7 +28,9 @@ import org.apache.log4j.Logger;
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class LoginServlet extends HttpServlet {
+
     private static final Logger logger = Logger.getLogger(LoginServlet.class);
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -45,15 +46,12 @@ public class LoginServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         try {
             String param = request.getParameter("userId");
-            if (param != null){
+            if (param != null) {
                 long userId = Long.parseLong(param);
                 request.getSession().setAttribute("userId", userId);
-                logger.info("Set userId="+userId);
-                out.write("{\"response\":\"OK\"}");
-            }else{
-                logger.warn("No userId parameter in request");
-                out.write("{\"response\":\"No userId parameter found\"}");
+                logger.info("Set userId=" + userId);
             }
+            out.write(request.getSession().getAttribute("userId").toString());
         } finally {
             out.close();
         }

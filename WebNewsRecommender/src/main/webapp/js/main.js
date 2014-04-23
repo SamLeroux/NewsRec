@@ -24,6 +24,8 @@ var lastResults = "AllResults"; // "AllResults" or "RelatedResults"
 
 $(document).ready(function() {
 
+    
+
     $("#btnBack").on("click", function() {
         btnBackClicked();
     });
@@ -371,6 +373,10 @@ function shorten(text, n) {
 
 
 function btnLoginClicked() {
-    console.log("loginclicked");
+    $("#name").empty();
+    $("#pass1").empty();
+    $("#pass2").empty();
+    $("#confirmPass").hide();
+    $("#btnRegister").text("Register");
     $('#loginDialog').popup('open');
 }

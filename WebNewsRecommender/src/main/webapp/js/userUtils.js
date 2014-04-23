@@ -20,7 +20,7 @@ var backendlessVersion = "V1";
 
 $(document).ready(function() {
     userUtils.init(backendlessAppId, backendlessJsId, backendlessVersion);
-    
+
     $("#btnRegister").on("click", function() {
         if ($("#confirmPass").is(':visible')) {
             $("#confirmPass").hide();
@@ -32,12 +32,37 @@ $(document).ready(function() {
     });
 
     $("#submit").on("click", function() {
+
+        if (!($("#pass1") && $("name"))) {
+            $().toastmessage('showToast', {
+                text: "All fields are required",
+                sticky: false,
+                type: 'error',
+                inEffectDuration: 2500
+            });
+        }
         if ($("#confirmPass").is(':visible')) {
             var user = $("#name").val();
             var p1 = $("#pass1").val();
             var p2 = $("#pass2").val();
+
+            if (!p2) {
+                $().toastmessage('showToast', {
+                    text: "All fields are required",
+                    sticky: false,
+                    type: 'error',
+                    inEffectDuration: 2500
+                });
+            }
             if (p1 === p2) {
-                userUtils.register(user, pass);
+                userUtils.register(user, p1);
+            } else {
+                $().toastmessage('showToast', {
+                    text: "Passwords do not match",
+                    sticky: false,
+                    type: 'error',
+                    inEffectDuration: 2500
+                });
             }
 
         }
@@ -52,44 +77,90 @@ $(document).ready(function() {
 
 
 var userUtils = {
-    user: null,
     init: function(appId, secret, version) {
         Backendless.initApp(appId, secret, version);
     },
     login: function(username, password) {
-        showErrorMessage("hello", 1000);
+        console.log(username + " " + password);
+        $.mobile.loading('show');
         try {
             userUtils.user = Backendless.UserService.login(username, password);
-            userUtils.setUserID(userUtils.user.uuid);
+            userUtils.setUserID(userUtils.user.id);
 
             localStorage.setItem("loggedInUserName", userUtils.user.username);
+            $('#loginDialog').popup('close');
+            $().toastmessage('showToast', {
+                text: "logged in as " + username,
+                sticky: false,
+                type: 'notice',
+                inEffectDuration: 2500
+            });
         }
         catch (err) {
-            showErrorMessage(err.message, 20000);
+            $('#loginDialog').popup('close');
+            $().toastmessage('showToast', {
+                text: err.message,
+                sticky: false,
+                type: 'error',
+                inEffectDuration: 2500
+            });
             console.log("error code - " + err.statusCode);
         }
+        $.mobile.loading('hide');
     },
     logout: function() {
         Backendless.UserService.logout();
         localStorage.removeItem("loggedInUserName");
     },
     register: function(u, p1) {
+        $.mobile.loading('show');
         var user = new Backendless.User();
-        user.password = p1;
+        console.log(u + " " + p1);
         user.username = u;
+        user.password = p1;
+        user.id = userUtils.getUserID();
         Backendless.UserService.register(user, new Backendless.Async(userUtils.userRegistered, userUtils.userRegistrationFailed));
     },
     userRegistered: function(user) {
-        $.alert("registration complete");
+        $('#loginDialog').popup('close');
+        $().toastmessage('showToast', {
+            text: "Registration complete",
+            sticky: false,
+            type: 'notice',
+            inEffectDuration: 2500
+        });
+        var username = $("#name").val();
+        var pass = $("#pass1").val();
+        userUtils.login(username, pass);
     },
     userRegistrationFailed: function(err) {
-        $.alert(err.message);
+        $('#loginDialog').popup('close');
+        $().toastmessage('showToast', {
+            text: err.message,
+            sticky: false,
+            type: 'error',
+            inEffectDuration: 2500
+        });
+        $.mobile.loading('hide');
     },
     getUserID: function() {
         var user = localStorage.getItem("userid");
+        if (!user) {
+            user = $.ajax({
+                type: "GET",
+                url: "login.do",
+                async: false
+            }).responseText;
+            localStorage.setItem("userid", user);
+        }
         return user;
     },
     setUserID: function(uid) {
         localStorage.setItem("userid", uid);
+        user = $.ajax({
+            type: "GET",
+            url: "login.do?userId=" + uid,
+            async: false
+        }).responseText;
     }
 };
