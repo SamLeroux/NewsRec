@@ -55,12 +55,18 @@ public class ViewedServlet extends HttpServlet {
                 String itemId = request.getParameterValues("itemId")[0];
                 IScorer scorer = (IScorer) getServletContext().getAttribute("scorer");
                 scorer.view(user, itemId);
-                System.out.println(itemId);
+
+                String recommendedBy = request.getParameterValues("recommendedBy")[0];
+                if (recommendedBy != null) {
+                    TestingLogWriter w = (TestingLogWriter) getServletContext().getAttribute("testlogger");
+                    w.write(user, recommendedBy, itemId);
+                }
+
             } else if (params.containsKey("url")) {
                 String url = request.getParameterValues("url")[0];
                 IScorer scorer = (IScorer) getServletContext().getAttribute("scorer");
                 scorer.viewUrl(user, url);
-                System.out.println(url);
+
             }
 
             out.write("{\"response\":\"OK\"}");

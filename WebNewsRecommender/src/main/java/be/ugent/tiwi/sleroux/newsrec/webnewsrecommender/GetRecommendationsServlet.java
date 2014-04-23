@@ -26,7 +26,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -62,11 +64,13 @@ public class GetRecommendationsServlet extends HttpServlet {
 
             IRecommender recommender = (IRecommender) getServletContext().getAttribute("recommender");
             List<RecommendedNewsItem> items = recommender.recommend(user, start, count);
-            // No need to send the full text  and the description over the network.
+            // No need to send the full text and the description over the network.
             String empty = "";
+            Map<String, Double> emptyMap = new HashMap<String, Double>();
             for (NewsItem n : items) {
                 n.setFulltext(empty);
                 n.setDescription(empty);
+                n.setTerms(emptyMap);
             }
             IClusterer clusterer = (IClusterer) getServletContext().getAttribute("clusterer");
             List<NewsItemCluster> clusters = clusterer.cluster(items);

@@ -95,6 +95,7 @@ var userUtils = {
                 type: 'notice',
                 inEffectDuration: 2500
             });
+            fetchRecommendations();
         }
         catch (err) {
             $('#loginDialog').popup('close');
@@ -145,14 +146,16 @@ var userUtils = {
     },
     getUserID: function() {
         var user = localStorage.getItem("userid");
-        if (!user) {
+        if (user === null || !user || user === undefined || user === "undefined") {
             user = $.ajax({
                 type: "GET",
                 url: "login.do",
                 async: false
             }).responseText;
+            console.log(user);
             localStorage.setItem("userid", user);
         }
+        console.log(user);
         return user;
     },
     setUserID: function(uid) {

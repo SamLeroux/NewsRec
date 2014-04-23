@@ -28,7 +28,9 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.RecommenderBuildExcept
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.RecommenderBuilder;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.IRecommender;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.IScorer;
+import java.io.IOException;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import org.apache.log4j.Logger;
@@ -51,7 +53,11 @@ public class NewsRecContextListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
+
         try {
+            TestingLogWriter writer = new TestingLogWriter("/home/sam/usertest.csv");
+            sce.getServletContext().setAttribute("testlogger", writer);
+            
             ratingsDao = new JDBCRatingsDao();
             trendsDao = new CachingTrendsDaoProxy(new JDBCTrendsDao());
 
@@ -72,6 +78,8 @@ public class NewsRecContextListener implements ServletContextListener {
             logger.error(ex);
         } catch (RecommenderBuildException ex) {
             logger.error(ex);
+        } catch (IOException ex){
+            logger.error(ex);
         }
 
     }
@@ -79,7 +87,7 @@ public class NewsRecContextListener implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         try {
-            if (builder != null){
+            if (builder != null) {
                 builder.close();
             }
         } catch (RecommenderBuildException ex) {

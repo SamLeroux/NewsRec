@@ -24,7 +24,7 @@ var lastResults = "AllResults"; // "AllResults" or "RelatedResults"
 
 $(document).ready(function() {
 
-    
+
 
     $("#btnBack").on("click", function() {
         btnBackClicked();
@@ -84,7 +84,7 @@ function getClusterDisplayLi(cluster) {
     a.on("click", function(event) {
         clickInArticle = false;
         displayArticle(cluster.representative.url);
-        ratingClick(event, cluster.representative.id);
+        ratingClick(event, cluster.representative.id, cluster.representative.recommendedBy);
     });
 
     var p = $("<p>");
@@ -102,12 +102,12 @@ function getClusterDisplayLi(cluster) {
 
 
 
-//    if (cluster.representative.recommendedBy === "personal") {
-//        h1.css("color", "red");
-//    }
-//    else if (cluster.representative.recommendedBy === "trending") {
-//        h1.css("color", "green");
-//    }
+    if (cluster.representative.recommendedBy === "personal") {
+        h1.css("color", "grey");
+    }
+    else if (cluster.representative.recommendedBy === "trending") {
+        h1.css("color", "black");
+    }
     a.append(h1);
 
     var h3 = $("<p>");
@@ -169,7 +169,7 @@ function getItemDisplayLi(item) {
         lastResults = "RelatedResults";
         clickInArticle = false;
         displayArticle(item.url);
-        ratingClick(event, item.id);
+        ratingClick(event, item.id, item.recommendedBy);
     });
 
     var p = $("<p>");
@@ -187,12 +187,12 @@ function getItemDisplayLi(item) {
 
 
 
-//    if (item.recommendedBy === "personal") {
-//        h1.css("color", "red");
-//    }
-//    else if (item.recommendedBy === "trending") {
-//        h1.css("color", "green");
-//    }
+    if (item.recommendedBy === "personal") {
+        h1.css("color", "grey");
+    }
+    else if (item.recommendedBy === "trending") {
+        h1.css("color", "black");
+    }
     a.append(h1);
 
     var h3 = $("<p>");
@@ -237,11 +237,11 @@ function displayArticle(url) {
 }
 
 
-function ratingClick(event, id) {
+function ratingClick(event, id, recommendedBy) {
     event.stopPropagation();
     $.ajax({
         type: 'POST',
-        url: "view.do?itemId=" + id,
+        url: "view.do?itemId=" + id + "&recommendedBy=" + recommendedBy,
         dataType: "json",
         success: function() {
             console.log("recorded view");
