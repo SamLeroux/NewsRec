@@ -66,11 +66,9 @@ public class GetRecommendationsServlet extends HttpServlet {
             List<RecommendedNewsItem> items = recommender.recommend(user, start, count);
             // No need to send the full text and the description over the network.
             String empty = "";
-            Map<String, Double> emptyMap = new HashMap<String, Double>();
             for (NewsItem n : items) {
                 n.setFulltext(empty);
                 n.setDescription(empty);
-                n.setTerms(emptyMap);
             }
             IClusterer clusterer = (IClusterer) getServletContext().getAttribute("clusterer");
             List<NewsItemCluster> clusters = clusterer.cluster(items);

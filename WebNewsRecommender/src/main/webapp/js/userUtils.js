@@ -73,6 +73,8 @@ $(document).ready(function() {
             userUtils.login(user, pass);
         }
     });
+    
+    
 });
 
 
@@ -93,14 +95,18 @@ var userUtils = {
                 text: "logged in as " + username,
                 sticky: false,
                 type: 'notice',
-                inEffectDuration: 2500
+                inEffectDuration: 2000
             });
-            fetchRecommendations();
+            fetchRecommendations(true);
         }
         catch (err) {
             $('#loginDialog').popup('close');
+            var message = err.message;
+            if (message === ""){
+                message = "Error during login";
+            }
             $().toastmessage('showToast', {
-                text: err.message,
+                text: message,
                 sticky: false,
                 type: 'error',
                 inEffectDuration: 2500

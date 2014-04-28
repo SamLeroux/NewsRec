@@ -24,7 +24,6 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.filters.RecentFilter;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.filters.UniqueResultsFilter;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
@@ -65,7 +64,7 @@ public class PersonalAndTrendingRecommender extends TrendingTopicRecommender {
         try {
             Map<String, Double> terms = ratingsDao.getRatings(userid);
             Query query = buildQuery(terms);
-            int hitsPerPage = count;
+            int hitsPerPage = start+count;
 
             TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
 
@@ -77,14 +76,14 @@ public class PersonalAndTrendingRecommender extends TrendingTopicRecommender {
             manager.maybeRefresh();
             searcher.search(query, f, collector);
 
-            ScoreDoc[] hits = collector.topDocs().scoreDocs;
+            ScoreDoc[] hits = collector.topDocs(start, count).scoreDocs;
 
-            int stop = (start + count < hits.length ? start + count : hits.length);
+            
 
-            for (int i = start; i < stop; i++) {
-                int docId = hits[i].doc;
+            for (ScoreDoc s: hits) {
+                int docId = s.doc;
                 Document d = searcher.doc(docId);
-                RecommendedNewsItem item = toNewsitem(d, docId, hits[i].score, "personal");
+                RecommendedNewsItem item = toNewsitem(d, docId, s.score, "personal");
                 results.add(item);
             }
             //Collections.sort(results);

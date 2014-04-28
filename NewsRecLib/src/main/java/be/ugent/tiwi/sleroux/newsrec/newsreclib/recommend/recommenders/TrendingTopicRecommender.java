@@ -19,7 +19,6 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.queries.R
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ITrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.TrendsDaoException;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.filters.RecentFilter;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.ScoreDecay;
@@ -62,9 +61,10 @@ public class TrendingTopicRecommender extends LuceneRecommender implements IReco
         try {
             String[] trends = trendsDao.getTrends(250);
             Query query = buildQuery(trends);
-            int hitsPerPage = count;
+            int hitsPerPage = start+count;
 
             TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
+
 
             //Filter filter = new SeenArticlesFilter(viewsDao, userid);
             Filter f = new RecentFilter("timestamp", 1000 * 60 * 60 * 24);
@@ -74,15 +74,14 @@ public class TrendingTopicRecommender extends LuceneRecommender implements IReco
 
             searcher.search(query, f, collector);
 
-            ScoreDoc[] hits = collector.topDocs().scoreDocs;
+            ScoreDoc[] hits = collector.topDocs(start, count).scoreDocs;
 
-            int stop = (start + count < hits.length ? start + count : hits.length);
-            List<RecommendedNewsItem> results = new ArrayList<>(stop - start);
+            List<RecommendedNewsItem> results = new ArrayList<>(hits.length);
 
-            for (int i = start; i < stop; i++) {
-                int docId = hits[i].doc;
+            for (ScoreDoc hit : hits) {
+                int docId = hit.doc;
                 Document d = searcher.doc(docId);
-                RecommendedNewsItem item = toNewsitem(d, docId, hits[i].score, "trending");
+                RecommendedNewsItem item = toNewsitem(d, docId, hit.score, "trending");
                 results.add(item);
             }
 

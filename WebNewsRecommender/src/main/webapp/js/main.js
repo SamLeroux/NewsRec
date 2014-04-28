@@ -21,17 +21,20 @@ var canFetch = true;
 var clickInArticle = true;
 
 var lastResults = "AllResults"; // "AllResults" or "RelatedResults" 
+var articles = [];
 
 $(document).ready(function() {
 
-
-
+    $("#articleFrame").attr("src","about:blank");
     $("#btnBack").on("click", function() {
         btnBackClicked();
     });
 
     $("#btnRefresh").on("click", function() {
-        fetchRecommendations();
+        start = 0;
+        count = 250;
+        fetchRecommendations(true);
+        window.scrollTo(0, 0);
     });
 
     $("#btnLogin").on("click", function() {
@@ -57,15 +60,19 @@ $(document).ready(function() {
         $("#btnLogin").removeClass("ui-shadow");
     }
 
-    fetchRecommendations();
+    var user = localStorage.getItem("userid");
+    if (!(user === null || !user || user === undefined || user === "undefined")) {
+        userUtils.setUserID(user);
+    }
+
+    fetchRecommendations(true);
 
     $("#resultsDiv").scroll(function() {
         if ($("#resultsDiv").scrollTop() +
                 $("#resultsDiv").innerHeight()
                 >= $("#resultsDiv")[0].scrollHeight) {
             if (canFetch) {
-                count += 250;
-                fetchRecommendations();
+                fetchRecommendations(false);
             }
         }
     });
@@ -78,7 +85,6 @@ function isPhone() {
 
 function getClusterDisplayLi(cluster) {
     var li = $("<li>");
-
 
     var a = $("<a>");
     a.on("click", function(event) {
@@ -100,13 +106,13 @@ function getClusterDisplayLi(cluster) {
     var title = cluster.representative.title;
     h1.html(shorten(title, 100));
 
-
-
-    if (cluster.representative.recommendedBy === "personal") {
-        h1.css("color", "grey");
-    }
-    else if (cluster.representative.recommendedBy === "trending") {
-        h1.css("color", "black");
+    if (localStorage["debug"]) {
+        if (cluster.representative.recommendedBy === "personal") {
+            h1.css("color", "grey");
+        }
+        else if (cluster.representative.recommendedBy === "trending") {
+            h1.css("color", "black");
+        }
     }
     a.append(h1);
 
@@ -145,25 +151,18 @@ function getClusterDisplayLi(cluster) {
         });
         span.html(cluster.items.length);
         a.append(span);
-
-
     }
 
     li.append(a);
 
     console.log(cluster.representative.title + " : " + cluster.items.length + " members");
     return li;
-
-
 }
 
 
 function getItemDisplayLi(item) {
     var li = $("<li>");
-
-
     var a = $("<a>");
-
 
     a.on("click", function(event) {
         lastResults = "RelatedResults";
@@ -185,13 +184,13 @@ function getItemDisplayLi(item) {
     var title = item.title;
     h1.html(shorten(title, 100));
 
-
-
-    if (item.recommendedBy === "personal") {
-        h1.css("color", "grey");
-    }
-    else if (item.recommendedBy === "trending") {
-        h1.css("color", "black");
+    if (localStorage["debug"]) {
+        if (item.recommendedBy === "personal") {
+            h1.css("color", "grey");
+        }
+        else if (item.recommendedBy === "trending") {
+            h1.css("color", "black");
+        }
     }
     a.append(h1);
 
@@ -268,28 +267,38 @@ function urlViewed(url) {
 
 }
 
-function fetchRecommendations() {
+function fetchRecommendations(replaceCurrentResults) {
     $.mobile.loading('show');
     canFetch = false;
     $.ajax({
         url: "GetRecommendations.do?count=" + count + "&start=" + start,
         dataType: "json",
-        success: recommendationsFetched,
+        success: function(data) {
+            recommendationsFetched(data, replaceCurrentResults);
+        },
         error: recommendationsFetchError
     });
 
 }
 
-function recommendationsFetched(data) {
-    $("#results").empty();
+function recommendationsFetched(data, replaceCurrentResults) {
+    if (replaceCurrentResults) {
+        articles = [];
+        $("#results").empty();
+    }
     for (var item in data) {
-        var li = getClusterDisplayLi(data[item]);
-        $("#results").append(li);
+        start += data[item].items.length +1;
+        if ($.inArray(data[item].representative.id, articles) < 0) {
+            var li = getClusterDisplayLi(data[item]);
+            $("#results").append(li);
+            articles.push(data[item].representative.id);
+        } else {
+            console.log("item al in lijst");
+        }
     }
     $("#results").listview("refresh");
     $.mobile.loading('hide');
     canFetch = true;
-
 }
 
 function recommendationsFetchError(xhr, errorType, exception) {
@@ -310,6 +319,7 @@ function btnBackClicked() {
         canFetch = true;
         if (isPhone()) {
             $("#articleDiv").hide();
+            $("#articleFrame").attr("src","about:blank");
         }
     }
     else if (lastResults === "RelatedResults") {
@@ -319,6 +329,7 @@ function btnBackClicked() {
         canFetch = false;
         if (isPhone()) {
             $("#articleDiv").hide();
+            $("#articleFrame").attr("src","about:blank");
         }
     }
 

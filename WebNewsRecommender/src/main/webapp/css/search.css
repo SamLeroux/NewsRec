@@ -93,7 +93,7 @@ limitations under the License.
     width:100%;
     height:auto;
     margin: auto;
-    
+
 }
 
 .ui-listview > li h2{
@@ -127,15 +127,19 @@ limitations under the License.
     #resultsDiv, #relatedResultsDiv{
         width:100%;
         height:100%;
+        margin-top: 2px;
+        margin-left: 2px;
+        padding:0;
+        
     }
 
     #results, #relatedResults{
         width:100%;
-        height:100%
+        height:100%;
+        padding:0;
     }
-    
+
     #headerDiv > h2{
         font-size: small;
     }
-
 }
