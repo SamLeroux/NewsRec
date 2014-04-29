@@ -20,6 +20,7 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.INewsSourceDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsSource;
 import java.io.Serializable;
 import java.util.List;
+import org.apache.log4j.Logger;
 import org.hibernate.Query;
 
 /**
@@ -29,27 +30,39 @@ import org.hibernate.Query;
  */
 public class MysqlNewsSourceDao extends HibernateDaoTemplate implements INewsSourceDao, Serializable {
 
+    private static final Logger logger = Logger.getLogger(MysqlNewsSourceDao.class);
+
     @Override
     public NewsSource[] getSourcesToCheck() throws DaoException {
-        startSession();
-        Query query = session.createQuery("from NewsSource where lastFetchTry = null or (lastFetchTry + fetchinterval < CURRENT_TIMESTAMP())");
-        List<NewsSource> sources = query.list();
-        stopSession();
-        return sources.toArray(new NewsSource[sources.size()]);
+        try {
+            startSession();
+            Query query = session.createQuery("from NewsSource where lastFetchTry = null or (lastFetchTry + fetchinterval < CURRENT_TIMESTAMP())");
+            List<NewsSource> sources = query.list();
+            stopSession();
+            return sources.toArray(new NewsSource[sources.size()]);
+        } catch (Exception ex) {
+            logger.error(ex);
+            return new NewsSource[0];
+        }
     }
 
     /**
      *
-     * @return
-     * @throws DaoException
+     * @return @throws DaoException
      */
     @Override
     public NewsSource[] getAllSources() throws DaoException {
-        startSession();
-        Query query = session.createQuery("from NewsSource");
-        List<NewsSource> sources = query.list();
-        stopSession();
-        return sources.toArray(new NewsSource[sources.size()]);
+        try {
+            startSession();
+            Query query = session.createQuery("from NewsSource");
+            List<NewsSource> sources = query.list();
+            stopSession();
+            return sources.toArray(new NewsSource[sources.size()]);
+        } catch (Exception ex) {
+            logger.error(ex);
+            return new NewsSource[0];
+        }
+
     }
 
     /**
@@ -75,6 +88,5 @@ public class MysqlNewsSourceDao extends HibernateDaoTemplate implements INewsSou
         session.update(source);
         stopSession();
     }
-
 
 }
