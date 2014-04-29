@@ -1,5 +1,5 @@
 
-CREATE TABLE NewsSources (
+CREATE TABLE NewsSource (
 	id INT NOT NULL AUTO_INCREMENT,
 	description VARCHAR(40000),
 	fetchinterval INT,

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2014 Sam Leroux <sam.leroux@ugent.be>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,12 +20,12 @@ var count = 250;
 var canFetch = true;
 var clickInArticle = true;
 
-var lastResults = "AllResults"; // "AllResults" or "RelatedResults" 
+var lastResults = "AllResults"; // "AllResults" or "RelatedResults"
 var articles = [];
 
 $(document).ready(function() {
 
-    $("#articleFrame").attr("src","about:blank");
+    $("#articleFrame").attr("src", "about:blank");
     $("#btnBack").on("click", function() {
         btnBackClicked();
     });
@@ -63,6 +63,12 @@ $(document).ready(function() {
     var user = localStorage.getItem("userid");
     if (!(user === null || !user || user === undefined || user === "undefined")) {
         userUtils.setUserID(user);
+        $().toastmessage('showToast', {
+            text: "logged in as " + username,
+            sticky: false,
+            type: 'notice',
+            inEffectDuration: 1500
+        });
     }
 
     fetchRecommendations(true);
@@ -287,7 +293,7 @@ function recommendationsFetched(data, replaceCurrentResults) {
         $("#results").empty();
     }
     for (var item in data) {
-        start += data[item].items.length +1;
+        start += data[item].items.length + 1;
         if ($.inArray(data[item].representative.id, articles) < 0) {
             var li = getClusterDisplayLi(data[item]);
             $("#results").append(li);
@@ -319,7 +325,7 @@ function btnBackClicked() {
         canFetch = true;
         if (isPhone()) {
             $("#articleDiv").hide();
-            $("#articleFrame").attr("src","about:blank");
+            $("#articleFrame").attr("src", "about:blank");
         }
     }
     else if (lastResults === "RelatedResults") {
@@ -329,7 +335,7 @@ function btnBackClicked() {
         canFetch = false;
         if (isPhone()) {
             $("#articleDiv").hide();
-            $("#articleFrame").attr("src","about:blank");
+            $("#articleFrame").attr("src", "about:blank");
         }
     }
 

@@ -32,4 +32,9 @@ CREATE TABLE Trends (
 	PRIMARY KEY (term)
 );
 
+CREATE TABLE Followers (
+	screenName VARCHAR(50),
+	userId NUMERIC(21,0)
+);
+
 

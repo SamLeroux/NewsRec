@@ -70,13 +70,11 @@ public class TermFileOutputBolt extends BaseRichBolt {
             try {
                 writer.write(input.getValueByField(field).toString());
                 writer.newLine();
-                writer.write("-------------------------------------------------------");
             } catch (IOException ex) {
                 logger.error(ex);
             }
         }
         try {
-            writer.write("-------------------------------------------------------");
             writer.newLine();
             writer.flush();
         } catch (IOException ex) {

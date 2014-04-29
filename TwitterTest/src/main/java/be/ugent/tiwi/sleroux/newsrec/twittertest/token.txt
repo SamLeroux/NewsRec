@@ -1,0 +1,5 @@
+Open the following URL and grant access to your account:
+https://api.twitter.com/oauth/authorize?oauth_token=Y7NnAssPVafHf7bP2JilJlVKrktSfShd89DrTUEpts
+Enter the PIN(if aviailable) or just hit enter.[PIN]:6122196
+AccessToken= 2369203675-1Pk99eotzhCznmIgr3iXb670DpsEVQCANuoBHRs
+TokenSecret= 6ua72cabIzcFsBgE15RVzULeKT44TnIrOIaf9chY9dlWe

@@ -88,5 +88,6 @@ sub uniq {
 #add(uniq(fetch("http://www.newscientist.com/feed/feeds","<a href=\"(http://feeds.newscientist.com/.*?)\">")));
 #add(("http://www.newscientist.com/feed/magazine","http://www.newscientist.com/blogs/shortsharpscience/atom.xml","http://www.newscientist.com/feed/view?id=1&type=channel","http://www.newscientist.com/feed/view?id=2&type=channel","http://www.newscientist.com/feed/view?id=3&type=channel","http://www.newscientist.com/feed/view?id=4&type=channel","http://www.newscientist.com/feed/view?id=5&type=channel","http://www.newscientist.com/feed/view?id=6&type=channel","http://www.newscientist.com/feed/view?id=7&type=channel","http://www.newscientist.com/feed/features"));
 #add(("http://news.yahoo.com/rss/"));
-add(("http://feeds.fool.com/usmf/foolwatch"));
-
+#add(("http://feeds.fool.com/usmf/foolwatch"));
+add(("http://www.neurope.eu/rss/883/feed/","http://www.neurope.eu/rss/884/feed/","http://www.neurope.eu/rss/1/feed/","));
+http://www.neurope.eu/rss/5/feed/","http://www.neurope.eu/rss/6/feed/","http://www.neurope.eu/rss/57/feed/","http://www.neurope.eu/rss/609/feed/","http://www.neurope.eu/rss/11/feed/","http://www.neurope.eu/rss/58/feed/","http://www.neurope.eu/rss/7/feed/","http://www.neurope.eu/rss/59/feed/"));

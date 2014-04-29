@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.util.CharArraySet;
 
 /**
- * Provides an easy wey to read a stopwords file.
+ * Provides an easy way to read a stopwords file.
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class StopWordsReader {

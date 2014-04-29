@@ -118,7 +118,7 @@
         <dependency>
             <groupId>storm</groupId>
             <artifactId>storm</artifactId>
-            <version>0.9.0.1</version>
+            <version>0.9.0.1</version><!--
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -133,7 +133,7 @@
                     <groupId>javax.jms</groupId>
                     <artifactId>jms</artifactId>
                 </exclusion>
-            </exclusions>
+            </exclusions>-->
         </dependency>
         <dependency>
             <groupId>commons-collections</groupId>
@@ -160,6 +160,18 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
+        </dependency>
+        
+        <!-- Twitter4j -->
+        <dependency>
+            <groupId>org.twitter4j</groupId>
+            <artifactId>twitter4j-core</artifactId>
+            <version>[4.0,)</version>
+        </dependency>
+        <dependency>
+            <groupId>org.twitter4j</groupId>
+            <artifactId>twitter4j-stream</artifactId>
+            <version>4.0.1</version>
         </dependency>
     </dependencies>
 </project>

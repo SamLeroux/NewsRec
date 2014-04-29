@@ -58,7 +58,6 @@ public class GoogleTrendsSpout extends BaseRichSpout {
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
         declarer.declareStream(StreamIDs.TERMSTREAM, new Fields(StreamIDs.TERM));
-
     }
 
     @Override

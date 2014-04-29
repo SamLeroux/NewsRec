@@ -21,11 +21,13 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.INewsSourceDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ITrendsDao;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ITwitterFollowersDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.MysqlNewsSourceDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCRatingsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCTrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.JDBCViewsDao;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl.MysqlFollowersDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItemCluster;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
@@ -56,6 +58,7 @@ public class ConsoleNewsRecommender {
     private IViewsDao viewsDao;
     private ITrendsDao trendsDao;
     private IRatingsDao ratingsDao;
+    private ITwitterFollowersDao followersDao;
     private RecommenderBuilder builder;
     private final String luceneLoc = "/home/sam/index";
     private final String stopwordsFileLocation = "/home/sam/stopwords_EN.txt";
@@ -65,6 +68,7 @@ public class ConsoleNewsRecommender {
             ratingsDao = new JDBCRatingsDao();
             trendsDao = new JDBCTrendsDao();
             viewsDao = new JDBCViewsDao();
+            followersDao = new MysqlFollowersDao();
             
             builder = new RecommenderBuilder(ratingsDao, trendsDao, viewsDao, luceneLoc);
      
@@ -80,8 +84,8 @@ public class ConsoleNewsRecommender {
         try {     
             //startAddArticles();
             //startRectest();
-            //startLocalFetchTest();
-            startClusterFetchTest();
+            startLocalFetchTest();
+            //startClusterFetchTest();
             //testClustering();
             builder.close();
         } catch (RecommenderBuildException ex) {
@@ -145,12 +149,13 @@ public class ConsoleNewsRecommender {
             NewsFetchTopologyStarter starter = new NewsFetchTopologyStarter(
                     newsSourceDao,
                     trendsDao,
+                    followersDao,
                     "newsfetch",
                     luceneLoc,
                     stopwordsFileLocation);
             
             starter.startLocal();
-            Thread.sleep(1000*60*60*24);
+            Thread.sleep(1000*60*60*1);
             starter.stopLocal();
         } catch (StormException| InterruptedException ex) {
             java.util.logging.Logger.getLogger(ConsoleNewsRecommender.class.getName()).log(Level.SEVERE, null, ex);
@@ -165,6 +170,7 @@ public class ConsoleNewsRecommender {
             NewsFetchTopologyStarter starter = new NewsFetchTopologyStarter(
                     newsSourceDao,
                     trendsDao,
+                    followersDao,
                     "newsfetch",
                     luceneLoc,
                     stopwordsFileLocation);
