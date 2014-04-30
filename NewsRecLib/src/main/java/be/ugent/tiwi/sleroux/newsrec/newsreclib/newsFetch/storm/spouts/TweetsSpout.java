@@ -21,19 +21,16 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.config.Config;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ITwitterFollowersDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.topology.StreamIDs;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.twitter.StatusListenerAdapter;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.twitter.TwitterStreamBuilder;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.StopWordsReader;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.log4j.Logger;
-import org.apache.lucene.analysis.util.CharArraySet;
 import twitter4j.FilterQuery;
 import twitter4j.Status;
 import twitter4j.TwitterStream;
@@ -47,9 +44,10 @@ public class TweetsSpout extends BaseRichSpout {
     private LinkedBlockingQueue<String> termsQueue;
     private SpoutOutputCollector collector;
     private TwitterStream stream;
-   
+
     private final ITwitterFollowersDao followersDao;
     private static final Logger logger = Logger.getLogger(TweetsSpout.class);
+    private static final Random rnd = new Random();
 
     public TweetsSpout(ITwitterFollowersDao followersDao) {
         this.followersDao = followersDao;
@@ -67,7 +65,6 @@ public class TweetsSpout extends BaseRichSpout {
         startListener();
     }
 
-    
     @Override
     public void nextTuple() {
         String term = termsQueue.poll();
@@ -116,16 +113,11 @@ public class TweetsSpout extends BaseRichSpout {
 
         @Override
         public void onStatus(Status status) {
-            String text = status.getText();
-//            String[] tokens = text.split(" ");
-//            for (String s : tokens) {
-//                if (!(s.startsWith("RT") || s.startsWith("http") || s.startsWith("@") || s.startsWith("#") || s.contains("."))) {
-//                    if (!stopwords.contains(s)) {
-//                        termsQueue.add(s);
-//                    }
-//                }
-//            }
-            termsQueue.add(text);
+            if (!status.isRetweet() || (status.isRetweet() && rnd.nextInt(10) == 0)) {
+                String text = status.getText();
+                text = text.replaceAll("http://.*?($| )", "").replaceAll("#.*? ", "").replaceAll("@.*? ", "").replaceFirst("RT ", "");
+                termsQueue.add(text);
+            }
         }
     }
 

@@ -36,10 +36,16 @@ public class NewsItemCluster {
                 || representative.getTimestamp().before(item.getTimestamp())) {
             if (representative != null) {
                 items.add(representative);
+                if (item.getImageUrl() == null && representative.getImageUrl() != null){
+                    item.setImageUrl(representative.getImageUrl());
+                }
             }
             representative = item;
         } else {
             items.add(item);
+            if (representative.getImageUrl() == null && item.getImageUrl() != null){
+                representative.setImageUrl(item.getImageUrl());
+            }
         }
     }
 
