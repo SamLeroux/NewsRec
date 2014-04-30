@@ -7,6 +7,7 @@ import backtype.storm.tuple.Fields;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.INewsSourceDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ITrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ITwitterFollowersDao;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.lucene.analyzers.EnAnalyzer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.StormException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.FetchArticleContentBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.LuceneIndexBolt;
@@ -14,8 +15,10 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.RssFetchBo
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.UpdateNewsSourceBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.spouts.FeedSourceSpout;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.StormRunner;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.LoggingBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.TermFileOutputBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.TrendingTermsToDatabaseBolt;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.TweetAnalyzerBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.trendDetect.IntermediateRankingsBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.trendDetect.RollingCountBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.trendDetect.TotalRankingsBolt;
@@ -76,10 +79,14 @@ public class NewsFetchTopologyStarter {
 
         //builder.setSpout("feedurlspout", new FeedSourceSpout(newsSourceDao));
         //builder.setSpout("trendsspout", new GoogleTrendsSpout());
-        builder.setSpout("tweetsspout", new TweetsSpout(followersDao, stopWordsLocation));
-        builder.setBolt("fileOutputBolt", new TermFileOutputBolt(), 1)
-                .allGrouping("tweetsspout", StreamIDs.TERMSTREAM);
+        builder.setSpout("tweetsspout", new TweetsSpout(followersDao));
 
+        builder.setBolt("tweetAnalyzerBolt", new TweetAnalyzerBolt(stopWordsLocation))
+                .fieldsGrouping("tweetsspout", StreamIDs.TWEETSTREAM, new Fields(StreamIDs.TWEET));
+
+        builder.setBolt("loggingbolt", new LoggingBolt())
+                .allGrouping("tweetAnalyzerBolt",StreamIDs.TERMSTREAM)
+                .allGrouping("tweetsspout",StreamIDs.TWEETSTREAM);
 //        builder.setBolt("rssfetchbolt", new RssFetchBolt(), 1)
 //                .globalGrouping("feedurlspout", StreamIDs.NEWSSOURCESTREAM);
 //
@@ -93,7 +100,7 @@ public class NewsFetchTopologyStarter {
         builder.setBolt("counterBolt", new RollingCountBolt(window, tickFreq), 4)
                 //                .fieldsGrouping("luceneIndexBolt", StreamIDs.TERMSTREAM, new Fields(StreamIDs.TERM))
                 //                .fieldsGrouping("trendsspout", StreamIDs.TERMSTREAM, new Fields(StreamIDs.TERM))
-                .fieldsGrouping("tweetsspout", StreamIDs.TERMSTREAM, new Fields(StreamIDs.TERM));
+                .fieldsGrouping("tweetAnalyzerBolt", StreamIDs.TERMSTREAM, new Fields(StreamIDs.TERM));
 
         builder.setBolt("intermediateRankerBolt", new IntermediateRankingsBolt(topN, tickFreq), 4)
                 .fieldsGrouping("counterBolt", new Fields("obj"));

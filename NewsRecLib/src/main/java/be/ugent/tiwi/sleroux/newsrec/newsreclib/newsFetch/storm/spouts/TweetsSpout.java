@@ -47,39 +47,17 @@ public class TweetsSpout extends BaseRichSpout {
     private LinkedBlockingQueue<String> termsQueue;
     private SpoutOutputCollector collector;
     private TwitterStream stream;
-    private  CharArraySet stopwords;
+   
     private final ITwitterFollowersDao followersDao;
     private static final Logger logger = Logger.getLogger(TweetsSpout.class);
 
-    public TweetsSpout(ITwitterFollowersDao followersDao, String stopwordsLocation) {
+    public TweetsSpout(ITwitterFollowersDao followersDao) {
         this.followersDao = followersDao;
-        try {
-            this.stopwords = StopWordsReader.getStopwords(stopwordsLocation);
-        } catch (IOException ex) {
-            stopwords = new CharArraySet(Config.LUCENE_VERSION, 10, true);
-            stopwords.add("he");
-            stopwords.add("him");
-            stopwords.add("by");
-            stopwords.add("her");
-            stopwords.add("has");
-            stopwords.add("been");
-            stopwords.add("will");
-            stopwords.add("a");
-            stopwords.add("on");
-            stopwords.add("to");
-            stopwords.add("it");
-            stopwords.add("is");
-            stopwords.add("are");
-            stopwords.add("say");
-            stopwords.add("has");
-            stopwords.add("have");
-            stopwords.add("with");
-        }
     }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declareStream(StreamIDs.TERMSTREAM, new Fields(StreamIDs.TERM));
+        declarer.declareStream(StreamIDs.TWEETSTREAM, new Fields(StreamIDs.TWEET));
     }
 
     @Override
@@ -89,11 +67,12 @@ public class TweetsSpout extends BaseRichSpout {
         startListener();
     }
 
+    
     @Override
     public void nextTuple() {
         String term = termsQueue.poll();
         if (term != null) {
-            collector.emit(StreamIDs.TERMSTREAM, new Values(term));
+            collector.emit(StreamIDs.TWEETSTREAM, new Values(term));
         } else {
             try {
                 Thread.sleep(500);
@@ -138,14 +117,15 @@ public class TweetsSpout extends BaseRichSpout {
         @Override
         public void onStatus(Status status) {
             String text = status.getText();
-            String[] tokens = text.split(" ");
-            for (String s : tokens) {
-                if (!(s.startsWith("RT") || s.startsWith("http") || s.startsWith("@") || s.startsWith("#") || s.contains("."))) {
-                    if (!stopwords.contains(s)){
-                        termsQueue.add(s);
-                    }
-                }
-            }
+//            String[] tokens = text.split(" ");
+//            for (String s : tokens) {
+//                if (!(s.startsWith("RT") || s.startsWith("http") || s.startsWith("@") || s.startsWith("#") || s.contains("."))) {
+//                    if (!stopwords.contains(s)) {
+//                        termsQueue.add(s);
+//                    }
+//                }
+//            }
+            termsQueue.add(text);
         }
     }
 

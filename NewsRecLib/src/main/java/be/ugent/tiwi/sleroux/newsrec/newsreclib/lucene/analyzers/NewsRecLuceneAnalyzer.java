@@ -73,6 +73,10 @@ public abstract class NewsRecLuceneAnalyzer extends Analyzer {
      * @return
      */
     @Override
-    protected abstract TokenStreamComponents createComponents(String fieldName, Reader reader);
+    protected TokenStreamComponents createComponents(String fieldName, Reader reader){
+        return createComponents(reader);
+    }
+    
+    protected abstract TokenStreamComponents createComponents(Reader reader);
     
 }

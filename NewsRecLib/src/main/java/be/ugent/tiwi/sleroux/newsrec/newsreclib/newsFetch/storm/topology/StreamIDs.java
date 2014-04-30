@@ -87,4 +87,7 @@ public class StreamIDs {
      */
     public static final String TERM = "term";
     
+    public static final String TWEET = "tweet";
+    public static final String TWEETSTREAM = "tweetstream";
+    
 }

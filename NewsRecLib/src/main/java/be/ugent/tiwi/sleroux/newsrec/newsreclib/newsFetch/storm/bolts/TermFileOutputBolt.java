@@ -75,7 +75,6 @@ public class TermFileOutputBolt extends BaseRichBolt {
             }
         }
         try {
-            writer.newLine();
             writer.flush();
         } catch (IOException ex) {
             logger.error(ex);

@@ -37,12 +37,11 @@ public class EnAnalyzer extends NewsRecLuceneAnalyzer {
 
     /**
      *
-     * @param fieldName
      * @param reader
      * @return
      */
     @Override
-    protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+    protected TokenStreamComponents createComponents(Reader reader) {
         //reader = new HTMLStripCharFilter(reader);
         Tokenizer t = new StandardTokenizer(Config.LUCENE_VERSION, reader);
         TokenStream result = t;

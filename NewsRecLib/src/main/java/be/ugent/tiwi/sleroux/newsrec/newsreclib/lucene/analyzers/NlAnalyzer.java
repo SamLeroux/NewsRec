@@ -37,7 +37,7 @@ import org.tartarus.snowball.ext.DutchStemmer;
 public class NlAnalyzer extends NewsRecLuceneAnalyzer{
 
     @Override
-    protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+    protected TokenStreamComponents createComponents(Reader reader) {
         Tokenizer t = new StandardTokenizer(Config.LUCENE_VERSION, reader);
         TokenStream result = t;
 

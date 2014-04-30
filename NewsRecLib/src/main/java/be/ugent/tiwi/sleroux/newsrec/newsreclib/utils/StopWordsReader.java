@@ -34,6 +34,10 @@ public class StopWordsReader {
     public static CharArraySet getStopwords(String stopwordsLocation) throws FileNotFoundException, IOException {
         logger.info("reading stopwords file: " + stopwordsLocation);
         CharArraySet stopw;
+        
+        if (stopwordsLocation == null){
+            throw new FileNotFoundException("file path is null");
+        }
         try (BufferedReader reader = new BufferedReader(new FileReader(stopwordsLocation))) {
             stopw = new CharArraySet(Config.LUCENE_VERSION, 1000, true);
             String line = reader.readLine();
