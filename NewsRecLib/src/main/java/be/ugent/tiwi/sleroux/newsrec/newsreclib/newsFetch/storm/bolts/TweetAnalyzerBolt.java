@@ -30,7 +30,11 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.StopWordsReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
@@ -46,6 +50,7 @@ public class TweetAnalyzerBolt extends BaseRichBolt {
     private NewsRecLuceneAnalyzer analyzer;
     private OutputCollector collector;
     private static final Logger logger = Logger.getLogger(TweetAnalyzerBolt.class);
+    private static final Pattern PATTERN = Pattern.compile("([A-Z][a-z]+( [A-Z][a-z]+)+)");
 
     public TweetAnalyzerBolt(String stopwordsLocation) {
         this.stopwordsLocation = stopwordsLocation;
@@ -78,9 +83,33 @@ public class TweetAnalyzerBolt extends BaseRichBolt {
             }
             reader.close();
             tokenStream.close();
+            
+            for (String term: extractNames(tweet)){
+                collector.emit(StreamIDs.TERMSTREAM, new Values(term));
+            }
         } catch (IOException ex) {
             logger.error(ex);
         }
+    }
+
+    private List<String> extractNames(String tweet) {
+        Matcher m = PATTERN.matcher(tweet);
+        CharArraySet stopwords = analyzer.getStopwords();
+        List<String> results = new ArrayList<>();
+        while (m.find()) {
+            String term = m.group(1).toLowerCase();
+            boolean stop = false;
+            int i = 0;
+            String[] comp = term.split(" ");
+            while (i < comp.length && !stop) {
+                stop = stopwords.contains(comp[i]);
+                i++;
+            }
+            if (!stopwords.contains(term) && !stop) {
+                results.add(term);
+            }
+        }
+        return results;
     }
 
     private CharArraySet readStopwords() {
