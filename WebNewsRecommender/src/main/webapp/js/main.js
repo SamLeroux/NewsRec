@@ -40,6 +40,16 @@ $(document).ready(function() {
     $("#btnLogin").on("click", function() {
         btnLoginClicked();
     });
+    
+    $("#btnAnon").on("click", function(){
+       closeLoginPopup();
+       $().toastmessage('showToast', {
+            text: "You chose not to register, you will still be able to receive personal recommendations but only on this computer.",
+            sticky: false,
+            type: 'notice',
+            inEffectDuration: 7500
+        });
+    });
 
     $("#results").listview();
 
@@ -63,12 +73,15 @@ $(document).ready(function() {
     var user = localStorage.getItem("userid");
     if (!(user === null || !user || user === undefined || user === "undefined")) {
         userUtils.setUserID(user);
+        var username = localStorage.getItem("loggedInUserName");
         $().toastmessage('showToast', {
             text: "logged in as " + username,
             sticky: false,
             type: 'notice',
-            inEffectDuration: 1500
+            inEffectDuration: 2000
         });
+    }else{
+        btnLoginClicked();
     }
 
     fetchRecommendations(true);
@@ -396,4 +409,8 @@ function btnLoginClicked() {
     $("#confirmPass").hide();
     $("#btnRegister").text("Register");
     $('#loginDialog').popup('open');
+}
+
+function closeLoginPopup(){
+    $('#loginDialog').popup('close');
 }

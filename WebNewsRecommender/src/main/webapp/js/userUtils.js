@@ -109,7 +109,7 @@ var userUtils = {
                 text: message,
                 sticky: false,
                 type: 'error',
-                inEffectDuration: 2500
+                inEffectDuration: 3500
             });
             console.log("error code - " + err.statusCode);
         }
@@ -146,7 +146,7 @@ var userUtils = {
             text: err.message,
             sticky: false,
             type: 'error',
-            inEffectDuration: 2500
+            inEffectDuration: 3500
         });
         $.mobile.loading('hide');
     },
