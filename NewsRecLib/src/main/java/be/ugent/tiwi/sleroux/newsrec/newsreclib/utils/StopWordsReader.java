@@ -25,6 +25,7 @@ import org.apache.lucene.analysis.util.CharArraySet;
 
 /**
  * Provides an easy way to read a stopwords file.
+ *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class StopWordsReader {
@@ -34,8 +35,8 @@ public class StopWordsReader {
     public static CharArraySet getStopwords(String stopwordsLocation) throws FileNotFoundException, IOException {
         logger.info("reading stopwords file: " + stopwordsLocation);
         CharArraySet stopw;
-        
-        if (stopwordsLocation == null){
+
+        if (stopwordsLocation == null) {
             throw new FileNotFoundException("file path is null");
         }
         try (BufferedReader reader = new BufferedReader(new FileReader(stopwordsLocation))) {
@@ -47,5 +48,27 @@ public class StopWordsReader {
             }
         }
         return stopw;
+    }
+
+    public static CharArraySet getDefaultStopwords() {
+        CharArraySet stopwords = new CharArraySet(Config.LUCENE_VERSION, 20, true);
+        stopwords.add("he");
+        stopwords.add("him");
+        stopwords.add("by");
+        stopwords.add("her");
+        stopwords.add("has");
+        stopwords.add("been");
+        stopwords.add("will");
+        stopwords.add("a");
+        stopwords.add("on");
+        stopwords.add("to");
+        stopwords.add("it");
+        stopwords.add("is");
+        stopwords.add("are");
+        stopwords.add("say");
+        stopwords.add("has");
+        stopwords.add("have");
+        stopwords.add("with");
+        return stopwords;
     }
 }

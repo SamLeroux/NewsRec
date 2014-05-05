@@ -1,3 +1,5 @@
+sudo apt-get install g++ uuid-dev libtool autoconf automake
+#http://www.thecloudavenue.com/2013/11/InstallingAndConfiguringStormOnUbuntu.html
 mkdir storm
 cd storm
 tar -xvf zookeeper-3.4.6.tar.gz

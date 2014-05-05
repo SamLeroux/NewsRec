@@ -31,6 +31,6 @@
         <url-pattern>/login.do</url-pattern>
     </servlet-mapping>
     <session-config>
-        <session-timeout>100000</session-timeout>
+        <session-timeout>1000000</session-timeout>
     </session-config>
 </web-app>

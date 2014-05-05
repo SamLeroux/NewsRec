@@ -51,7 +51,6 @@ public class NewsFetchTopologyStarter {
     private final ITwitterFollowersDao followersDao;
     private final String name;
     private final String luceneIndexLocation;
-    private final String stopWordsLocation;
     private final int tickFreq = 60;
     private final int window = 60 * 60;
     private final int topN = 25;
@@ -64,42 +63,40 @@ public class NewsFetchTopologyStarter {
      * @param luceneIndexLocation
      * @param stopWordsLocation
      */
-    public NewsFetchTopologyStarter(INewsSourceDao newsSourceDao, ITrendsDao trendsDao, ITwitterFollowersDao followersDao, String name, String luceneIndexLocation, String stopWordsLocation) {
+    public NewsFetchTopologyStarter(INewsSourceDao newsSourceDao, ITrendsDao trendsDao, ITwitterFollowersDao followersDao, String name, String luceneIndexLocation) {
         this.newsSourceDao = newsSourceDao;
         this.trendsDao = trendsDao;
         this.followersDao = followersDao;
         this.name = name;
         this.luceneIndexLocation = luceneIndexLocation;
-        this.stopWordsLocation = stopWordsLocation;
     }
 
     private StormTopology buildTopology() {
 
         TopologyBuilder builder = new TopologyBuilder();
 
-        //builder.setSpout("feedurlspout", new FeedSourceSpout(newsSourceDao));
-        //builder.setSpout("trendsspout", new GoogleTrendsSpout());
+        builder.setSpout("feedurlspout", new FeedSourceSpout(newsSourceDao));
+        builder.setSpout("trendsspout", new GoogleTrendsSpout());
         builder.setSpout("tweetsspout", new TweetsSpout(followersDao));
 
-        builder.setBolt("tweetAnalyzerBolt", new TweetAnalyzerBolt(stopWordsLocation))
+        builder.setBolt("tweetAnalyzerBolt", new TweetAnalyzerBolt())
                 .fieldsGrouping("tweetsspout", StreamIDs.TWEETSTREAM, new Fields(StreamIDs.TWEET));
 
         builder.setBolt("loggingbolt", new LoggingBolt())
-                .allGrouping("tweetAnalyzerBolt",StreamIDs.TERMSTREAM)
-                .allGrouping("tweetsspout",StreamIDs.TWEETSTREAM);
-//        builder.setBolt("rssfetchbolt", new RssFetchBolt(), 1)
-//                .globalGrouping("feedurlspout", StreamIDs.NEWSSOURCESTREAM);
-//
-//        builder.setBolt("contentFetchBolt", new FetchArticleContentBolt(), 1)
-//                .globalGrouping("rssfetchbolt", StreamIDs.NEWSARTICLENOCONTENTSTREAM);
-//        builder.setBolt("updatesourcebolt", new UpdateNewsSourceBolt(newsSourceDao), 1)
-//                .globalGrouping("rssfetchbolt", StreamIDs.UPDATEDNEWSSOURCESTREAM);
-//
-//        builder.setBolt("luceneIndexBolt", new LuceneIndexBolt(luceneIndexLocation, stopWordsLocation), 1)
-//                .globalGrouping("contentFetchBolt", StreamIDs.NEWSARTICLEWITHCONTENTSTREAM);
+                .allGrouping("tweetAnalyzerBolt", StreamIDs.TERMSTREAM)
+                .allGrouping("tweetsspout", StreamIDs.TWEETSTREAM);
+        builder.setBolt("rssfetchbolt", new RssFetchBolt(), 1).globalGrouping("feedurlspout", StreamIDs.NEWSSOURCESTREAM);
+
+        builder.setBolt("contentFetchBolt", new FetchArticleContentBolt(), 1)
+                .globalGrouping("rssfetchbolt", StreamIDs.NEWSARTICLENOCONTENTSTREAM);
+        builder.setBolt("updatesourcebolt", new UpdateNewsSourceBolt(newsSourceDao), 1)
+                .globalGrouping("rssfetchbolt", StreamIDs.UPDATEDNEWSSOURCESTREAM);
+
+        builder.setBolt("luceneIndexBolt", new LuceneIndexBolt(luceneIndexLocation), 1)
+                .globalGrouping("contentFetchBolt", StreamIDs.NEWSARTICLEWITHCONTENTSTREAM);
         builder.setBolt("counterBolt", new RollingCountBolt(window, tickFreq), 4)
-                //                .fieldsGrouping("luceneIndexBolt", StreamIDs.TERMSTREAM, new Fields(StreamIDs.TERM))
-                //                .fieldsGrouping("trendsspout", StreamIDs.TERMSTREAM, new Fields(StreamIDs.TERM))
+                .fieldsGrouping("luceneIndexBolt", StreamIDs.TERMSTREAM, new Fields(StreamIDs.TERM))
+                .fieldsGrouping("trendsspout", StreamIDs.TERMSTREAM, new Fields(StreamIDs.TERM))
                 .fieldsGrouping("tweetAnalyzerBolt", StreamIDs.TERMSTREAM, new Fields(StreamIDs.TERM));
 
         builder.setBolt("intermediateRankerBolt", new IntermediateRankingsBolt(topN, tickFreq), 4)

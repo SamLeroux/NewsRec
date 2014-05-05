@@ -47,7 +47,7 @@ public class LuceneTopTermExtract implements Serializable {
     private static final Logger logger = Logger.getLogger(LuceneTopTermExtract.class);
     private static final int DEFAULT_NUMBER_TERMS = 10;
     private static final Pattern PATTERN = Pattern.compile("([A-Z][a-z]+( [A-Z][a-z]+)+)");
-    private final NewsRecLuceneAnalyzer analyzer;
+    private NewsRecLuceneAnalyzer analyzer;
 
     /**
      *
@@ -57,6 +57,13 @@ public class LuceneTopTermExtract implements Serializable {
         this.analyzer = analyzer;
     }
 
+    public void setAnalyzer(NewsRecLuceneAnalyzer analyzer) {
+        this.analyzer = analyzer;
+    }
+    
+    
+
+    
     /**
      * Returns the 10 most important terms in the document with the specified
      * id.

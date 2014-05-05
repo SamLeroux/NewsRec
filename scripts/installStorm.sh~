@@ -30,4 +30,8 @@ tar -xvf apache-storm-0.9.1-incubating.tar.gz
 rm apache-storm-0.9.1-incubating.tar.gz
 cd apache-storm-0.9.1-incubating/
 mkdir data
-
+nano conf/storm.yaml
+bin/storm nimbus
+bin/storm supervisor
+bin/storm ui
+ps x

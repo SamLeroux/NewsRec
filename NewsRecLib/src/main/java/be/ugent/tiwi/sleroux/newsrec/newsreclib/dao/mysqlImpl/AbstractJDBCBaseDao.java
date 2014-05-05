@@ -51,6 +51,8 @@ public abstract class AbstractJDBCBaseDao {
         source.setUsername(user);
         source.setPassword(pass);
         source.setUrl(url);
+        source.setTestOnReturn(true);
+        source.setValidationQuery("SELECT 1");
         logger.debug("connectionpool created");
         return source;
     }

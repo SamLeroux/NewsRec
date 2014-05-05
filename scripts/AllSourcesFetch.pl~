@@ -19,7 +19,7 @@ sub fetch{
 	#print $content;
 	my @matches = $content =~ /$regex/g;
 	foreach my $match  (@matches){
-		print "$match\n";
+		#print "$match\n";
 	}
 	return @matches;
 }
@@ -45,7 +45,8 @@ sub add{
 
 sub append{
 	my $prefix = $_[0];
-	my @items = $_[1];
+	shift;
+	my @items = @_;
 	my @out;
 	foreach my $item (@items){
 		push @out, ($prefix . $item);
@@ -88,5 +89,11 @@ sub uniq {
 #add(uniq(fetch("http://www.newscientist.com/feed/feeds","<a href=\"(http://feeds.newscientist.com/.*?)\">")));
 #add(("http://www.newscientist.com/feed/magazine","http://www.newscientist.com/blogs/shortsharpscience/atom.xml","http://www.newscientist.com/feed/view?id=1&type=channel","http://www.newscientist.com/feed/view?id=2&type=channel","http://www.newscientist.com/feed/view?id=3&type=channel","http://www.newscientist.com/feed/view?id=4&type=channel","http://www.newscientist.com/feed/view?id=5&type=channel","http://www.newscientist.com/feed/view?id=6&type=channel","http://www.newscientist.com/feed/view?id=7&type=channel","http://www.newscientist.com/feed/features"));
 #add(("http://news.yahoo.com/rss/"));
-add(("http://feeds.fool.com/usmf/foolwatch"));
-
+#add(("http://feeds.fool.com/usmf/foolwatch"));
+#add(("http://www.neurope.eu/rss/883/feed/","http://www.neurope.eu/rss/884/feed/","http://www.neurope.eu/rss/1/feed/","));
+#http://www.neurope.eu/rss/5/feed/","http://www.neurope.eu/rss/6/feed/","http://www.neurope.eu/rss/57/feed/","http://www.neurope.eu/rss/609/feed/","http://www.neurope.eu/rss/11/feed/","http://www.neurope.eu/rss/58/feed/","http://www.neurope.eu/rss/7/feed/","http://www.neurope.eu/rss/59/feed/"));
+#add(append("http://www.standaard.be",fetch("http://www.standaard.be/rssfeeds","<a class=\"info\" target=\"_blank\" href=\"(/rss/.*?)\">.*?</a>")));
+#add(uniq(fetch("http://www.nieuwsblad.be/article/detail.aspx?articleid=DMA13102005_004","href=\"(http://feeds.*?)\">")));
+add(uniq(fetch("http://www.demorgen.be/static/nmc/nmc/frameset/dm_footer/rssFeeds.html?language=nl","<a href=\"(http://www.demorgen.be/.*?rss.xml)\"")));
+add(uniq(fetch("http://diensten.tijd.be/service/rss","link href=\"(http://www.tijd.be/rss/.*?.xml)\"")));
+add(uniq(fetch("http://www.hln.be/static/nmc/nmc/frameset/hln_footer/rssFeeds.html?language=nl&pageType=integration&navigationItemId=1441&navigation=rss","(http://www.hln.be/.*?/rss.xml)")));

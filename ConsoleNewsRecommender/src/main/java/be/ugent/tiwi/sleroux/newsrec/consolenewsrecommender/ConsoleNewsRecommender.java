@@ -84,8 +84,8 @@ public class ConsoleNewsRecommender {
         try {     
             //startAddArticles();
             //startRectest();
-            startLocalFetchTest();
-            //startClusterFetchTest();
+            //startLocalFetchTest();
+            startClusterFetchTest();
             //testClustering();
             builder.close();
         } catch (RecommenderBuildException ex) {
@@ -151,8 +151,7 @@ public class ConsoleNewsRecommender {
                     trendsDao,
                     followersDao,
                     "newsfetch",
-                    luceneLoc,
-                    stopwordsFileLocation);
+                    luceneLoc);
             
             starter.startLocal();
             Thread.sleep(1000*60*60*1);
@@ -172,8 +171,7 @@ public class ConsoleNewsRecommender {
                     trendsDao,
                     followersDao,
                     "newsfetch",
-                    luceneLoc,
-                    stopwordsFileLocation);
+                    luceneLoc);
             
             starter.startOnCLuster();
         } catch (StormException ex) {

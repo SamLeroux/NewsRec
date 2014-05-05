@@ -23,14 +23,15 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.config.Config;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.lucene.analyzers.EnAnalyzer;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.lucene.analyzers.LanguageAnalyzerHelper;
+import be.ugent.tiwi.sleroux.newsrec.newsreclib.lucene.analyzers.NewsRecLuceneAnalyzer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.topology.StreamIDs;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.termExtract.LuceneTopTermExtract;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.NewsItemLuceneDocConverter;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.StopWordsReader;
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
@@ -49,7 +50,6 @@ public class LuceneIndexBolt extends BaseRichBolt {
     private IndexWriter writer;
     private OutputCollector collector;
     private final String indexLocation;
-    private final String stopwordsLocation;
     private LuceneTopTermExtract termExtract;
     private static final Logger logger = Logger.getLogger(LuceneIndexBolt.class);
 
@@ -58,9 +58,8 @@ public class LuceneIndexBolt extends BaseRichBolt {
      * @param indexLocation
      * @param stopwordsLocation
      */
-    public LuceneIndexBolt(String indexLocation, String stopwordsLocation) {
+    public LuceneIndexBolt(String indexLocation) {
         this.indexLocation = indexLocation;
-        this.stopwordsLocation = stopwordsLocation;
     }
 
     @Override
@@ -74,8 +73,7 @@ public class LuceneIndexBolt extends BaseRichBolt {
         try {
             logger.info("Opening index");
             Directory dir = FSDirectory.open(new File(indexLocation));
-            EnAnalyzer analyzer = new EnAnalyzer();
-            analyzer.setStopwords(StopWordsReader.getStopwords(stopwordsLocation));
+            NewsRecLuceneAnalyzer analyzer = LanguageAnalyzerHelper.getInstance().getAnalyzer(Locale.ENGLISH);
             this.termExtract = new LuceneTopTermExtract(analyzer);
             IndexWriterConfig config = new IndexWriterConfig(Config.LUCENE_VERSION, analyzer);
             writer = new IndexWriter(dir, config);
@@ -103,6 +101,7 @@ public class LuceneIndexBolt extends BaseRichBolt {
 
             // input newsitem
             NewsItem item = (NewsItem) input.getValueByField(StreamIDs.NEWSARTICLEWITHCONTENT);
+            termExtract.setAnalyzer(LanguageAnalyzerHelper.getInstance().getAnalyzer(item.getLocale()));
             try (DirectoryReader reader = DirectoryReader.open(writer, true)) {
                 termExtract.addTopTerms(item, reader);
             }

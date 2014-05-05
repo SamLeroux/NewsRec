@@ -118,7 +118,7 @@
         <dependency>
             <groupId>storm</groupId>
             <artifactId>storm</artifactId>
-            <version>0.9.0.1</version><!--
+            <version>0.9.0.1</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -133,7 +133,7 @@
                     <groupId>javax.jms</groupId>
                     <artifactId>jms</artifactId>
                 </exclusion>
-            </exclusions>-->
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>commons-collections</groupId>

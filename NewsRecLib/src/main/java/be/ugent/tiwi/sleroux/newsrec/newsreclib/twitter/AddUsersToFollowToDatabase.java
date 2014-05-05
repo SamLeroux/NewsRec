@@ -31,14 +31,15 @@ import twitter4j.auth.AccessToken;
  */
 public class AddUsersToFollowToDatabase {
 
-    private static final String[] users = new String[]{"BillGates", "TheEconomist", "WhiteHouse", "nytimes", "BBCBreaking", "ForbesTech", "CNN", "Forbes", "cnntech", "HuffingtonPost", "guardiantech", "washingtonpost", "BBCWorld", "New_Europe"};
+    //private static final String[] users = new String[]{"BillGates", "TheEconomist", "WhiteHouse", "nytimes", "BBCBreaking", "ForbesTech", "CNN", "Forbes", "cnntech", "HuffingtonPost", "guardiantech", "washingtonpost", "BBCWorld", "New_Europe"};
+    private static final String[] users = new String[]{"destandaard"};
     private static Twitter twitter;
     private static final Logger logger = Logger.getLogger(AddUsersToFollowToDatabase.class);
     private static ITwitterFollowersDao dao;
 
     public static void main(String[] args) throws DaoException {
         dao = new MysqlFollowersDao();
-        //insert();
+        insert();
         for (long l : dao.getUsersToFollow()) {
             System.out.println(l);
         }
