@@ -53,5 +53,14 @@ public class DummyRatingsDao implements IRatingsDao{
     @Override
     public void close() throws DaoException {
     }
+
+    @Override
+    public Map<Long, Map<String, Double>> getAllRatings() throws RatingsDaoException {
+        HashMap<Long, Map<String, Double>> output = new HashMap();
+        output.put(0L, ratings);
+        return output;
+    }
+    
+    
     
 }

@@ -34,7 +34,7 @@ $(document).ready(function() {
         start = 0;
         count = 250;
         fetchRecommendations(true);
-        window.scrollTo(0, 0);
+        $("#resultsDiv").scrollTo(0, 0);
     });
 
     $("#btnLogin").on("click", function() {

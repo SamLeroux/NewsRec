@@ -24,6 +24,7 @@ import java.util.Map;
  */
 public interface IRatingsDao {
     public Map<String, Double> getRatings(long userid) throws RatingsDaoException;
+    public Map<Long, Map<String, Double>> getAllRatings() throws RatingsDaoException;
     public void giveRating(long userid, String term, double rating) throws RatingsDaoException;
     public void giveRating(long userid, Map<String, Double> terms) throws RatingsDaoException;
     public void close() throws DaoException;

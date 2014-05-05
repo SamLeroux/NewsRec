@@ -34,6 +34,7 @@ import java.util.Map;
 public class JDBCRatingsDao extends AbstractJDBCBaseDao implements IRatingsDao {
 
     private final ScoreDecay decay;
+
     public JDBCRatingsDao() throws DaoException {
         decay = new ScoreDecay();
     }
@@ -56,7 +57,7 @@ public class JDBCRatingsDao extends AbstractJDBCBaseDao implements IRatingsDao {
                     Date lastChanged = results.getDate(3);
                     double score = results.getDouble(2);
                     score *= decay.getBoost(new Date().getTime() - lastChanged.getTime());
-                    ratings.put(results.getString(1), score );
+                    ratings.put(results.getString(1), score);
                 }
             }
             return ratings;
@@ -142,6 +143,53 @@ public class JDBCRatingsDao extends AbstractJDBCBaseDao implements IRatingsDao {
             try {
                 if (insertUpdateRatingStatement != null) {
                     insertUpdateRatingStatement.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                throw new RatingsDaoException(ex);
+            }
+        }
+    }
+
+    @Override
+    public Map<Long, Map<String, Double>> getAllRatings() throws RatingsDaoException {
+        PreparedStatement selectStatement = null;
+        Connection conn = null;
+        try {
+            logger.debug("get all ratings");
+            
+            String statementText = bundle.getString("selectAllRatingsQuery");
+            conn = getConnection();
+            conn.setAutoCommit(true);
+            selectStatement = conn.prepareStatement(statementText);
+            Map<Long,Map<String, Double>> ratings;
+            
+            try (ResultSet results = selectStatement.executeQuery()) {
+                ratings = new HashMap<>();
+                while (results.next()) {
+                    
+                    long userId = results.getLong(1);
+                    String term = results.getString(2);
+                    double score = results.getDouble(3);
+                    Date lastChanged = results.getDate(4);
+                    score *= decay.getBoost(new Date().getTime() - lastChanged.getTime());
+                    
+                    if (!ratings.containsKey(userId)){
+                        ratings.put(userId, new HashMap<String, Double>());
+                    }
+                    ratings.get(userId).put(term, score);
+                }
+            }
+            return ratings;
+        } catch (SQLException ex) {
+            logger.error("Error fetching all ratings", ex);
+            throw new RatingsDaoException("Error fetching all ratings: " + ex.getMessage(), ex);
+        } finally {
+            try {
+                if (selectStatement != null) {
+                    selectStatement.close();
                 }
                 if (conn != null) {
                     conn.close();
