@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.lucene.analyzers;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.StopWordsReader;
@@ -33,12 +32,12 @@ public class LanguageAnalyzerHelper {
     private final Map<Locale, NewsRecLuceneAnalyzer> analyzerMap;
     private static LanguageAnalyzerHelper instance;
     private static final Logger logger = Logger.getLogger(LanguageAnalyzerHelper.class);
-    
+
     private LanguageAnalyzerHelper() {
-        
+
         analyzerMap = new HashMap<>();
         PropertyResourceBundle b = (PropertyResourceBundle) PropertyResourceBundle.getBundle("newsRec");
-        
+
         NewsRecLuceneAnalyzer a = new EnAnalyzer();
         try {
             a.setStopwords(StopWordsReader.getStopwords(b.getString("stopwEng")));
@@ -46,7 +45,7 @@ public class LanguageAnalyzerHelper {
             a.setStopwords(StopWordsReader.getDefaultStopwords());
         }
         analyzerMap.put(Locale.ENGLISH, a);
-        
+
         NewsRecLuceneAnalyzer a2 = new EnAnalyzer();
         try {
             a2.setStopwords(StopWordsReader.getStopwords(b.getString("stopwNl")));
@@ -55,7 +54,7 @@ public class LanguageAnalyzerHelper {
         }
         analyzerMap.put(Locale.forLanguageTag("nl"), a2);
     }
-    
+
     public static LanguageAnalyzerHelper getInstance() {
         if (instance == null) {
             synchronized (LanguageAnalyzerHelper.class) {
@@ -66,14 +65,14 @@ public class LanguageAnalyzerHelper {
         }
         return instance;
     }
-    
+
     public NewsRecLuceneAnalyzer getAnalyzer(Locale l) {
-        if (!analyzerMap.containsKey(l)){
-            logger.warn("No analyzer registered for locale: "+l);
+        if (!analyzerMap.containsKey(l)) {
+            logger.warn("No analyzer registered for locale: " + l);
             logger.info("returning default analyzer");
             return analyzerMap.get(Locale.ENGLISH);
         }
         return analyzerMap.get(l);
     }
-    
+
 }

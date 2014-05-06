@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IRatingsDao;
@@ -28,7 +27,8 @@ import org.apache.lucene.search.SearcherManager;
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 @Deprecated
-public class ColdStartLuceneRecommender implements IRecommender{
+public class ColdStartLuceneRecommender implements IRecommender {
+
     private final LuceneTermRecommender r1;
     private final TopNRecommender r2;
 
@@ -37,14 +37,13 @@ public class ColdStartLuceneRecommender implements IRecommender{
         r2 = new TopNRecommender(vdao, manager);
     }
 
-    
     @Override
     public List<RecommendedNewsItem> recommend(long userid, int start, int count) throws RecommendationException {
         List<RecommendedNewsItem> results = r1.recommend(userid, start, count);
-        if (results.size() < count){
+        if (results.size() < count) {
             List<RecommendedNewsItem> results2 = r2.recommend(userid, start, count);
             int i = 0;
-            while (results.size() < count && i < results2.size()){
+            while (results.size() < count && i < results2.size()) {
                 results.add(results2.get(i));
                 i++;
             }

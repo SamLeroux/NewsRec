@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 /**
- * Scorers record views or ratings. All scorers must implement the IScorer interface.
+ * Scorers record views or ratings. All scorers must implement the IScorer
+ * interface.
  */
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers;

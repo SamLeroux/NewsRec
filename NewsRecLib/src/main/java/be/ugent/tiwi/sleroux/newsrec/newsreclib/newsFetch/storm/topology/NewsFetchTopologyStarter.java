@@ -7,7 +7,6 @@ import backtype.storm.tuple.Fields;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.INewsSourceDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ITrendsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ITwitterFollowersDao;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.lucene.analyzers.EnAnalyzer;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.StormException;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.FetchArticleContentBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.LuceneIndexBolt;
@@ -16,7 +15,6 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.UpdateNews
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.spouts.FeedSourceSpout;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.StormRunner;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.LoggingBolt;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.TermFileOutputBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.TrendingTermsToDatabaseBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.TweetAnalyzerBolt;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.trendDetect.IntermediateRankingsBolt;
@@ -61,7 +59,6 @@ public class NewsFetchTopologyStarter {
      * @param trendsDao
      * @param name
      * @param luceneIndexLocation
-     * @param stopWordsLocation
      */
     public NewsFetchTopologyStarter(INewsSourceDao newsSourceDao, ITrendsDao trendsDao, ITwitterFollowersDao followersDao, String name, String luceneIndexLocation) {
         this.newsSourceDao = newsSourceDao;

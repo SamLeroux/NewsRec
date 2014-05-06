@@ -75,12 +75,12 @@ public class TermScorePairTest extends TestCase {
      * Test of compareTo method, of class TermScorePair.
      */
     public void testCompareTo() {
-       TermScorePair tsp1 = new TermScorePair("abc", 1);
-       TermScorePair tsp2 = new TermScorePair("def", 2);
+        TermScorePair tsp1 = new TermScorePair("abc", 1);
+        TermScorePair tsp2 = new TermScorePair("def", 2);
         assertTrue(tsp1.compareTo(tsp2) > 0);
         assertTrue(tsp2.compareTo(tsp1) < 0);
         assertTrue(tsp1.compareTo(tsp1) == 0);
-        
+
     }
 
 }

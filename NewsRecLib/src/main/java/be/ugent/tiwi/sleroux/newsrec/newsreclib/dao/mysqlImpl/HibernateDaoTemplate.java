@@ -29,9 +29,8 @@ import org.hibernate.cfg.Configuration;
 public abstract class HibernateDaoTemplate {
 
     private static SessionFactory sessionfactory = null;
-    protected Session session=null;
-    protected Transaction transaction=null;
-
+    protected Session session = null;
+    protected Transaction transaction = null;
 
     public HibernateDaoTemplate() {
         if (sessionfactory == null) {
@@ -51,16 +50,14 @@ public abstract class HibernateDaoTemplate {
 
     public void stopSession() throws DaoException {
 
-        try{
-            if (transaction != null){
+        try {
+            if (transaction != null) {
                 transaction.commit();
             }
-        }
-        catch (HibernateException ex){
+        } catch (HibernateException ex) {
             throw new DaoException();
-        }
-        finally{
-            if (session !=null){
+        } finally {
+            if (session != null) {
                 session.close();
             }
         }

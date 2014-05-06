@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.topology;
 
 /**
@@ -21,7 +20,7 @@ package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.topology;
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class StreamIDs {
-    
+
     /**
      *
      */
@@ -31,7 +30,7 @@ public class StreamIDs {
      *
      */
     public static final String NEWSSOURCEITEM = "newsSource";
-    
+
     /**
      *
      */
@@ -46,7 +45,7 @@ public class StreamIDs {
      *
      */
     public static final String NEWSARTICLESOURCE = "sourcename";
-    
+
     /**
      *
      */
@@ -56,7 +55,7 @@ public class StreamIDs {
      *
      */
     public static final String UPDATEDNEWSSOURCE = "updatedNewsSource";
-    
+
     /**
      *
      */
@@ -66,7 +65,7 @@ public class StreamIDs {
      *
      */
     public static final String NEWSARTICLEWITHCONTENT = "articleWithContent";
-    
+
     /**
      *
      */
@@ -76,7 +75,7 @@ public class StreamIDs {
      *
      */
     public static final String INDEXEDITEM = "indexeditem";
-    
+
     /**
      *
      */
@@ -86,8 +85,8 @@ public class StreamIDs {
      *
      */
     public static final String TERM = "term";
-    
+
     public static final String TWEET = "tweet";
     public static final String TWEETSTREAM = "tweetstream";
-    
+
 }

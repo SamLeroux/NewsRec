@@ -16,7 +16,6 @@
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.model;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import junit.framework.TestCase;
@@ -26,16 +25,16 @@ import junit.framework.TestCase;
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class RecommendedNewsItemTest extends TestCase {
-    
+
     public RecommendedNewsItemTest(String testName) {
         super(testName);
     }
-    
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
     }
-    
+
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
@@ -51,11 +50,11 @@ public class RecommendedNewsItemTest extends TestCase {
         r2.setScore(2F);
         RecommendedNewsItem r3 = new RecommendedNewsItem();
         r3.setScore(1F);
-        
+
         assertTrue(r1.compareTo(r2) < 0);
         assertTrue(r2.compareTo(r1) > 0);
         assertTrue(r3.compareTo(r1) == 0);
-        
+
         List<RecommendedNewsItem> items = new ArrayList<>();
         items.add(r1);
         items.add(r2);
@@ -68,7 +67,7 @@ public class RecommendedNewsItemTest extends TestCase {
             assertTrue(items.get(1) == r1);
         }
         assertTrue(items.get(2) == r2);
-        
+
     }
-    
+
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.model;
 
 import java.net.URL;
@@ -21,9 +20,11 @@ import java.util.Date;
 
 /**
  * Represents a news source such as a newspaper.
+ *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class NewsSource {
+
     private int id;
     private String name;
     private Date lastArticleFetchTime;
@@ -40,8 +41,6 @@ public class NewsSource {
         this.id = id;
     }
 
-    
-    
     public String getName() {
         return name;
     }
@@ -52,7 +51,8 @@ public class NewsSource {
 
     /**
      * The timestamp of the last seen article.
-     * @return 
+     *
+     * @return
      */
     public Date getLastArticleFetchTime() {
         return lastArticleFetchTime;
@@ -64,7 +64,8 @@ public class NewsSource {
 
     /**
      * The timestamp of the last check for new articles.
-     * @return 
+     *
+     * @return
      */
     public Date getLastFetchTry() {
         return lastFetchTry;
@@ -74,11 +75,10 @@ public class NewsSource {
         this.lastFetchTry = lastFetchTry;
     }
 
-    
-
     /**
      * The time between checks for new articles in seconds
-     * @return 
+     *
+     * @return
      */
     public int getFetchinterval() {
         return fetchinterval;
@@ -109,7 +109,4 @@ public class NewsSource {
         return "NewsSource{" + "id=" + id + ", name=" + name + ", lastArticleFetchTime=" + lastArticleFetchTime + ", lastFetchTry=" + lastFetchTry + ", fetchinterval=" + fetchinterval + ", description=" + description + ", rssUrl=" + rssUrl + '}';
     }
 
-    
-    
-    
 }

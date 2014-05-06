@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.model;
 
 import java.util.Date;
@@ -24,16 +23,16 @@ import junit.framework.TestCase;
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class NewsItemClusterTest extends TestCase {
-    
+
     public NewsItemClusterTest(String testName) {
         super(testName);
     }
-    
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
     }
-    
+
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
@@ -48,11 +47,11 @@ public class NewsItemClusterTest extends TestCase {
         instance.addItem(item);
         assertTrue(instance.getRepresentative() == item);
         assertTrue(instance.getItems().isEmpty());
-        
+
         instance.addItem(item);
         assertTrue(instance.getRepresentative() == item);
         assertFalse(instance.getItems().isEmpty());
-        
+
     }
 
     /**
@@ -61,30 +60,30 @@ public class NewsItemClusterTest extends TestCase {
     public void testGetSize() {
         RecommendedNewsItem item = new RecommendedNewsItem();
         NewsItemCluster instance = new NewsItemCluster();
-        for (int i = 0; i < 5; i++){
+        for (int i = 0; i < 5; i++) {
             instance.addItem(item);
         }
         assertTrue(instance.getSize() == 5);
-        
+
     }
 
-    public void testCorrectRepresentative(){
+    public void testCorrectRepresentative() {
         NewsItemCluster c = new NewsItemCluster();
-        
+
         RecommendedNewsItem r1 = new RecommendedNewsItem();
         r1.setTimestamp(new Date());
         c.addItem(r1);
-        
+
         assertTrue(c.getRepresentative() == r1);
         assertTrue(c.getItems().isEmpty());
-        
+
         RecommendedNewsItem r2 = new RecommendedNewsItem();
-        r2.setTimestamp(new Date(System.currentTimeMillis()+200000));
+        r2.setTimestamp(new Date(System.currentTimeMillis() + 200000));
         c.addItem(r2);
-        
+
         assertTrue(c.getRepresentative() == r2);
         assertFalse(c.getItems().isEmpty());
         assertTrue(c.getItems().get(0) == r1);
     }
-    
+
 }

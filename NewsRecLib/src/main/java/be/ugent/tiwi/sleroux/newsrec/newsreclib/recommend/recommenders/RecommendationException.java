@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.NewsRecException;
@@ -22,7 +21,7 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.NewsRecException;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class RecommendationException extends NewsRecException{
+public class RecommendationException extends NewsRecException {
 
     public RecommendationException() {
     }
@@ -42,5 +41,5 @@ public class RecommendationException extends NewsRecException{
     public RecommendationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
-    
+
 }

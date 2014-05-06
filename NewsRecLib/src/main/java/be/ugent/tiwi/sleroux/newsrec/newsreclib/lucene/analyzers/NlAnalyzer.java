@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.lucene.analyzers;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.config.Config;
@@ -34,7 +33,7 @@ import org.tartarus.snowball.ext.DutchStemmer;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class NlAnalyzer extends NewsRecLuceneAnalyzer{
+public class NlAnalyzer extends NewsRecLuceneAnalyzer {
 
     @Override
     protected TokenStreamComponents createComponents(Reader reader) {
@@ -50,11 +49,11 @@ public class NlAnalyzer extends NewsRecLuceneAnalyzer{
         } else {
             logger.info("No stopwordsfile provided, no stopword removal");
         }
-     
+
         result = new SnowballFilter(result, new DutchStemmer());
 
         TokenStreamComponents comp = new TokenStreamComponents(t, result);
         return comp;
     }
-    
+
 }

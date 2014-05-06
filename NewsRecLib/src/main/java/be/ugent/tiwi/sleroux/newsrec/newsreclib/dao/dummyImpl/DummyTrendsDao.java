@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.dummyImpl;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
@@ -24,14 +23,14 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.TrendsDaoException;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class DummyTrendsDao implements ITrendsDao{
+public class DummyTrendsDao implements ITrendsDao {
 
     private String[] trends;
 
     public DummyTrendsDao() {
-        trends = new String[]{"linux","java","ubuntu"};
+        trends = new String[]{"linux", "java", "ubuntu"};
     }
-    
+
     @Override
     public String[] getTrends() throws TrendsDaoException {
         return trends;
@@ -50,5 +49,5 @@ public class DummyTrendsDao implements ITrendsDao{
     public String[] getTrends(int n) throws TrendsDaoException {
         return trends;
     }
-    
+
 }

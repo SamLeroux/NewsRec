@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.NewsRecException;
@@ -22,7 +21,7 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.NewsRecException;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class DaoException extends NewsRecException{
+public class DaoException extends NewsRecException {
 
     public DaoException() {
     }
@@ -42,5 +41,5 @@ public class DaoException extends NewsRecException{
     public DaoException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
-    
+
 }

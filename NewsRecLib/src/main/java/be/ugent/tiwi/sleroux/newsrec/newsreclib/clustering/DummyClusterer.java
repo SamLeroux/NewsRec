@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItemCluster;
@@ -25,17 +24,17 @@ import java.util.List;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class DummyClusterer implements IClusterer{
+public class DummyClusterer implements IClusterer {
 
     @Override
     public List<NewsItemCluster> cluster(List<RecommendedNewsItem> items) {
         List<NewsItemCluster> clusters = new ArrayList<>(items.size());
-        for (RecommendedNewsItem item: items){
+        for (RecommendedNewsItem item : items) {
             NewsItemCluster c = new NewsItemCluster();
             c.setRepresentative(item);
             clusters.add(c);
         }
         return clusters;
     }
-    
+
 }

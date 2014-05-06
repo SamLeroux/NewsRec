@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.trendDetect;
 
 /**
@@ -34,10 +33,11 @@ public interface Rankable extends Comparable<Rankable> {
      */
     long getCount();
 
-  /**
-* Note: We do not defensively copy the object wrapped by the Rankable. It is passed as is.
-*
+    /**
+     * Note: We do not defensively copy the object wrapped by the Rankable. It
+     * is passed as is.
+     *     
 * @return a defensive copy
-*/
-  Rankable copy();
+     */
+    Rankable copy();
 }

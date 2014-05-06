@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering.distance;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
@@ -23,5 +22,6 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public interface IDistance {
+
     public double distance(RecommendedNewsItem n1, RecommendedNewsItem n2);
 }

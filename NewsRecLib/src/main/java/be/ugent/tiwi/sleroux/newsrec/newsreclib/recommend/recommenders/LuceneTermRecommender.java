@@ -54,8 +54,6 @@ public class LuceneTermRecommender extends LuceneRecommender {
         this.viewsDao = viewsDao;
     }
 
-    
-
     @Override
     public List<RecommendedNewsItem> recommend(long userid, int start, int count) throws RecommendationException {
         IndexSearcher searcher = null;
@@ -70,7 +68,7 @@ public class LuceneTermRecommender extends LuceneRecommender {
             searcher = manager.acquire();
             manager.maybeRefresh();
             searcher.search(query, filter, collector);
-            
+
             ScoreDoc[] hits = collector.topDocs().scoreDocs;
 
             int stop = (start + count < hits.length ? start + count : hits.length);
@@ -79,7 +77,7 @@ public class LuceneTermRecommender extends LuceneRecommender {
             for (int i = start; i < stop; i++) {
                 int docId = hits[i].doc;
                 Document d = searcher.doc(docId);
-                results.add(toNewsitem(d, docId, hits[i].score,"termRecommender"));
+                results.add(toNewsitem(d, docId, hits[i].score, "termRecommender"));
                 //System.out.println(docId);
                 //System.out.println(searcher.explain(query, docId).toString());
             }
@@ -89,7 +87,7 @@ public class LuceneTermRecommender extends LuceneRecommender {
         } catch (RatingsDaoException | IOException ex) {
             logger.error(ex);
             throw new RecommendationException(ex);
-        } finally{
+        } finally {
             try {
                 manager.release(searcher);
             } catch (IOException ex) {
@@ -98,7 +96,7 @@ public class LuceneTermRecommender extends LuceneRecommender {
             searcher = null;
         }
     }
-    
+
     protected Query buildQuery(Map<String, Double> terms) {
         BooleanQuery q = new BooleanQuery();
         for (String term : terms.keySet()) {

@@ -114,8 +114,6 @@ public class NewsItemToTermsBolt extends BaseRichBolt {
                 collector.emit(StreamIDs.TERMSTREAM, new Values(term));
             }
 
-            
-
         } catch (IOException ex) {
             logger.error(ex);
         } finally {
@@ -173,7 +171,7 @@ public class NewsItemToTermsBolt extends BaseRichBolt {
     }
 
     private void updateTermMap(DirectoryReader reader, IndexSearcher searcher, Map<String, Double> termMap, String id, String field, double weight) throws IOException {
-        Query query = new TermQuery(new Term("id",id));
+        Query query = new TermQuery(new Term("id", id));
         TopDocs topdocs = searcher.search(query, 1);
 
         if (topdocs.totalHits > 0) {

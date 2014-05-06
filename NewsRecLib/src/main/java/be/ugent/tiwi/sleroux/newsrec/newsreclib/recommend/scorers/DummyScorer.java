@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers;
 
 /**
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class DummyScorer implements IScorer{
+public class DummyScorer implements IScorer {
 
     @Override
     public void score(long user, String item, double rating) {
@@ -33,5 +32,5 @@ public class DummyScorer implements IScorer{
     @Override
     public void viewUrl(long user, String url) {
     }
-    
+
 }

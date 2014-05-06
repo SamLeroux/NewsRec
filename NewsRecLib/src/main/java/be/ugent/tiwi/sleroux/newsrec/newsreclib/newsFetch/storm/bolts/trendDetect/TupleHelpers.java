@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.trendDetect;
 
 import backtype.storm.Constants;
@@ -25,8 +24,8 @@ import backtype.storm.tuple.Tuple;
  */
 public final class TupleHelpers {
 
-  private TupleHelpers() {
-  }
+    private TupleHelpers() {
+    }
 
     /**
      *
@@ -34,8 +33,8 @@ public final class TupleHelpers {
      * @return
      */
     public static boolean isTickTuple(Tuple tuple) {
-    return tuple.getSourceComponent().equals(Constants.SYSTEM_COMPONENT_ID) && tuple.getSourceStreamId().equals(
-        Constants.SYSTEM_TICK_STREAM_ID);
-  }
+        return tuple.getSourceComponent().equals(Constants.SYSTEM_COMPONENT_ID) && tuple.getSourceStreamId().equals(
+                Constants.SYSTEM_TICK_STREAM_ID);
+    }
 
 }

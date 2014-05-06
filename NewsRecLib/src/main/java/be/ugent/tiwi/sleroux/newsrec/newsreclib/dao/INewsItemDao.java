@@ -13,16 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 
 /**
  * Dao for newsItems
+ *
  * @author Sam Leroux <sam.leroux@ugent.be>
  * @see NewsItem
  */
 public interface INewsItemDao {
+
     public void addNewsItem(NewsItem item) throws DaoException;
 }

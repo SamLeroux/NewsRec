@@ -84,9 +84,9 @@ public class RecommendedNewsItem extends NewsItem implements Comparable<Recommen
     public int compareTo(RecommendedNewsItem o) {
         if (getRecommendedBy() != null && o.getRecommendedBy() != null && !getRecommendedBy().equals(o.getRecommendedBy())) {
             if (o.getRecommendedBy().equals("trending")) {
-                return Float.compare(score, o.getScore()*2);
-            }else{
-                return Float.compare(2*score, o.getScore());
+                return Float.compare(score, o.getScore() * 2);
+            } else {
+                return Float.compare(2 * score, o.getScore());
             }
         }
 

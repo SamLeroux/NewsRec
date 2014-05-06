@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.dummyImpl;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
@@ -26,14 +25,13 @@ import java.util.Map;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class DummyRatingsDao implements IRatingsDao{
+public class DummyRatingsDao implements IRatingsDao {
+
     private final Map<String, Double> ratings;
 
     public DummyRatingsDao() {
         ratings = new HashMap<>();
     }
-    
-    
 
     @Override
     public Map<String, Double> getRatings(long userid) throws RatingsDaoException {
@@ -60,7 +58,5 @@ public class DummyRatingsDao implements IRatingsDao{
         output.put(0L, ratings);
         return output;
     }
-    
-    
-    
+
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.mysqlImpl;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
@@ -26,7 +25,8 @@ import org.hibernate.Query;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class DebuggingMysqlNewsSourceDao extends HibernateDaoTemplate implements INewsSourceDao{
+public class DebuggingMysqlNewsSourceDao extends HibernateDaoTemplate implements INewsSourceDao {
+
     @Override
     public NewsSource[] getSourcesToCheck() {
         Query query = session.createQuery("from NewsSource where id=410");

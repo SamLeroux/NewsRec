@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts;
 
 import backtype.storm.task.OutputCollector;
@@ -27,11 +26,12 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsSource;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.topology.StreamIDs;
 import java.util.Map;
 import org.apache.log4j.Logger;
+
 /**
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class UpdateNewsSourceBolt extends BaseRichBolt{
+public class UpdateNewsSourceBolt extends BaseRichBolt {
 
     private final INewsSourceDao newsSourceDao;
     private OutputCollector collector;
@@ -44,8 +44,7 @@ public class UpdateNewsSourceBolt extends BaseRichBolt{
     public UpdateNewsSourceBolt(INewsSourceDao newsSourceDao) {
         this.newsSourceDao = newsSourceDao;
     }
-    
-    
+
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
     }
@@ -58,13 +57,13 @@ public class UpdateNewsSourceBolt extends BaseRichBolt{
     @Override
     public void execute(Tuple input) {
         try {
-            NewsSource source = (NewsSource)input.getValueByField(StreamIDs.UPDATEDNEWSSOURCE);
-            logger.info("updating newssource: "+source.getName());
+            NewsSource source = (NewsSource) input.getValueByField(StreamIDs.UPDATEDNEWSSOURCE);
+            logger.info("updating newssource: " + source.getName());
             newsSourceDao.updateNewsSource(source);
         } catch (DaoException ex) {
             logger.error(ex);
         }
         collector.ack(input);
     }
-    
+
 }

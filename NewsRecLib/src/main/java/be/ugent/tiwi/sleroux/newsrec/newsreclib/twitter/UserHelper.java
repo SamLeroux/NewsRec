@@ -59,7 +59,7 @@ public class UserHelper {
                 System.out.println(requestToken.getAuthorizationURL());
                 System.out.print("Enter the PIN(if aviailable) or just hit enter.[PIN]:");
                 String pin = br.readLine();
-                
+
                 try {
                     if (pin.length() > 0) {
                         accessToken = twitter.getOAuthAccessToken(requestToken, pin);
@@ -70,7 +70,7 @@ public class UserHelper {
                     if (401 == te.getStatusCode()) {
                         System.out.println("Unable to get the access token.");
                     } else {
-                        te.printStackTrace();
+                        logger.error(te);
                     }
                 }
             } catch (IOException ex) {
@@ -81,7 +81,7 @@ public class UserHelper {
     }
 
     private static void storeAccessToken(long useId, AccessToken accessToken) {
-        System.out.println("Userid="+useId);
+        System.out.println("Userid=" + useId);
         System.out.println("AccessToken= " + accessToken.getToken());
         System.out.println("TokenSecret= " + accessToken.getTokenSecret());
     }

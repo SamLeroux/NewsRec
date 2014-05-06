@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao;
 
 import java.util.List;
@@ -23,8 +22,12 @@ import java.util.List;
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public interface IViewsDao {
+
     public List<Integer> getSeenArticles(long userId) throws ViewsDaoException;
+
     public void see(long userId, int docNr, String itemId) throws ViewsDaoException;
+
     public List<Long> getNMostSeenArticles(int start, int stop) throws ViewsDaoException;
+
     public void close() throws DaoException;
 }

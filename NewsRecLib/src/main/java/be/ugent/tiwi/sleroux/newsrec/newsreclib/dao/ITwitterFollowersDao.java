@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao;
 
 import java.util.List;
@@ -23,6 +22,8 @@ import java.util.List;
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public interface ITwitterFollowersDao {
+
     public List<Long> getUsersToFollow() throws DaoException;
+
     public void addUserToFollow(String screenName, long id) throws DaoException;
 }

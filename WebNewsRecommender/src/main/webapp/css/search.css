@@ -49,12 +49,12 @@ limitations under the License.
     right:0;
     padding:0;
     overflow-y:hidden;
-    overflow-x:hidden;
+    //overflow-x:hidden;
     position:fixed;
 }
 
 #articleFrame{
-    height:100%;
+    height:93%;
     width:100%;
     display: none;
     margin:0;
@@ -124,13 +124,17 @@ limitations under the License.
         display:none;
     }
 
+    #articleFrame{
+        height:100%;
+    }
+    
     #resultsDiv, #relatedResultsDiv{
         width:100%;
         height:100%;
         margin-top: 2px;
         margin-left: 2px;
         padding:0;
-        
+
     }
 
     #results, #relatedResults{

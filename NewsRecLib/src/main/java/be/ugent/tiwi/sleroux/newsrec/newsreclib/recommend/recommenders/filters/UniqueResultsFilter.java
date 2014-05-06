@@ -32,6 +32,7 @@ import org.apache.lucene.util.OpenBitSet;
 public class UniqueResultsFilter extends Filter {
 
     private final List<RecommendedNewsItem> items;
+
     public UniqueResultsFilter(List<RecommendedNewsItem> items) {
         this.items = items;
     }

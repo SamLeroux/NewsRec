@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers;
 
 /**
  * Update the user model after the user has viewed or scored an item.
+ *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public interface IScorer {
+
     public void score(long user, String item, double rating);
+
     public void view(long user, String item);
+
     public void viewUrl(long user, String url);
 }

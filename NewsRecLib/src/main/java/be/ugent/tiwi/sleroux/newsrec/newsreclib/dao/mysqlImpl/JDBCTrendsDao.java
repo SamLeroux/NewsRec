@@ -34,25 +34,25 @@ import java.util.List;
 public class JDBCTrendsDao extends AbstractJDBCBaseDao implements ITrendsDao, Serializable {
 
     public static final int DEFAULT_NUMBER_TRENDS = 100;
+
     public JDBCTrendsDao() throws DaoException {
     }
 
-    
     @Override
     public String[] getTrends(int n) throws TrendsDaoException {
         logger.debug("Get trends");
-        
+
         Connection conn = null;
         PreparedStatement selectStatement = null;
-        
+
         try {
-            
+
             String selectText = bundle.getString("selectTopTermsQuery");
             conn = getConnection();
             selectStatement = conn.prepareStatement(selectText);
-            
+
             selectStatement.setInt(1, n);
-            
+
             try (ResultSet results = selectStatement.executeQuery()) {
                 List<String> trends = new ArrayList<>(100);
                 while (results.next()) {
@@ -60,7 +60,7 @@ public class JDBCTrendsDao extends AbstractJDBCBaseDao implements ITrendsDao, Se
                 }
                 return trends.toArray(new String[trends.size()]);
             }
-            
+
         } catch (SQLException ex) {
             throw new TrendsDaoException(ex);
         } finally {
@@ -82,15 +82,15 @@ public class JDBCTrendsDao extends AbstractJDBCBaseDao implements ITrendsDao, Se
     public void updateTrends(String[] trends) throws TrendsDaoException {
         Connection conn = null;
         PreparedStatement insertStatement = null;
-        
+
         try {
-            
+
             logger.debug("update trends");
-            
+
             String insertText = bundle.getString("insertUpdateTrendsQuery");
             conn = getConnection();
             insertStatement = conn.prepareStatement(insertText);
-            
+
             int i = 0;
             for (String trend : trends) {
                 insertStatement.setString(1, trend);
@@ -99,7 +99,7 @@ public class JDBCTrendsDao extends AbstractJDBCBaseDao implements ITrendsDao, Se
                 i++;
                 insertStatement.addBatch();
             }
-            
+
             int[] result = insertStatement.executeBatch();
         } catch (SQLException | NullPointerException ex) {
             logger.error("Error updating rating", ex);
@@ -112,7 +112,7 @@ public class JDBCTrendsDao extends AbstractJDBCBaseDao implements ITrendsDao, Se
                 if (conn != null) {
                     conn.close();
                 }
-            } catch (SQLException |NullPointerException ex) {
+            } catch (SQLException | NullPointerException ex) {
                 throw new TrendsDaoException(ex);
             }
         }

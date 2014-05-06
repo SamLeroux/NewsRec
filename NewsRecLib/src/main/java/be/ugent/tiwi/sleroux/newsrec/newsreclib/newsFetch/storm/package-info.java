@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 /**
- * This package contains classes to fetch newsitems. To be highly scalable this is
- * done in a Storm topology.
+ * This package contains classes to fetch newsitems. To be highly scalable this
+ * is done in a Storm topology.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm;

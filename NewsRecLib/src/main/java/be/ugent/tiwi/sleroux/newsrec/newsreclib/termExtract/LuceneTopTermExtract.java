@@ -60,10 +60,7 @@ public class LuceneTopTermExtract implements Serializable {
     public void setAnalyzer(NewsRecLuceneAnalyzer analyzer) {
         this.analyzer = analyzer;
     }
-    
-    
 
-    
     /**
      * Returns the 10 most important terms in the document with the specified
      * id.
@@ -244,7 +241,7 @@ public class LuceneTopTermExtract implements Serializable {
             boolean stop = false;
             int i = 0;
             String[] comp = term.split(" ");
-            while (i < comp.length && !stop){
+            while (i < comp.length && !stop) {
                 stop = stopwords.contains(comp[i]);
                 i++;
             }

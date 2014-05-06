@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao;
 
 import java.util.Map;
@@ -23,9 +22,14 @@ import java.util.Map;
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public interface IRatingsDao {
+
     public Map<String, Double> getRatings(long userid) throws RatingsDaoException;
+
     public Map<Long, Map<String, Double>> getAllRatings() throws RatingsDaoException;
+
     public void giveRating(long userid, String term, double rating) throws RatingsDaoException;
+
     public void giveRating(long userid, Map<String, Double> terms) throws RatingsDaoException;
+
     public void close() throws DaoException;
 }

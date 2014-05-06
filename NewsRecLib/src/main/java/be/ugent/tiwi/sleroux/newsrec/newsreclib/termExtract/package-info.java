@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 /**
  * Provides classes to extract top terms from newsitems.
+ *
  * @author Sam Leroux
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.termExtract;

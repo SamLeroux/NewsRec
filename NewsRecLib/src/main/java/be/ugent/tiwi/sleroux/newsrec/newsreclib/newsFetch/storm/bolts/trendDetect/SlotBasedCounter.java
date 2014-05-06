@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.trendDetect;
 
 import java.io.Serializable;
@@ -25,27 +24,28 @@ import java.util.Set;
 /**
  * This class provides per-slot counts of the occurrences of objects.
  * <p/>
- * It can be used, for instance, as a building block for implementing sliding window counting of objects.
+ * It can be used, for instance, as a building block for implementing sliding
+ * window counting of objects.
  *
  * @param <T> The type of those objects we want to count.
  */
 public final class SlotBasedCounter<T> implements Serializable {
 
-  private static final long serialVersionUID = 4858185737378394432L;
+    private static final long serialVersionUID = 4858185737378394432L;
 
-  private final Map<T, long[]> objToCounts = new HashMap<>();
-  private final int numSlots;
+    private final Map<T, long[]> objToCounts = new HashMap<>();
+    private final int numSlots;
 
     /**
      *
      * @param numSlots
      */
     public SlotBasedCounter(int numSlots) {
-    if (numSlots <= 0) {
-      throw new IllegalArgumentException("Number of slots must be greater than zero (you requested " + numSlots + ")");
+        if (numSlots <= 0) {
+            throw new IllegalArgumentException("Number of slots must be greater than zero (you requested " + numSlots + ")");
+        }
+        this.numSlots = numSlots;
     }
-    this.numSlots = numSlots;
-  }
 
     /**
      *
@@ -53,13 +53,13 @@ public final class SlotBasedCounter<T> implements Serializable {
      * @param slot
      */
     public void incrementCount(T obj, int slot) {
-    long[] counts = objToCounts.get(obj);
-    if (counts == null) {
-      counts = new long[this.numSlots];
-      objToCounts.put(obj, counts);
+        long[] counts = objToCounts.get(obj);
+        if (counts == null) {
+            counts = new long[this.numSlots];
+            objToCounts.put(obj, counts);
+        }
+        counts[slot]++;
     }
-    counts[slot]++;
-  }
 
     /**
      *
@@ -68,69 +68,69 @@ public final class SlotBasedCounter<T> implements Serializable {
      * @return
      */
     public long getCount(T obj, int slot) {
-    long[] counts = objToCounts.get(obj);
-    if (counts == null) {
-      return 0;
+        long[] counts = objToCounts.get(obj);
+        if (counts == null) {
+            return 0;
+        } else {
+            return counts[slot];
+        }
     }
-    else {
-      return counts[slot];
-    }
-  }
 
     /**
      *
      * @return
      */
     public Map<T, Long> getCounts() {
-    Map<T, Long> result = new HashMap<>();
-    for (T obj : objToCounts.keySet()) {
-      result.put(obj, computeTotalCount(obj));
+        Map<T, Long> result = new HashMap<>();
+        for (T obj : objToCounts.keySet()) {
+            result.put(obj, computeTotalCount(obj));
+        }
+        return result;
     }
-    return result;
-  }
 
-  private long computeTotalCount(T obj) {
-    long[] curr = objToCounts.get(obj);
-    long total = 0;
-    for (long l : curr) {
-      total += l;
+    private long computeTotalCount(T obj) {
+        long[] curr = objToCounts.get(obj);
+        long total = 0;
+        for (long l : curr) {
+            total += l;
+        }
+        return total;
     }
-    return total;
-  }
 
-  /**
-   * Reset the slot count of any tracked objects to zero for the given slot.
-   *
-   * @param slot
-   */
-  public void wipeSlot(int slot) {
-    for (T obj : objToCounts.keySet()) {
-      resetSlotCountToZero(obj, slot);
+    /**
+     * Reset the slot count of any tracked objects to zero for the given slot.
+     *
+     * @param slot
+     */
+    public void wipeSlot(int slot) {
+        for (T obj : objToCounts.keySet()) {
+            resetSlotCountToZero(obj, slot);
+        }
     }
-  }
 
-  private void resetSlotCountToZero(T obj, int slot) {
-    long[] counts = objToCounts.get(obj);
-    counts[slot] = 0;
-  }
-
-  private boolean shouldBeRemovedFromCounter(T obj) {
-    return computeTotalCount(obj) == 0;
-  }
-
-  /**
-   * Remove any object from the counter whose total count is zero (to free up memory).
-   */
-  public void wipeZeros() {
-    Set<T> objToBeRemoved = new HashSet<>();
-    for (T obj : objToCounts.keySet()) {
-      if (shouldBeRemovedFromCounter(obj)) {
-        objToBeRemoved.add(obj);
-      }
+    private void resetSlotCountToZero(T obj, int slot) {
+        long[] counts = objToCounts.get(obj);
+        counts[slot] = 0;
     }
-    for (T obj : objToBeRemoved) {
-      objToCounts.remove(obj);
+
+    private boolean shouldBeRemovedFromCounter(T obj) {
+        return computeTotalCount(obj) == 0;
     }
-  }
+
+    /**
+     * Remove any object from the counter whose total count is zero (to free up
+     * memory).
+     */
+    public void wipeZeros() {
+        Set<T> objToBeRemoved = new HashSet<>();
+        for (T obj : objToCounts.keySet()) {
+            if (shouldBeRemovedFromCounter(obj)) {
+                objToBeRemoved.add(obj);
+            }
+        }
+        for (T obj : objToBeRemoved) {
+            objToCounts.remove(obj);
+        }
+    }
 
 }

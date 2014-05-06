@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering.distance;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
@@ -23,21 +22,20 @@ import com.aliasi.util.Distance;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class DistanceAdapter implements Distance{
+public class DistanceAdapter implements Distance {
 
     private final IDistance distance;
 
     public DistanceAdapter(IDistance distance) {
         this.distance = distance;
     }
-    
-    
+
     @Override
     public double distance(Object e, Object e1) {
-        RecommendedNewsItem n1 = (RecommendedNewsItem)e;
-        RecommendedNewsItem n2 = (RecommendedNewsItem)e1;
-        
+        RecommendedNewsItem n1 = (RecommendedNewsItem) e;
+        RecommendedNewsItem n2 = (RecommendedNewsItem) e1;
+
         return distance.distance(n1, n2);
     }
-    
+
 }

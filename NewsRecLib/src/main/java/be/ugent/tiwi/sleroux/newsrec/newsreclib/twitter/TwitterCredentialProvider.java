@@ -25,19 +25,19 @@ public class TwitterCredentialProvider {
 
     private static final PropertyResourceBundle bundle = (PropertyResourceBundle) PropertyResourceBundle.getBundle("twitter");
 
-    public static String get0AuthConsumerKey(){
+    public static String get0AuthConsumerKey() {
         return bundle.getString("0AuthConsumerkey");
     }
-    
-    public static String get0AuthConsumerSecret(){
+
+    public static String get0AuthConsumerSecret() {
         return bundle.getString("0AuthConsumerSecret");
     }
-    
-    public static String getAccessToken(){
+
+    public static String getAccessToken() {
         return bundle.getString("0AuthAccessToken");
     }
-    
-    public static String getAccessSecret(){
+
+    public static String getAccessSecret() {
         return bundle.getString("0AuthTokenSecret");
     }
 }

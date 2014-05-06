@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.lucene.analyzers;
 
 import java.io.Reader;
@@ -27,6 +26,7 @@ import org.apache.lucene.analysis.util.CharArraySet;
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public abstract class NewsRecLuceneAnalyzer extends Analyzer {
+
     protected static final Logger logger = Logger.getLogger(EnAnalyzer.class);
     protected CharArraySet stopwords = null;
     protected SynonymMap synonyms = null;
@@ -73,10 +73,10 @@ public abstract class NewsRecLuceneAnalyzer extends Analyzer {
      * @return
      */
     @Override
-    protected TokenStreamComponents createComponents(String fieldName, Reader reader){
+    protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
         return createComponents(reader);
     }
-    
+
     protected abstract TokenStreamComponents createComponents(Reader reader);
-    
+
 }

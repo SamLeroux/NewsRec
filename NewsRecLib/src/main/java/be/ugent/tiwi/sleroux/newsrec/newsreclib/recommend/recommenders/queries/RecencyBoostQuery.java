@@ -49,19 +49,15 @@ public class RecencyBoostQuery extends CustomScoreQuery {
         decay = new ScoreDecay();
     }
 
-    public RecencyBoostQuery(Query subQuery,ScoreDecay decay) {
+    public RecencyBoostQuery(Query subQuery, ScoreDecay decay) {
         super(subQuery);
         this.decay = decay;
     }
-    
-    
 
     @Override
     protected CustomScoreProvider getCustomScoreProvider(AtomicReaderContext context) throws IOException {
         return new RecencyBoostScoreProvider(context);
     }
-
-   
 
     private class RecencyBoostScoreProvider extends CustomScoreProvider {
 

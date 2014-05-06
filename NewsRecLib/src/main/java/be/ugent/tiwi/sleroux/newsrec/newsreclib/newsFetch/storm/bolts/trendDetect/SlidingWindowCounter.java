@@ -40,8 +40,7 @@ import java.util.Map;
  * example represent 1 minute of time each:
  * <p/>
  * <
- * pre>
- * {@code
+ * pre> null {@code
  * Sliding window counts of an object X over time
  *
  * Minute (timeline):

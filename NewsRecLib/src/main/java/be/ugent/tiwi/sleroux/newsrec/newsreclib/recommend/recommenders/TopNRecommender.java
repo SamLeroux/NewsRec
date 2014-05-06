@@ -19,7 +19,6 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.queries.R
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.filters.SeenArticlesFilter;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.IViewsDao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.ViewsDaoException;
-import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.utils.ScoreDecay;
 import java.io.IOException;

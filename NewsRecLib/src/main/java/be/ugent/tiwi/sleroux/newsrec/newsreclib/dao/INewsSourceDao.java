@@ -18,8 +18,9 @@ package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao;
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.NewsSource;
 
 /**
- * Provides access to newsSources
- * Always call starSession() before and stopSession() after every operation.
+ * Provides access to newsSources Always call starSession() before and
+ * stopSession() after every operation.
+ *
  * @see NewsSource
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
@@ -28,7 +29,7 @@ public interface INewsSourceDao {
     NewsSource[] getSourcesToCheck() throws DaoException;
 
     NewsSource[] getAllSources() throws DaoException;
-    
+
     void updateNewsSource(NewsSource source) throws DaoException;
 
     void addNewsSource(NewsSource source) throws DaoException;

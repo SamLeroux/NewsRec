@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
@@ -21,17 +20,21 @@ import java.util.List;
 
 /**
  * Basic recommender interface.
+ *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public interface IRecommender {
+
     /**
-     * Recommend "count" items for the user with userid "userid", return only the
-     * items after "start".
+     * Recommend "count" items for the user with userid "userid", return only
+     * the items after "start".
+     *
      * @param userid
      * @param start
      * @param count
-     * @return 
-     * @throws be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.RecommendationException 
+     * @return
+     * @throws
+     * be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.RecommendationException
      */
     public List<RecommendedNewsItem> recommend(long userid, int start, int count) throws RecommendationException;
 }

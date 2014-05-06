@@ -36,21 +36,21 @@ public class NewsItemCluster {
                 || representative.getTimestamp().before(item.getTimestamp())) {
             if (representative != null) {
                 items.add(representative);
-                if (item.getImageUrl() == null && representative.getImageUrl() != null){
+                if (item.getImageUrl() == null && representative.getImageUrl() != null) {
                     item.setImageUrl(representative.getImageUrl());
                 }
             }
             representative = item;
         } else {
             items.add(item);
-            if (representative.getImageUrl() == null && item.getImageUrl() != null){
+            if (representative.getImageUrl() == null && item.getImageUrl() != null) {
                 representative.setImageUrl(item.getImageUrl());
             }
         }
     }
 
     public int getSize() {
-        return items.size()+1;
+        return items.size() + 1;
     }
 
     public List<RecommendedNewsItem> getItems() {

@@ -16,7 +16,7 @@
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.utils;
 
 /**
- * 
+ *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class ScoreDecay {
@@ -57,10 +57,9 @@ public class ScoreDecay {
     public void setM(double m) {
         this.m = m;
     }
-    
-    public double getBoost(long ageMs){
+
+    public double getBoost(long ageMs) {
         return a / (ageMs * m + b);
     }
-    
-    
+
 }

@@ -59,9 +59,9 @@ public class SeenArticlesFilter extends Filter {
             for (int i : viewed) {
                 int relative = i - docBase; // relative id in this context
                 if (relative >= 0 && relative < maxId) {
-                    logger.debug("cleared "+i+", should not show up in results");
+                    logger.debug("cleared " + i + ", should not show up in results");
                     // Remove this document from the results.
-                    bits.fastClear(i-docBase);
+                    bits.fastClear(i - docBase);
                 }
             }
         } catch (ViewsDaoException ex) {

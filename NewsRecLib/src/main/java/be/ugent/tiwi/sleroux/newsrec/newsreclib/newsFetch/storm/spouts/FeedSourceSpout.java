@@ -32,10 +32,6 @@ import org.apache.log4j.Logger;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-
-
 /**
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
@@ -58,7 +54,7 @@ public class FeedSourceSpout extends BaseRichSpout {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declareStream(StreamIDs.NEWSSOURCESTREAM,new Fields(StreamIDs.NEWSSOURCEITEM));
+        declarer.declareStream(StreamIDs.NEWSSOURCESTREAM, new Fields(StreamIDs.NEWSSOURCEITEM));
     }
 
     @Override
@@ -72,15 +68,14 @@ public class FeedSourceSpout extends BaseRichSpout {
     @Override
     public void close() {
         timer.cancel();
-        super.close();         
+        super.close();
     }
 
-    
     @Override
     public void nextTuple() {
         NewsSource source = sourcesQueue.poll();
         if (source != null) {
-            collector.emit(StreamIDs.NEWSSOURCESTREAM,new Values(source));
+            collector.emit(StreamIDs.NEWSSOURCESTREAM, new Values(source));
         } else {
             try {
                 Thread.sleep(200);
@@ -97,7 +92,7 @@ public class FeedSourceSpout extends BaseRichSpout {
             try {
                 NewsSource[] sources = newsSourceDao.getSourcesToCheck();
                 sourcesQueue.addAll(Arrays.asList(sources));
-                logger.info(sources.length+" feeds to check");
+                logger.info(sources.length + " feeds to check");
             } catch (DaoException ex) {
                 logger.error(ex);
             }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao;
 
 /**
@@ -21,8 +20,12 @@ package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao;
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public interface ITrendsDao {
+
     public String[] getTrends() throws TrendsDaoException;
+
     public String[] getTrends(int n) throws TrendsDaoException;
+
     public void updateTrends(String[] trends) throws TrendsDaoException;
+
     public void close() throws DaoException;
 }

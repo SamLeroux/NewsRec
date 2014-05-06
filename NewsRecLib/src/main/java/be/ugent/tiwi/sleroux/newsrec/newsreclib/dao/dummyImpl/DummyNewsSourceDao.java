@@ -50,7 +50,7 @@ public class DummyNewsSourceDao implements INewsSourceDao {
 
     @Override
     public NewsSource[] getSourcesToCheck() throws DaoException {
-        if (!started){
+        if (!started) {
             throw new DaoException("Session not started");
         }
         return getAllSources();
@@ -58,7 +58,7 @@ public class DummyNewsSourceDao implements INewsSourceDao {
 
     @Override
     public NewsSource[] getAllSources() throws DaoException {
-        if (!started){
+        if (!started) {
             throw new DaoException("Session not started");
         }
         return newsSources.toArray(new NewsSource[newsSources.size()]);
@@ -66,7 +66,7 @@ public class DummyNewsSourceDao implements INewsSourceDao {
 
     @Override
     public void addNewsSource(NewsSource source) throws DaoException {
-        if (!started){
+        if (!started) {
             throw new DaoException("Session not started");
         }
         newsSources.add(source);
@@ -74,7 +74,7 @@ public class DummyNewsSourceDao implements INewsSourceDao {
 
     @Override
     public void startSession() throws DaoException {
-        if (started){
+        if (started) {
             throw new DaoException("Previous session not closed");
         }
         started = true;
@@ -82,7 +82,7 @@ public class DummyNewsSourceDao implements INewsSourceDao {
 
     @Override
     public void stopSession() throws DaoException {
-        if (!started){
+        if (!started) {
             throw new DaoException("Session not started");
         }
         started = false;

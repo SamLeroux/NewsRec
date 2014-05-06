@@ -26,9 +26,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -58,7 +56,7 @@ public class GetRecommendationsServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
         try {
-            long user = (Long)request.getSession().getAttribute("userId");
+            long user = (Long) request.getSession().getAttribute("userId");
             int start = Integer.parseInt(request.getParameter("start"));
             int count = Integer.parseInt(request.getParameter("count"));
 
@@ -79,7 +77,7 @@ public class GetRecommendationsServlet extends HttpServlet {
                     return o2.getRepresentative().compareTo(o1.getRepresentative());
                 }
             });
-            
+
             Gson gson = new Gson();
             String json = gson.toJson(clusters.toArray(new NewsItemCluster[clusters.size()]));
 //            System.out.println(json);

@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao;
 
 /**
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class TrendsDaoException extends DaoException{
+public class TrendsDaoException extends DaoException {
 
     public TrendsDaoException() {
     }
@@ -40,5 +39,5 @@ public class TrendsDaoException extends DaoException{
     public TrendsDaoException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
-    
+
 }

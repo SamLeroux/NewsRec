@@ -64,7 +64,7 @@ public class PersonalAndTrendingRecommender extends TrendingTopicRecommender {
         try {
             Map<String, Double> terms = ratingsDao.getRatings(userid);
             Query query = buildQuery(terms);
-            int hitsPerPage = start+count;
+            int hitsPerPage = start + count;
 
             TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
 
@@ -78,9 +78,7 @@ public class PersonalAndTrendingRecommender extends TrendingTopicRecommender {
 
             ScoreDoc[] hits = collector.topDocs(start, count).scoreDocs;
 
-            
-
-            for (ScoreDoc s: hits) {
+            for (ScoreDoc s : hits) {
                 int docId = s.doc;
                 Document d = searcher.doc(docId);
                 RecommendedNewsItem item = toNewsitem(d, docId, s.score, "personal");

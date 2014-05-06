@@ -50,7 +50,6 @@ public class ViewedServlet extends HttpServlet {
             Map<String, String> params = request.getParameterMap();
 
             long user = (Long) request.getSession().getAttribute("userId");
-            System.out.println(user);
             if (params.containsKey("itemId")) {
                 String itemId = request.getParameterValues("itemId")[0];
                 IScorer scorer = (IScorer) getServletContext().getAttribute("scorer");

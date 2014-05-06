@@ -18,7 +18,6 @@ public class TwitterStreamBuilder {
         cb.setOAuthAccessToken(TwitterCredentialProvider.getAccessToken());
         cb.setOAuthAccessTokenSecret(TwitterCredentialProvider.getAccessSecret());
 
-        
         return new TwitterStreamFactory(cb.build()).getInstance();
     }
 }

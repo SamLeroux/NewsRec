@@ -159,24 +159,24 @@ public class JDBCRatingsDao extends AbstractJDBCBaseDao implements IRatingsDao {
         Connection conn = null;
         try {
             logger.debug("get all ratings");
-            
+
             String statementText = bundle.getString("selectAllRatingsQuery");
             conn = getConnection();
             conn.setAutoCommit(true);
             selectStatement = conn.prepareStatement(statementText);
-            Map<Long,Map<String, Double>> ratings;
-            
+            Map<Long, Map<String, Double>> ratings;
+
             try (ResultSet results = selectStatement.executeQuery()) {
                 ratings = new HashMap<>();
                 while (results.next()) {
-                    
+
                     long userId = results.getLong(1);
                     String term = results.getString(2);
                     double score = results.getDouble(3);
                     Date lastChanged = results.getDate(4);
                     score *= decay.getBoost(new Date().getTime() - lastChanged.getTime());
-                    
-                    if (!ratings.containsKey(userId)){
+
+                    if (!ratings.containsKey(userId)) {
                         ratings.put(userId, new HashMap<String, Double>());
                     }
                     ratings.get(userId).put(term, score);

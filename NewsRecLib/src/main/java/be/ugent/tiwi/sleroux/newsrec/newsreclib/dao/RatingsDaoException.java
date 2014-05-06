@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao;
 
 /**
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class RatingsDaoException extends DaoException{
+public class RatingsDaoException extends DaoException {
 
     public RatingsDaoException() {
     }
@@ -40,5 +39,5 @@ public class RatingsDaoException extends DaoException{
     public RatingsDaoException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
-    
+
 }

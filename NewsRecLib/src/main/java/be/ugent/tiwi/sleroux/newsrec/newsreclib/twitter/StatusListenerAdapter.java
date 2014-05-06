@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.twitter;
 
 import org.apache.log4j.Logger;
@@ -26,10 +25,10 @@ import twitter4j.StatusListener;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class StatusListenerAdapter implements StatusListener{
+public class StatusListenerAdapter implements StatusListener {
 
     protected static final Logger logger = Logger.getLogger(StatusListenerAdapter.class);
-    
+
     @Override
     public void onStatus(Status status) {
     }
@@ -55,5 +54,5 @@ public class StatusListenerAdapter implements StatusListener{
     public void onException(Exception excptn) {
         logger.error(excptn);
     }
-    
+
 }

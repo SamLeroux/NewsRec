@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.model.RecommendedNewsItem;
@@ -25,30 +24,28 @@ import java.util.List;
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 @Deprecated
-public class CombinedRecommender implements IRecommender{
-    
+public class CombinedRecommender implements IRecommender {
+
     private final List<IRecommender> recommenders;
 
     public CombinedRecommender() {
         recommenders = new ArrayList<>();
     }
-    
-    public void addRecommender(IRecommender r){
+
+    public void addRecommender(IRecommender r) {
         recommenders.add(r);
     }
-    
-    
 
     @Override
     public List<RecommendedNewsItem> recommend(long userid, int start, int count) throws RecommendationException {
-        if (!recommenders.isEmpty()){
+        if (!recommenders.isEmpty()) {
             List<RecommendedNewsItem> results = recommenders.get(0).recommend(userid, start, count);
-            for (int i = 1; i < recommenders.size();i++){
+            for (int i = 1; i < recommenders.size(); i++) {
                 results.addAll(recommenders.get(i).recommend(userid, start, count));
             }
             return results;
         }
         return new ArrayList();
     }
-    
+
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.clustering.distance.IDistance;
@@ -37,7 +36,7 @@ public class ThresholdClusterer implements IClusterer {
     public List<NewsItemCluster> cluster(List<RecommendedNewsItem> items) {
         itemToCLuster = new int[items.size()];
         clusterToItems = new ArrayList<>(items.size());
-        
+
         for (int i = 0; i < items.size(); i++) {
             items.get(i).setRecommendationId(i);
             itemToCLuster[i] = i;

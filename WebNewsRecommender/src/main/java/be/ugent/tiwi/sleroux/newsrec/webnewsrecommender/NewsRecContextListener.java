@@ -30,7 +30,6 @@ import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.recommenders.IRecommen
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.recommend.scorers.IScorer;
 import java.io.IOException;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import org.apache.log4j.Logger;
@@ -57,7 +56,7 @@ public class NewsRecContextListener implements ServletContextListener {
         try {
             TestingLogWriter writer = new TestingLogWriter("/home/sam/usertest.csv");
             sce.getServletContext().setAttribute("testlogger", writer);
-            
+
             ratingsDao = new JDBCRatingsDao();
             trendsDao = new CachingTrendsDaoProxy(new JDBCTrendsDao());
 
@@ -78,7 +77,7 @@ public class NewsRecContextListener implements ServletContextListener {
             logger.error(ex);
         } catch (RecommenderBuildException ex) {
             logger.error(ex);
-        } catch (IOException ex){
+        } catch (IOException ex) {
             logger.error(ex);
         }
 

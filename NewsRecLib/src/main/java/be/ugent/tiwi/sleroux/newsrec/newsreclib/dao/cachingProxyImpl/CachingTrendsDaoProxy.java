@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.cachingProxyImpl;
 
 import be.ugent.tiwi.sleroux.newsrec.newsreclib.dao.DaoException;
@@ -25,29 +24,26 @@ import org.apache.log4j.Logger;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class CachingTrendsDaoProxy implements ITrendsDao{
+public class CachingTrendsDaoProxy implements ITrendsDao {
 
     private final ITrendsDao inner;
     private String[] trends = null;
     private long lastFetched;
     private static final Logger logger = Logger.getLogger(CachingTrendsDaoProxy.class);
-    
 
     public CachingTrendsDaoProxy(ITrendsDao inner) {
         this.inner = inner;
         lastFetched = 0;
     }
-    
-    
+
     @Override
     public String[] getTrends() throws TrendsDaoException {
         long diff = System.currentTimeMillis() - lastFetched;
-        if (trends == null || diff >= 5*60*1000){
+        if (trends == null || diff >= 5 * 60 * 1000) {
             logger.info("requesting trends from inner dao");
             trends = inner.getTrends();
             lastFetched = System.currentTimeMillis();
-        }
-        else{
+        } else {
             logger.info("returning cached trends");
         }
         return trends;
@@ -67,16 +63,14 @@ public class CachingTrendsDaoProxy implements ITrendsDao{
     @Override
     public String[] getTrends(int n) throws TrendsDaoException {
         long diff = System.currentTimeMillis() - lastFetched;
-        if (trends == null || diff >= 5*60*1000){
+        if (trends == null || diff >= 5 * 60 * 1000) {
             logger.info("requesting trends from inner dao");
             trends = inner.getTrends(n);
             lastFetched = System.currentTimeMillis();
-        }
-        else{
+        } else {
             logger.info("returning cached trends");
         }
         return trends;
     }
-    
+
 }
-    

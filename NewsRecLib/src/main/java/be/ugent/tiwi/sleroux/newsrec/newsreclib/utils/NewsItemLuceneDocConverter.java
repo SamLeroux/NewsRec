@@ -45,8 +45,9 @@ public class NewsItemLuceneDocConverter {
 
     /**
      * Converts a NewsItem to a Lucene Document.
+     *
      * @param item
-     * @return 
+     * @return
      */
     public static Document newsItemToDocument(NewsItem item) {
         Document doc = new Document();
@@ -68,7 +69,7 @@ public class NewsItemLuceneDocConverter {
             doc.add(new StringField("url", item.getUrl().toString(), Field.Store.YES));
         }
         if (item.getImageUrl() != null) {
-            System.out.println("image : "+item.getImageUrl());
+            System.out.println("image : " + item.getImageUrl());
             doc.add(new StringField("imageUrl", item.getImageUrl().toString(), Field.Store.YES));
         }
         if (item.getLocale() != null) {
@@ -93,8 +94,9 @@ public class NewsItemLuceneDocConverter {
 
     /**
      * Converts a Lucene Document to a NewsItem
+     *
      * @param d
-     * @return 
+     * @return
      */
     public static RecommendedNewsItem documentToNewsItem(Document d) {
         RecommendedNewsItem item = new RecommendedNewsItem();
@@ -128,7 +130,6 @@ public class NewsItemLuceneDocConverter {
             item.setId("");
         }
 
-       
         field = d.getField("imageUrl");
         if (field != null) {
             try {

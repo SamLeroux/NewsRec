@@ -13,68 +13,69 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.newsreclib.newsFetch.storm.bolts.trendDetect;
 
 import backtype.storm.utils.Time;
 import org.apache.commons.collections.buffer.CircularFifoBuffer;
 
 /**
-* This class tracks the time-since-last-modify of a "thing" in a rolling fashion.
-* <p/>
-* For example, create a 5-slot tracker to track the five most recent time-since-last-modify.
-* <p/>
-* You must manually "mark" that the "something" that you want to track -- in terms of modification times -- has just
-* been modified.
-*/
+ * This class tracks the time-since-last-modify of a "thing" in a rolling
+ * fashion.
+ * <p/>
+ * For example, create a 5-slot tracker to track the five most recent
+ * time-since-last-modify.
+ * <p/>
+ * You must manually "mark" that the "something" that you want to track -- in
+ * terms of modification times -- has just been modified.
+ */
 public class NthLastModifiedTimeTracker {
 
-  private static final int MILLIS_IN_SEC = 250;
+    private static final int MILLIS_IN_SEC = 250;
 
-  private final CircularFifoBuffer lastModifiedTimesMillis;
+    private final CircularFifoBuffer lastModifiedTimesMillis;
 
     /**
      *
      * @param numTimesToTrack
      */
     public NthLastModifiedTimeTracker(int numTimesToTrack) {
-    if (numTimesToTrack < 1) {
-      throw new IllegalArgumentException(
-          "numTimesToTrack must be greater than zero (you requested " + numTimesToTrack + ")");
+        if (numTimesToTrack < 1) {
+            throw new IllegalArgumentException(
+                    "numTimesToTrack must be greater than zero (you requested " + numTimesToTrack + ")");
+        }
+        lastModifiedTimesMillis = new CircularFifoBuffer(numTimesToTrack);
+        initLastModifiedTimesMillis();
     }
-    lastModifiedTimesMillis = new CircularFifoBuffer(numTimesToTrack);
-    initLastModifiedTimesMillis();
-  }
 
-  private void initLastModifiedTimesMillis() {
-    long nowCached = now();
-    for (int i = 0; i < lastModifiedTimesMillis.maxSize(); i++) {
-      lastModifiedTimesMillis.add(Long.valueOf(nowCached));
+    private void initLastModifiedTimesMillis() {
+        long nowCached = now();
+        for (int i = 0; i < lastModifiedTimesMillis.maxSize(); i++) {
+            lastModifiedTimesMillis.add(Long.valueOf(nowCached));
+        }
     }
-  }
 
-  private long now() {
-    return Time.currentTimeMillis();
-  }
+    private long now() {
+        return Time.currentTimeMillis();
+    }
 
     /**
      *
      * @return
      */
     public int secondsSinceOldestModification() {
-    long modifiedTimeMillis = ((Long) lastModifiedTimesMillis.get()).longValue();
-    return (int) ((now() - modifiedTimeMillis) / MILLIS_IN_SEC);
-  }
+        long modifiedTimeMillis = ((Long) lastModifiedTimesMillis.get()).longValue();
+        return (int) ((now() - modifiedTimeMillis) / MILLIS_IN_SEC);
+    }
 
     /**
      *
      */
     public void markAsModified() {
-    updateLastModifiedTime();
-  }
+        updateLastModifiedTime();
+    }
 
-  private void updateLastModifiedTime() {
-    lastModifiedTimesMillis.add(now());
-  }
+    private void updateLastModifiedTime() {
+        lastModifiedTimesMillis.add(now());
+    }
 
 }

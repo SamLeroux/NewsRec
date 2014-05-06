@@ -61,10 +61,9 @@ public class TrendingTopicRecommender extends LuceneRecommender implements IReco
         try {
             String[] trends = trendsDao.getTrends(250);
             Query query = buildQuery(trends);
-            int hitsPerPage = start+count;
+            int hitsPerPage = start + count;
 
             TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
-
 
             //Filter filter = new SeenArticlesFilter(viewsDao, userid);
             Filter f = new RecentFilter("timestamp", 1000 * 60 * 60 * 24);

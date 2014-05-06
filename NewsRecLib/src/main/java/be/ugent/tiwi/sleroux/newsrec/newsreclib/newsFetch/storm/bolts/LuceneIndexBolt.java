@@ -56,7 +56,6 @@ public class LuceneIndexBolt extends BaseRichBolt {
     /**
      *
      * @param indexLocation
-     * @param stopwordsLocation
      */
     public LuceneIndexBolt(String indexLocation) {
         this.indexLocation = indexLocation;
@@ -105,26 +104,24 @@ public class LuceneIndexBolt extends BaseRichBolt {
             try (DirectoryReader reader = DirectoryReader.open(writer, true)) {
                 termExtract.addTopTerms(item, reader);
             }
-            
+
             // Convert to lucene document and add to index
             Document doc = NewsItemLuceneDocConverter.newsItemToDocument(item);
             writer.addDocument(doc);
             writer.commit();
-            
+
             logger.info("emitting " + item.getTerms().size() + " terms");
             for (String term : item.getTerms().keySet()) {
                 collector.emit(StreamIDs.TERMSTREAM, new Values(term));
             }
 
             logger.info("New item in Lucene index");
-            
+
         } catch (IOException ex) {
             logger.error(ex);
         }
         collector.ack(input);
 
     }
-
-    
 
 }

@@ -49,7 +49,6 @@ public class NewsItem {
 
     private URL url;
     private URL imageUrl;
-    
 
     public NewsItem() {
         terms = new HashMap<>();
@@ -197,14 +196,8 @@ public class NewsItem {
 
     }
 
-   
-
     public void setAuthors(List<String> authors) {
         this.authors = authors;
     }
-
-   
-    
-    
 
 }

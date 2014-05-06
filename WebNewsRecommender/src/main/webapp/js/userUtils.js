@@ -97,10 +97,11 @@ var userUtils = {
                 type: 'notice',
                 inEffectDuration: 2000
             });
+            start = 0;
             fetchRecommendations(true);
         }
         catch (err) {
-            $('#loginDialog').popup('close');
+            //$('#loginDialog').popup('close');
             var message = err.message;
             if (message === ""){
                 message = "Error during login";
@@ -141,7 +142,7 @@ var userUtils = {
         userUtils.login(username, pass);
     },
     userRegistrationFailed: function(err) {
-        $('#loginDialog').popup('close');
+        //$('#loginDialog').popup('close');
         $().toastmessage('showToast', {
             text: err.message,
             sticky: false,
