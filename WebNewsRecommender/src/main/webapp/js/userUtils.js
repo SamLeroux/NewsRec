@@ -73,8 +73,8 @@ $(document).ready(function() {
             userUtils.login(user, pass);
         }
     });
-    
-    
+
+
 });
 
 
@@ -103,7 +103,7 @@ var userUtils = {
         catch (err) {
             //$('#loginDialog').popup('close');
             var message = err.message;
-            if (message === ""){
+            if (message === "") {
                 message = "Error during login";
             }
             $().toastmessage('showToast', {

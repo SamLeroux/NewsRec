@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.webnewsrecommender;
 
 import java.io.File;
@@ -26,29 +25,28 @@ import java.io.Writer;
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
 public class TestingLogWriter {
+
     private final Writer outputWriter;
 
     public TestingLogWriter(String filename) throws IOException {
         File f = new File(filename);
-        outputWriter = new FileWriter(f,true);
+        outputWriter = new FileWriter(f, true);
     }
-    
-    public void write(long userId, String recommendedBy, String articleId){
+
+    public void write(long userId, String recommendedBy, String articleId) {
         try {
-            outputWriter.write(System.currentTimeMillis()+";"+userId+";"+recommendedBy+";"+articleId+"\n");
+            outputWriter.write(System.currentTimeMillis() + ";" + userId + ";" + recommendedBy + ";" + articleId + "\n");
             outputWriter.flush();
         } catch (IOException ex) {
-            System.out.println(System.currentTimeMillis()+";"+userId+";"+recommendedBy+";"+articleId);
+            System.out.println(System.currentTimeMillis() + ";" + userId + ";" + recommendedBy + ";" + articleId);
         }
     }
-    
-    public void close(){
+
+    public void close() {
         try {
             outputWriter.close();
         } catch (IOException ex) {
         }
     }
-    
-    
-    
+
 }

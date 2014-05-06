@@ -40,10 +40,10 @@ $(document).ready(function() {
     $("#btnLogin").on("click", function() {
         btnLoginClicked();
     });
-    
-    $("#btnAnon").on("click", function(){
-       closeLoginPopup();
-       $().toastmessage('showToast', {
+
+    $("#btnAnon").on("click", function() {
+        closeLoginPopup();
+        $().toastmessage('showToast', {
             text: "You chose not to register, you will still be able to receive personal recommendations but only on this computer.",
             sticky: false,
             type: 'notice',
@@ -80,7 +80,7 @@ $(document).ready(function() {
             type: 'notice',
             inEffectDuration: 2000
         });
-    }else{
+    } else {
         btnLoginClicked();
     }
 
@@ -403,14 +403,18 @@ function shorten(text, n) {
 
 
 function btnLoginClicked() {
+    $.mobile.window.one("navigate", function(e) {
+        e.preventDefault();
+    });
     $("#name").empty();
     $("#pass1").empty();
     $("#pass2").empty();
     $("#confirmPass").hide();
     $("#btnRegister").text("Register");
-    $('#loginDialog').popup('open');
+    $("#loginDialog").popup({ history: false });
+    $("#loginDialog").popup('open');
 }
 
-function closeLoginPopup(){
+function closeLoginPopup() {
     $('#loginDialog').popup('close');
 }

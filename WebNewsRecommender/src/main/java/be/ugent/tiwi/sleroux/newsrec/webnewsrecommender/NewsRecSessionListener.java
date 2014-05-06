@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.ugent.tiwi.sleroux.newsrec.webnewsrecommender;
 
 import java.util.Random;
@@ -24,9 +23,10 @@ import javax.servlet.http.HttpSessionListener;
  *
  * @author Sam Leroux <sam.leroux@ugent.be>
  */
-public class NewsRecSessionListener implements HttpSessionListener{
+public class NewsRecSessionListener implements HttpSessionListener {
 
     private static final Random rnd = new Random();
+
     @Override
     public void sessionCreated(HttpSessionEvent se) {
         se.getSession().setAttribute("userId", rnd.nextLong());
@@ -35,5 +35,5 @@ public class NewsRecSessionListener implements HttpSessionListener{
     @Override
     public void sessionDestroyed(HttpSessionEvent se) {
     }
-    
+
 }
