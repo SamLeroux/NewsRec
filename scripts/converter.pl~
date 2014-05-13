@@ -43,11 +43,12 @@ foreach my $user (keys %datapoints){
 	if ( scalar $datapoints{$user} > 0){
 		my $lastClick = $datapoints{$user} -> [0] -> {"timestamp"};
 		foreach my $click (@{$datapoints{$user}}){
-			if ($click -> {"timestamp"} - $lastClick > 1000*60*10){
+			if ($click -> {"timestamp"} - $lastClick > 1000*60*30){
 				$image -> filledRectangle($x,$y, $x+$d, $y+$d/2, $sessionColor);
 				$y += $d/2;
 			}
 			if ($click -> {"type"} eq "trending"){
+				
 				$image -> filledRectangle($x,$y, $x+$d, $y+$d, $trendingColor);
 			}
 			else{
@@ -62,9 +63,14 @@ foreach my $user (keys %datapoints){
 	$x += $d;
 }
 
-binmode STDOUT;
-print $image->png;
+open(PICTURE, ">output.png") or die("Cannot open file for writing");
 
+# Make sure we are writing to a binary stream
+binmode PICTURE;
+
+# Convert the image to PNG and print it to the file PICTURE
+print PICTURE $image->png;
+close PICTURE;
 
 
 

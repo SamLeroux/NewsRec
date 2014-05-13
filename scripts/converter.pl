@@ -43,11 +43,12 @@ foreach my $user (keys %datapoints){
 	if ( scalar $datapoints{$user} > 0){
 		my $lastClick = $datapoints{$user} -> [0] -> {"timestamp"};
 		foreach my $click (@{$datapoints{$user}}){
-			if ($click -> {"timestamp"} - $lastClick > 1000*60*15){
+			if ($click -> {"timestamp"} - $lastClick > 1000*60*30){
 				$image -> filledRectangle($x,$y, $x+$d, $y+$d/2, $sessionColor);
 				$y += $d/2;
 			}
 			if ($click -> {"type"} eq "trending"){
+				
 				$image -> filledRectangle($x,$y, $x+$d, $y+$d, $trendingColor);
 			}
 			else{

@@ -99,7 +99,6 @@ sub uniq {
 #add(uniq(fetch("http://www.hln.be/static/nmc/nmc/frameset/hln_footer/rssFeeds.html?language=nl&pageType=integration&navigationItemId=1441&navigation=rss","(http://www.hln.be/.*?/rss.xml)")));
 
 add(uniq(append("http://news.sky.com",fetch("http://news.sky.com/info/rss","<a href=\"(/feeds/rss/.*?.xml)\">"))));
-add(uniq(fetch("http://www.ndtv.com/rss","<a href=\"(http://feeds.feedburner.com/.*?) *\"")));
 add(("http://www.gadsdentimes.com/rss/articles/NEWS/1017/30"));
 add(uniq(append("http://theweek.com",fetch("https://theweek.com/home/info/rss","<a href=\"(/section/index/.*?.rss)\">"))));
-add(("http://rss.cbc.ca/lineup/topstories.xml","http://rss.cbc.ca/lineup/world.xml","http://rss.cbc.ca/lineup/technology.xml","http://rss.cbc.ca/lineup/sports.xml","http://rss.cbc.ca/lineup/business.xml","http://rss.cbc.ca/lineup/politics.xml"));
+

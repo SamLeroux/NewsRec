@@ -97,8 +97,7 @@ sub uniq {
 #add(uniq(fetch("http://www.demorgen.be/static/nmc/nmc/frameset/dm_footer/rssFeeds.html?language=nl","<a href=\"(http://www.demorgen.be/.*?rss.xml)\"")));
 #add(uniq(fetch("http://diensten.tijd.be/service/rss","link href=\"(http://www.tijd.be/rss/.*?.xml)\"")));
 #add(uniq(fetch("http://www.hln.be/static/nmc/nmc/frameset/hln_footer/rssFeeds.html?language=nl&pageType=integration&navigationItemId=1441&navigation=rss","(http://www.hln.be/.*?/rss.xml)")));
-
-add(uniq(append("http://news.sky.com",fetch("http://news.sky.com/info/rss","<a href=\"(/feeds/rss/.*?.xml)\">"))));
-add(("http://www.gadsdentimes.com/rss/articles/NEWS/1017/30"));
-add(uniq(append("http://theweek.com",fetch("https://theweek.com/home/info/rss","<a href=\"(/section/index/.*?.rss)\">"))));
-
+#add(uniq(append("http://news.sky.com",fetch("http://news.sky.com/info/rss","<a href=\"(/feeds/rss/.*?.xml)\">"))));
+#add(("http://www.gadsdentimes.com/rss/articles/NEWS/1017/30"));
+#add(uniq(append("http://theweek.com",fetch("https://theweek.com/home/info/rss","<a href=\"(/section/index/.*?.rss)\">"))));
+add(("http://www.thefirearmblog.com/blog/feed/"));

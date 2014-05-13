@@ -23,7 +23,14 @@ var clickInArticle = true;
 var lastResults = "AllResults"; // "AllResults" or "RelatedResults"
 var articles = [];
 
+var backendlessAppId = "0F008386-765A-AF0D-FF36-B411C667FB00";
+var backendlessJsId = "D949C164-DF52-D314-FF06-71A543DF2A00";
+var backendlessVersion = "V1";
+
 $(document).ready(function() {
+
+    $.mobile.hashListeningEnabled = false;
+    $.mobile.changePage.defaults.changeHash = false;
 
     $("#articleFrame").attr("src", "about:blank");
     $("#btnBack").on("click", function() {
@@ -42,13 +49,68 @@ $(document).ready(function() {
     });
 
     $("#btnAnon").on("click", function() {
-        closeLoginPopup();
-        $().toastmessage('showToast', {
-            text: "You chose not to register, you will still be able to receive personal recommendations but only on this computer.",
-            sticky: false,
-            type: 'notice',
-            inEffectDuration: 7500
-        });
+        cancelLogin()
+    });
+    $("#btnClosePopup").on("click", function() {
+        cancelLogin()
+    });
+
+    userUtils.init(backendlessAppId, backendlessJsId, backendlessVersion);
+
+    $("#btnRegister").on("click", function() {
+        if ($("#confirmPass").is(':visible')) {
+            $("#confirmPass").hide();
+            $("#btnRegister").text("Register");
+        } else {
+            $("#confirmPass").show();
+            $("#btnRegister").text("Log in");
+        }
+    });
+
+    $("#submit").on("click", function() {
+
+        if (!($("#pass1").val() && $("#name").val())) {
+            $().toastmessage('showToast', {
+                text: "All fields are required",
+                sticky: false,
+                type: 'error',
+                inEffectDuration: 2500
+            });
+        }
+        else {
+            if ($("#confirmPass").is(':visible')) {
+                var user = $("#name").val();
+                var p1 = $("#pass1").val();
+                var p2 = $("#pass2").val();
+
+                if (!p2) {
+                    $().toastmessage('showToast', {
+                        text: "All fields are required",
+                        sticky: false,
+                        type: 'error',
+                        inEffectDuration: 2500
+                    });
+                } else {
+                    if (p1 === p2) {
+                        userUtils.register(user, p1);
+                    } else {
+                        $().toastmessage('showToast', {
+                            text: "Passwords do not match",
+                            sticky: false,
+                            type: 'error',
+                            inEffectDuration: 2500
+                        });
+                    }
+                }
+
+            }
+            else {
+                //login
+                var user = $("#name").val();
+                var pass = $("#pass1").val();
+                userUtils.login(user, pass);
+            }
+        }
     });
 
     $("#results").listview();
@@ -74,12 +136,14 @@ $(document).ready(function() {
     if (!(user === null || !user || user === undefined || user === "undefined")) {
         userUtils.setUserID(user);
         var username = localStorage.getItem("loggedInUserName");
-        $().toastmessage('showToast', {
-            text: "logged in as " + username,
-            sticky: false,
-            type: 'notice',
-            inEffectDuration: 2000
-        });
+        if (username !== null) {
+            $().toastmessage('showToast', {
+                text: "logged in as " + username,
+                sticky: false,
+                type: 'notice',
+                inEffectDuration: 2000
+            });
+        }
     } else {
         btnLoginClicked();
     }
@@ -236,6 +300,7 @@ function displayArticle(url) {
         $("#resultsDiv").hide();
         $("#articleDiv").show();
         $("#btnBack").show();
+        $("#btnRefresh").hide();
         canFetch = false;
     }
 
@@ -411,10 +476,21 @@ function btnLoginClicked() {
     $("#pass2").empty();
     $("#confirmPass").hide();
     $("#btnRegister").text("Register");
-    $("#loginDialog").popup({ history: false });
+    $("#loginDialog").popup({history: false});
     $("#loginDialog").popup('open');
 }
 
-function closeLoginPopup() {
+function cancelLogin() {
     $('#loginDialog').popup('close');
+    var user = localStorage.getItem("userid");
+    if (user === null) {
+        $().toastmessage('showToast', {
+            text: "You chose not to register, you will still be able to receive personal recommendations but only on this computer.",
+            sticky: false,
+            type: 'notice',
+            inEffectDuration: 7500
+        });
+        userUtils.getUserID();
+    }
+
 }
