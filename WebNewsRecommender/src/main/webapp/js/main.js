@@ -27,6 +27,8 @@ var backendlessAppId = "0F008386-765A-AF0D-FF36-B411C667FB00";
 var backendlessJsId = "D949C164-DF52-D314-FF06-71A543DF2A00";
 var backendlessVersion = "V1";
 
+var timer = null;
+
 $(document).ready(function() {
 
     $.mobile.hashListeningEnabled = false;
@@ -49,10 +51,10 @@ $(document).ready(function() {
     });
 
     $("#btnAnon").on("click", function() {
-        cancelLogin()
+        cancelLogin();
     });
     $("#btnClosePopup").on("click", function() {
-        cancelLogin()
+        cancelLogin();
     });
 
     userUtils.init(backendlessAppId, backendlessJsId, backendlessVersion);
@@ -319,9 +321,8 @@ function displayArticle(url) {
 
 }
 
-
-function ratingClick(event, id, recommendedBy) {
-    event.stopPropagation();
+function sendRating(id, recommendedBy){
+    console.log("send rating: "+new Date().getTime());
     $.ajax({
         type: 'POST',
         url: "view.do?itemId=" + id + "&recommendedBy=" + recommendedBy,
@@ -333,7 +334,19 @@ function ratingClick(event, id, recommendedBy) {
             console.log("error recording view");
         }
     });
+}
 
+function ratingClick(event, id, recommendedBy) {
+    event.stopPropagation();
+    if (timer !== null){
+        window.clearTimeout(timer);
+        timer = null;
+        console.log("cancel rating");
+    }
+    console.log("schedule rating: "+new Date().getTime());
+    timer = window.setTimeout(function(){        
+        sendRating(id, recommendedBy);
+    },10000);
 }
 
 function urlViewed(url) {
@@ -395,6 +408,13 @@ function recommendationsFetchError(xhr, errorType, exception) {
 
 function btnBackClicked() {
     $.mobile.loading('hide');
+    
+    if (timer !== null){
+        window.clearTimeout(timer);
+        timer = null;
+        console.log("cancel rating");
+    }
+    
     if (lastResults === "AllResults") {
         $("#resultsDiv").show();
         $("#btnBack").hide();
@@ -432,7 +452,13 @@ function toDateString(date) {
 
         if (age === 0) {
             age = today.getMinutes() - date.getMinutes();
-            suffix = " minutes ago";
+            if (age < 20){
+                age = "";
+                suffix = "just now";
+            }
+            else{
+                suffix = " minutes ago";
+            }
         }
         else if (age === 1) {
             suffix = " hour ago";
