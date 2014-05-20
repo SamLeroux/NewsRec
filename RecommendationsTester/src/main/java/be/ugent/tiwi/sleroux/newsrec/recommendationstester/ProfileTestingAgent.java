@@ -70,7 +70,7 @@ public class ProfileTestingAgent implements ITestingAgent {
                 if (stop) {
                     relevant++;
                     if (!seen.contains(cluster.getRepresentative().getId())) {
-                        access.view(cluster.getRepresentative().getId(), cluster.getRepresentative().getDocNr());
+                        access.view(cluster.getRepresentative().getId(), cluster.getRepresentative().getDocNr(), cluster.getRepresentative().getRecommendedBy());
                         seen.add(cluster.getRepresentative().getId());
                         relevantNotYetSeen++;
                     }

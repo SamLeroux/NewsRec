@@ -38,9 +38,9 @@ public class RecommenderAccess {
             Logger.getLogger(RecommenderAccess.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    public void view(String id, int docNr) {
+    public void view(String id, int docNr, String recommendedBy) {
         try {
-            doGet(baseUrl+"view.do?itemId=" + id + "&docNr=" + docNr);
+            doGet(baseUrl+"view.do?itemId=" + id + "&docNr=" + docNr+"&recommendedBy="+recommendedBy);
         } catch (IOException ex) {
             Logger.getLogger(RecommenderAccess.class.getName()).log(Level.SEVERE, null, ex);
         }
